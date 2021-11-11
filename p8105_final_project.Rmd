@@ -1,0 +1,6 @@
+---
+title: "p8105_final_project"
+author: "Shaina Mackin"
+date: "11/11/2021"
+output: html_document
+---
