@@ -8,3 +8,7 @@ output: html_document
 ```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
 ```
+
+```{r read, echo = FALSE, message = FALSE}
+data = read.table("data/atusact_2020.dat", header = TRUE, sep=",")
+```
