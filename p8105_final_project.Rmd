@@ -5,6 +5,14 @@ date: "11/11/2021"
 output: github_document
 ---
 
+The group members (names and UNIs): Shaina Mackin (smm2350), Dee Wang (dtw2127), Xin Fang (xf2226), Sandya Ganesh (sg3891)
+The tentative project title:
+The motivation for this project:
+The intended final products:
+The anticipated data sources:
+The planned analyses / visualizations / coding challenges:
+The planned timeline:
+
 ```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
 ```
