@@ -1,6 +1,10 @@
 ---
 title: "p8105_final_project"
-author: "Shaina Mackin"
+author: "Shaina Mackin, Dee Wang, Xin Fang, Sandya Ganesh"
 date: "11/11/2021"
 output: html_document
 ---
+
+```{r setup, echo = FALSE, message = FALSE}
+library(tidyverse)
+```
