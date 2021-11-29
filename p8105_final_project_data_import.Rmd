@@ -23,7 +23,10 @@ activity_summary_2019 = read.table("data/atussum_2019.dat", header = TRUE, sep =
 activity_summary_2020 = read.table("data/atussum_2020.dat", header = TRUE, sep = ",")
 ```
 
-Look into the data
+Look into the data and ensure coding has been done correctly
 ```{r}
 head(activity_2019)
+
+unique(resp_2019$TEHRUSLT) # -1 might be incorrect coding to exclude for hours worked
+unique(roster_2019$TESEX)
 ```
