@@ -6,5 +6,14 @@ library(tidyverse)
 ```
 
 ``` r
-data = read.table("data/atusact_2020.dat", header = TRUE, sep = ",")
+resp__2019 = read.table("data/atusresp_2019.dat", header = TRUE, sep = ",")
+resp__2020 = read.table("data/atusresp_2020.dat", header = TRUE, sep = ",")
+roster__2019 = read.table("data/atusrost_2019.dat", header = TRUE, sep = ",")
+roster__2020 = read.table("data/atusrost_2020.dat", header = TRUE, sep = ",")
+roster__2019 = read.table("data/atusrost_2019.dat", header = TRUE, sep = ",")
+roster__2020 = read.table("data/atusrost_2020.dat", header = TRUE, sep = ",")
+who_2019 = read.table("data/atuswho_2019.dat", header = TRUE, sep = ",")
+who_2020 = read.table("data/atuswho_2020.dat", header = TRUE, sep = ",")
+activity_summary_2019 = read.table("data/atussum_2019.dat", header = TRUE, sep = ",")
+activity_summary_2020 = read.table("data/atussum_2020.dat", header = TRUE, sep = ",")
 ```
