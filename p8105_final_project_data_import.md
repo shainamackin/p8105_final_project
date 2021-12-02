@@ -20,6 +20,8 @@ activity_2019 = read.table("data/atusact_2019.dat", header = TRUE, sep = ",")
 activity_2020 = read.table("data/atusact_2020.dat", header = TRUE, sep = ",")
 activity_summary_2019 = read.table("data/atussum_2019.dat", header = TRUE, sep = ",")
 activity_summary_2020 = read.table("data/atussum_2020.dat", header = TRUE, sep = ",")
+cps_2019 = read.table("data/atuscps_2019.dat", header = TRUE, sep = ",")
+cps_2020 = read.table("data/atuscps_2020.dat", header = TRUE, sep = ",")
 ```
 
 Look into the data and ensure coding has been done correctly
@@ -1615,4 +1617,54 @@ activity_codes %in% c("Travel related to personal care",
 "Security procedures related to traveling, n.e.c.*",
 "Traveling, n.e.c.*") ~ "traveling"
 ))
+```
+
+Let’s read in and tidy the cps files that have the geographic
+information. First we’ll select the appropriate columns from cps and
+then rename the columns to be more useful. Then we’ll recode the column
+values.
+
+``` r
+cps_2020_clean = cps_2020 %>% 
+  select(TUCASEID:GTCO) %>% 
+  rename(division = GEDIV, 
+         region = GEREG, 
+         state = GESTFIPS, 
+         metro_area = GTCBSA, 
+         metro_status = GTMETSTA, 
+         county = GTCO) %>% 
+  mutate(state = recode(state,
+`1 ` = "AL", `17`= "IL", `30` = "MT", `44` = "RI",
+`2 ` = "AK", `18`= "IN", `31` = "NE", `45` = "SC",
+`4 ` = "AZ", `19`= "IA", `32` = "NV", `46` = "SD",
+`5 ` = "AR", `20`= "KS", `33` = "NH", `47` = "TN",
+`6 ` = "CA", `21`= "KY", `34` = "NJ", `48` = "TX",
+`8 ` = "CO", `22`= "LA", `35` = "NM", `49` = "UT",
+`9 ` = "CT", `23`= "ME", `36` = "NY", `50` = "VT",
+`10` = "DE", `24`= "MD", `37` = "NC", `51` = "VA",
+`11` = "DC", `25`= "MA", `38` = "ND", `53` = "WA",
+`12` = "FL", `26`= "MI", `39` = "OH", `54` = "WV",
+`13` = "GA", `27`= "MN", `40` = "OK", `55` = "WI",
+`15` = "HI", `28`= "MS", `41` = "OR", `56` = "WY",
+`16` = "ID", `29`= "MO", `42` = "PA"), 
+        region = recode(region, 
+                        `1` = "Northeast", 
+                        `2` = "Midwest", 
+                        `3` = "South", 
+                        `4` = "West"), 
+        division = recode(division, 
+                          `1` = "New England",
+                          `2` = "Middle Atlantic",
+                          `3` = "East North Central",
+                          `4` = "West North Central",
+                          `5` = "South Atlantic",
+                          `6` = "East South Central",
+                          `7` = "West South Central",
+                          `8` = "Mountain",
+                          `9` = "Pacific"
+                          ), 
+        metro_status = recode(metro_status, 
+                            `1` = "metropolitan", 
+                            `2` = "non-metropolitan", 
+                            `3` = "not identified")) 
 ```
