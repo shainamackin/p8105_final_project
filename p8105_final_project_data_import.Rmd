@@ -1191,7 +1191,7 @@ activity_summary_2019_long =
 Let's categorize 2019 activities. 
 
 ```{r}
-activity_summary_2019_categorized = ativity_summary_2019_long %>%
+activity_summary_2019_categorized = activity_summary_2019_long %>%
   mutate(category = case_when(
     activity_codes %in% c("Sleeping", 
 "Sleeplessness",
