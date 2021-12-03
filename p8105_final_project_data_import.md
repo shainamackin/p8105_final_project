@@ -1640,7 +1640,7 @@ activity_codes %in% c("Travel related to personal care",
 Bind the 2019 and 2020 summary files.
 
 ``` r
-activity_summary_combined = rbind(activity_summary_2019_long, activity_summary_2020_long)
+activity_summary_combined = rbind(activity_summary_2019_categorized, activity_summary_2020_categorized)
 ```
 
 Let’s read in and tidy the cps files that have the geographic
@@ -6341,18 +6341,18 @@ fit %>%
   broom::glance()
 ```
 
-    ## # A tibble: 1 × 12
+    ## # A tibble: 1 x 12
     ##   r.squared adj.r.squared sigma statistic    p.value    df  logLik    AIC    BIC
     ##       <dbl>         <dbl> <dbl>     <dbl>      <dbl> <dbl>   <dbl>  <dbl>  <dbl>
     ## 1   0.00173       0.00168  46.0      31.7    1.79e-8     1 -96027. 1.92e5 1.92e5
-    ## # … with 3 more variables: deviance <dbl>, df.residual <int>, nobs <int>
+    ## # ... with 3 more variables: deviance <dbl>, df.residual <int>, nobs <int>
 
 ``` r
 fit %>% 
   broom::tidy()
 ```
 
-    ## # A tibble: 2 × 5
+    ## # A tibble: 2 x 5
     ##   term        estimate std.error statistic  p.value
     ##   <chr>          <dbl>     <dbl>     <dbl>    <dbl>
     ## 1 (Intercept)   16.0      1.01       15.8  3.65e-56

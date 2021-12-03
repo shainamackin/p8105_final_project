@@ -1599,7 +1599,7 @@ activity_codes %in% c("Travel related to personal care",
 Bind the 2019 and 2020 summary files. 
 
 ```{r}
-activity_summary_combined = rbind(activity_summary_2019_long, activity_summary_2020_long)
+activity_summary_combined = rbind(activity_summary_2019_categorized, activity_summary_2020_categorized)
 ```
 
 Let's read in and tidy the cps files that have the geographic information. First we'll select the appropriate columns from cps and then rename the columns to be more useful. Then we'll recode the column values. 
