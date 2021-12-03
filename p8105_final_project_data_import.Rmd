@@ -1667,25 +1667,62 @@ Merge the cps and summary datafiles.
 cps_summary_merged = left_join(activity_summary_combined, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
 ```
 
-Regression analysis with age and time spent on leisure activities
+Regression analysis with race and time spent on leisure activities
 
 ```{r}
-cps_summary_leisure = cps_summary_merged %>% 
-  filter(activity_codes == "Computer use for leisure (exc. Games)")
+
+cps_summary_leisure_2019 = cps_summary_merged %>% 
+  filter(category == "leisure", year == "2019") %>% 
+  mutate(
+    race = recode(race, 
+        '1' = 'White only',
+        '2' = 'Black only',
+        '3' = 'American Indian, Alaskan Native only',
+        '4' = 'Asian only',
+        '5' = 'Hawaiian/Pacific Islander only',
+        '6' = 'White-Black',
+        '7' = 'White-American Indian',
+        '8' = 'White-Asian',
+        '9' = 'White-Hawaiian',
+        '10' = 'Black-American Indian',
+        '11' = 'Black-Asian',
+        '12' = 'Black-Hawaiian',
+        '13' = 'American Indian-Asian',
+        '14' = 'American Indian-Hawaiian',
+        '15' = 'Asian-Hawaiian',
+        '16' = 'White-Black-American Indian',
+        '17' = 'White-Black-Asian',
+        '18' = 'White-Black-Hawaiian',
+        '19' = 'White-American Indian-Asian',
+        '20' = 'White-American Indian-Hawaiian',
+        '21' = 'White-Asian-Hawaiian',
+        '22' = 'Black-American Indian-Asian',
+        '23' = 'White-Black-American Indian-Asian',
+        '24' = 'White-American Indian-Asian-Hawaiian',
+        '25' = 'Other 3 race combinations',
+        '26' = 'Other 4 and 5 race combinations',
+    ))
+
+cps_summary_leisure_2020 = cps_summary_merged %>% 
+  filter(category == "leisure", year == "2020")
 ```
 
 ```{r}
-fit = lm(total_minutes ~ age, data = cps_summary_leisure)
+fit_leisure_2019 = lm(total_minutes ~ race, data = cps_summary_leisure_2019)
 
-summary(fit)
-summary(fit)$coef
-coef(fit)
-fitted.values(fit)
+fit_leisure_2019 %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>% 
+  knitr::kable(digits = 3)
 
-fit %>% 
-  broom::glance()
+```
 
-fit %>% 
-  broom::tidy()
+```{r}
+fit_leisure_2020 = lm(total_minutes ~ age, data = cps_summary_leisure_2020)
+
+fit_leisure_2020 %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>% 
+  knitr::kable(digits = 3)
 
 ```
