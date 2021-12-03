@@ -1709,3 +1709,13 @@ Merge the cps and summary datafiles.
 ``` r
 cps_summary_merged = left_join(activity_summary_combined, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
 ```
+
+Regression analysis with age and time spent on leisure activities
+
+``` r
+cps_summary_leisure = cps_summary_merged %>% 
+  filter(activity_codes == "Computer use for leisure (exc. Games)")
+    
+
+fit = lm(total_minutes ~ age, data = cps_summary_leisure)
+```
