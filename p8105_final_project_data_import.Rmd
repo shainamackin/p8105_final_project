@@ -25,6 +25,8 @@ cps_2019 = read.table("data/atuscps_2019.dat", header = TRUE, sep = ",")
 cps_2020 = read.table("data/atuscps_2020.dat", header = TRUE, sep = ",")
 ```
 
+The activity summary files contains information about total minutes spent on each activity (I believe respondents were asked to fill out a time diary for one day of the week). There is only one respondent per household. The cps datasets contains geographic information as well as information about each household and each respondent in the household. 
+
 Look into the data and ensure coding has been done correctly
 ```{r}
 head(activity_2019)
@@ -38,7 +40,12 @@ activity_summary_2020_long =
   pivot_longer(data = activity_summary_2020, 
                cols = t010101:t500107, 
                names_to = "activity_codes", 
-               values_to = "total minutes") %>%
+               values_to = "total_minutes") %>%
+  select(TUCASEID, PTDTRACE, TEAGE, TELFS, activity_codes, total_minutes) %>% #selected mostly demographic variables 
+  mutate(year = 2020) %>% 
+  rename(race = PTDTRACE, 
+         labor_force_status = TELFS, 
+         age = TEAGE) %>%
   mutate(activity_codes = recode(activity_codes, t010101 = "Sleeping",
 t010102 = "Sleeplessness",
 t010201 = "Washing, dressing and grooming oneself",
@@ -798,7 +805,12 @@ activity_summary_2019_long =
   pivot_longer(data = activity_summary_2019, 
                cols = t010101:t500107, 
                names_to = "activity_codes", 
-               values_to = "total minutes") %>%
+               values_to = "total_minutes") %>%
+  select(TUCASEID, PTDTRACE, TEAGE, TELFS, activity_codes, total_minutes) %>% #selected mostly demographic variables 
+  mutate(year = 2019) %>% 
+  rename(race = PTDTRACE, 
+         labor_force_status = TELFS, 
+         age = TEAGE) %>%
   mutate(activity_codes = recode(activity_codes, 
                                  t010101 = "Sleeping", 
                                  t010102 = "Sleeplessness",
@@ -1196,49 +1208,49 @@ Let's categorize 2019 activities.
 activity_summary_2019_categorized = activity_summary_2019_long %>%
   mutate(category = case_when(
     activity_codes %in% c("Sleeping", 
-"Sleeplessness",
-"Using pet services",
-"Washing, dressing and grooming oneself",
-"Grooming, n.e.c.*",
-"Health-related self care",
-"Self care, n.e.c.*",
-"Personal/Private activities",
-"Personal activities, n.e.c.*",
-"Personal emergencies",
-"Personal care, n.e.c.*") ~ "personal_care", 
-activity_codes %in% c("Interior cleaning",
-"Laundry",
-"Sewing, repairing, and maintaining textiles",
-"Storing interior hh items, inc. food",
-"Housework, n.e.c.*",
-"Food and drink preparation",
-"Food presentation",
-"Kitchen and food clean-up",
-"Food and drink prep, presentation, and clean-up, n.e.c.*",
-"Interior arrangement, decoration, and repairs",
-"Building and repairing furniture",
-"Heating and cooling",
-"Interior maintenance, repair, and decoration, n.e.c.*",
-"Exterior cleaning",
-"Exterior repair, improvements, and decoration",
-"Exterior maintenance, repair and decoration, n.e.c.*",
-"Lawn, garden, and houseplant care",
-"Ponds, pools, and hot tubs",
-"Lawn and garden, n.e.c.*",
-"Care for animals and pets (not veterinary care)",
-"Walking / exercising / playing with animals",
-"Pet and animal care, n.e.c.*",
-"Vehicle repair and maintenance (by self)",
-"Vehicles, n.e.c.*",
-"Appliance, tool, and toy set-up, repair, and maintenance (by self)",
-"Appliances and tools, n.e.c.*",
-"Financial management",
-"Household and personal organization and planning",
-"HH and personal mail and messages (except e-mail)",
-"HH and personal e-mail and messages",
-"Home security",
-"Household management, n.e.c.*",
-"Household activities, n.e.c.*") ~ "household", 
+                          "Sleeplessness",
+                          "Using pet services",
+                          "Washing, dressing and grooming oneself",
+                          "Grooming, n.e.c.*",
+                          "Health-related self care",
+                          "Self care, n.e.c.*",
+                          "Personal/Private activities",
+                          "Personal activities, n.e.c.*",
+                          "Personal emergencies",
+                          "Personal care, n.e.c.*") ~ "personal_care",
+    activity_codes %in% c("Interior cleaning",
+                            "Laundry",
+                            "Sewing, repairing, and maintaining textiles",
+                            "Storing interior hh items, inc. food",
+                            "Housework, n.e.c.*",
+                            "Food and drink preparation",
+                            "Food presentation",
+                            "Kitchen and food clean-up",
+                            "Food and drink prep, presentation, and clean-up, n.e.c.*",
+                            "Interior arrangement, decoration, and repairs",
+                            "Building and repairing furniture",
+                            "Heating and cooling",
+                            "Interior maintenance, repair, and decoration, n.e.c.*",
+                            "Exterior cleaning",
+                            "Exterior repair, improvements, and decoration",
+                            "Exterior maintenance, repair and decoration, n.e.c.*",
+                            "Lawn, garden, and houseplant care",
+                            "Ponds, pools, and hot tubs",
+                            "Lawn and garden, n.e.c.*",
+                            "Care for animals and pets (not veterinary care)",
+                            "Walking / exercising / playing with animals",
+                            "Pet and animal care, n.e.c.*",
+                            "Vehicle repair and maintenance (by self)",
+                            "Vehicles, n.e.c.*",
+                            "Appliance, tool, and toy set-up, repair, and maintenance (by self)",
+                            "Appliances and tools, n.e.c.*",
+                            "Financial management",
+                            "Household and personal organization and planning",
+                            "HH and personal mail and messages (except e-mail)",
+                            "HH and personal e-mail and messages",
+                            "Home security",
+                            "Household management, n.e.c.*",
+                            "Household activities, n.e.c.*") ~ "household", 
 activity_codes %in% c("Physical care for hh children",
 "Reading to/with hh children",
 "Playing with hh children, not sports",
@@ -1581,17 +1593,34 @@ activity_codes %in% c("Travel related to personal care",
 
 ```
 
+
+Bind the 2019 and 2020 summary files. 
+
+```{r}
+activity_summary_combined = rbind(activity_summary_2019_long, activity_summary_2020_long)
+```
+
 Let's read in and tidy the cps files that have the geographic information. First we'll select the appropriate columns from cps and then rename the columns to be more useful. Then we'll recode the column values. 
 
 ```{r}
-cps_2020_clean = cps_2020 %>% 
-  select(TUCASEID:GTCO) %>% 
+cps_2020_sub = cps_2020 %>% #select geographic variables
+  select(TUCASEID:GTCO, PRTAGE) %>% 
+  mutate(year = 2020)
+
+cps_2019_sub = cps_2019 %>% #select geographic variables
+  select(TUCASEID:GTCO, PRTAGE) %>% 
+  mutate(year = 2019)
+
+#stack the 2019 and 2020 cps datasets
+
+cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>% 
   rename(division = GEDIV, 
          region = GEREG, 
          state = GESTFIPS, 
          metro_area = GTCBSA, 
          metro_status = GTMETSTA, 
-         county = GTCO) %>% 
+         county = GTCO,
+         age = PRTAGE) %>% 
   mutate(state = recode(state,
 `1 ` = "AL", `17`= "IL", `30` = "MT", `44` = "RI",
 `2 ` = "AK", `18`= "IN", `31` = "NE", `45` = "SC",
@@ -1628,3 +1657,10 @@ cps_2020_clean = cps_2020 %>%
                             `3` = "not identified")) 
 
 ```
+
+Merge the cps and summary datafiles. 
+
+```{r}
+cps_summary_merged = left_join(activity_summary_combined, cps_combined, by = c("TUCASEID", "age", "year"))
+```
+
