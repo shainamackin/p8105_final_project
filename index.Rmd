@@ -1,0 +1,37 @@
+---
+title: "Only Time Will Tell"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    source_code: embed 
+---
+``` {r include = FALSE}
+library(tidyverse)
+library(rvest)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+
+```
+
+
+![](https://upload.wikimedia.org/wikipedia/commons/f/f4/Analog_clock_animation.gif) 
+
+<p>&nbsp;</p>
+<p align="center">
+
+# Project Motivation
+COVID-19 has drastically impacted the ways in which we spend our time. During the height of the pandemic, stay-at-home orders, lockdown measures, and social distancing norms severely influenced daily activities. We were interested in exploring these pandemic impacts on time use and analyzing how they may differ based on social and demographic characteristics across the United States.
+<p>&nbsp;</p>
+# The Data
+This project uses publicly available data from the U.S. Bureau of Labor Statistics’ [American Time Use Survey (ATUS)](https://www.bls.gov/tus/datafiles-2020.htm) to investigate time use trends across the U.S. between 2019 and 2020.  
+<p>&nbsp;</p>
+
+
