@@ -87,11 +87,12 @@ activity_summary_2020_long =
                cols = t010101:t500107, 
                names_to = "activity_codes", 
                values_to = "total_minutes") %>%
-  select(TUCASEID, PTDTRACE, TEAGE, TELFS, activity_codes, total_minutes) %>% #selected mostly demographic variables 
+  select(TUCASEID, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %>% #selected mostly demographic variables 
   mutate(year = 2020) %>% 
   rename(race = PTDTRACE, 
          labor_force_status = TELFS, 
-         age = TEAGE) %>%
+         age = TEAGE, 
+         sex = TESEX) %>%
   mutate(activity_codes = recode(activity_codes, t010101 = "Sleeping",
 t010102 = "Sleeplessness",
 t010201 = "Washing, dressing and grooming oneself",
@@ -851,11 +852,12 @@ activity_summary_2019_long =
                cols = t010101:t500107, 
                names_to = "activity_codes", 
                values_to = "total_minutes") %>%
-  select(TUCASEID, PTDTRACE, TEAGE, TELFS, activity_codes, total_minutes) %>% #selected mostly demographic variables 
+  select(TUCASEID, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %>% #selected mostly demographic variables 
   mutate(year = 2019) %>% 
   rename(race = PTDTRACE, 
          labor_force_status = TELFS, 
-         age = TEAGE) %>%
+         age = TEAGE, 
+         sex = TESEX) %>%
   mutate(activity_codes = recode(activity_codes, 
                                  t010101 = "Sleeping", 
                                  t010102 = "Sleeplessness",
@@ -1648,11 +1650,11 @@ values.
 
 ``` r
 cps_2020_sub = cps_2020 %>% #select geographic variables
-  select(TUCASEID:GTCO, PRTAGE) %>% 
+  select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
   mutate(year = 2020)
 
 cps_2019_sub = cps_2019 %>% #select geographic variables
-  select(TUCASEID:GTCO, PRTAGE) %>% 
+  select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
   mutate(year = 2019)
 
 #stack the 2019 and 2020 cps datasets
@@ -1664,7 +1666,8 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
          metro_area = GTCBSA, 
          metro_status = GTMETSTA, 
          county = GTCO,
-         age = PRTAGE) %>% 
+         age = PRTAGE, 
+         sex = PESEX) %>% 
   mutate(state = recode(state,
 `1 ` = "AL", `17`= "IL", `30` = "MT", `44` = "RI",
 `2 ` = "AK", `18`= "IN", `31` = "NE", `45` = "SC",
@@ -1704,5 +1707,5 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
 Merge the cps and summary datafiles.
 
 ``` r
-cps_summary_merged = left_join(activity_summary_combined, cps_combined, by = c("TUCASEID", "age", "year"))
+cps_summary_merged = left_join(activity_summary_combined, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
 ```
