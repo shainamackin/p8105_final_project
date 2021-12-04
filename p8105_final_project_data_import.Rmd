@@ -41,9 +41,10 @@ activity_summary_2020_long =
                cols = t010101:t500107, 
                names_to = "activity_codes", 
                values_to = "total_minutes") %>%
-  select(TUCASEID, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %>% #selected mostly demographic variables 
+  select(TUCASEID, TU20FWGT, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %>% #selected mostly demographic variables 
   mutate(year = 2020) %>% 
-  rename(race = PTDTRACE, 
+  rename(weight = TU20FWGT, 
+         race = PTDTRACE, 
          labor_force_status = TELFS, 
          age = TEAGE, 
          sex = TESEX) %>%
@@ -430,8 +431,8 @@ Let's categorize some of the activities for the 2020 data.
 activity_summary_2020_categorized = activity_summary_2020_long %>%
   mutate(category = case_when(
     activity_codes %in% c("Sleeping",
-                               "Sleeplessness",
-                               "Washing, dressing and grooming oneself",
+                               "Sleeplessness") ~ "sleep",
+    activity_codes %in% c("Washing, dressing and grooming oneself",
                                "Grooming, n.e.c.*",
                                "Health-related self care",
                                "Self care, n.e.c.*",
@@ -807,9 +808,10 @@ activity_summary_2019_long =
                cols = t010101:t500107, 
                names_to = "activity_codes", 
                values_to = "total_minutes") %>%
-  select(TUCASEID, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %>% #selected mostly demographic variables 
+  select(TUCASEID, TUFINLWGT, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %>% #selected mostly demographic variables 
   mutate(year = 2019) %>% 
-  rename(race = PTDTRACE, 
+  rename(weight = TUFINLWGT,
+         race = PTDTRACE, 
          labor_force_status = TELFS, 
          age = TEAGE, 
          sex = TESEX) %>%
@@ -1210,8 +1212,8 @@ Let's categorize 2019 activities.
 activity_summary_2019_categorized = activity_summary_2019_long %>%
   mutate(category = case_when(
     activity_codes %in% c("Sleeping", 
-                          "Sleeplessness",
-                          "Using pet services",
+                          "Sleeplessness") ~ "sleep", 
+    activity_codes %in% c("Using pet services",
                           "Washing, dressing and grooming oneself",
                           "Grooming, n.e.c.*",
                           "Health-related self care",
@@ -1667,6 +1669,75 @@ Merge the cps and summary datafiles.
 cps_summary_merged = left_join(activity_summary_combined, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
 ```
 
+Let's calculate average hours per day spent on leisure activities. We will sum the product of the total minutes spent on leisure activities and the weight and divide this by the sum of the weights. Average leisure hours per day = sum(minutes spent on leisure * weight)/sum of weights.
+
+```{r}
+leisure_data_2019 = 
+  cps_summary_merged %>% 
+  filter(category == "leisure", 
+         year == 2019) %>% 
+  mutate(time_weight_product = total_minutes*weight) 
+
+avg_daily_leisure_2019 = sum(leisure_data_2019$time_weight_product)/
+  sum(leisure_data_2019$weight)
+
+```
+The average number of hours spent on leisure activities in 2019 was `r avg_daily_leisure_2019`.
+
+```{r}
+leisure_data_2020 = 
+  cps_summary_merged %>% 
+  filter(category == "leisure", 
+         year == 2020) %>% 
+  mutate(time_weight_product = total_minutes*weight) 
+
+avg_daily_leisure_2020 = sum(leisure_data_2020$time_weight_product)/
+  sum(leisure_data_2020$weight)
+```
+
+The average number of hours spent on leisure activities in 2020 was `r avg_daily_leisure_2020`.
+
+Let's write a function to do the same calculations for the other categories of activities. 
+
+```{r}
+daily_time = function(catgry, yr){
+  data = cps_summary_merged %>% 
+  filter(category == catgry, 
+         year == yr) %>% 
+  mutate(time_weight_product = total_minutes*weight)
+  
+  avg_daily = sum(data$time_weight_product)/
+  sum(data$weight)
+  
+  print(avg_daily)
+
+}
+
+daily_time("leisure", 2019)
+daily_time("work", 2019)
+daily_time("education", 2019)
+daily_time("exercise", 2019)
+
+```
+
+
+
+Let's see what the average number of hours spent on leisure activities is by state.
+
+```{r}
+leisure_data_state =
+  cps_summary_merged %>% 
+  filter(category == "leisure") %>% 
+  mutate(time_weight_product = total_minutes*weight) %>% 
+  group_by(state, year) %>% 
+  summarize(avg_leisure_time = sum(time_weight_product)/sum(weight), 
+            n = n()
+            )
+```
+
+
+## Regression
+
 Regression analysis with race and time spent on leisure activities
 
 ```{r}
@@ -1706,6 +1777,9 @@ cps_summary_leisure_2019 = cps_summary_merged %>%
 cps_summary_leisure_2020 = cps_summary_merged %>% 
   filter(category == "leisure", year == "2020")
 ```
+
+
+
 
 ```{r}
 fit_leisure_2019 = lm(total_minutes ~ race, data = cps_summary_leisure_2019)
