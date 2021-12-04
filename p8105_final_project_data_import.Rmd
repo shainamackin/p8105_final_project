@@ -1660,7 +1660,6 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
                             `1` = "metropolitan", 
                             `2` = "non-metropolitan", 
                             `3` = "not identified")) 
-
 ```
 
 Merge the cps and summary datafiles. 
@@ -1678,7 +1677,7 @@ leisure_data_2019 =
          year == 2019) %>% 
   mutate(time_weight_product = total_minutes*weight) 
 
-avg_daily_leisure_2019 = sum(leisure_data_2019$time_weight_product)/
+avg_daily_leisure_2019 = sum(leisure_data_2019$time_weight_product) /
   sum(leisure_data_2019$weight)
 
 ```
@@ -1691,7 +1690,7 @@ leisure_data_2020 =
          year == 2020) %>% 
   mutate(time_weight_product = total_minutes*weight) 
 
-avg_daily_leisure_2020 = sum(leisure_data_2020$time_weight_product)/
+avg_daily_leisure_2020 = sum(leisure_data_2020$time_weight_product) /
   sum(leisure_data_2020$weight)
 ```
 
@@ -1706,7 +1705,7 @@ daily_time = function(catgry, yr){
          year == yr) %>% 
   mutate(time_weight_product = total_minutes*weight)
   
-  avg_daily = sum(data$time_weight_product)/
+  avg_daily = sum(data$time_weight_product) /
   sum(data$weight)
   
   print(avg_daily)
@@ -1720,19 +1719,34 @@ daily_time("exercise", 2019)
 
 ```
 
-
-
 Let's see what the average number of hours spent on leisure activities is by state.
 
 ```{r}
 leisure_data_state =
   cps_summary_merged %>% 
   filter(category == "leisure") %>% 
-  mutate(time_weight_product = total_minutes*weight) %>% 
+  mutate(time_weight_product = total_minutes*weight) %>%  
   group_by(state, year) %>% 
   summarize(avg_leisure_time = sum(time_weight_product)/sum(weight), 
             n = n()
             )
+```
+
+Map the average number of hours spent on leisure activities is by state.
+```{r}
+library(usmap)
+library(ggplot2)
+
+plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red") + 
+  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
+  theme(legend.position = "right") +
+  facet_wrap(~ year)
+```
+
+## Plotly 
+
+```{r}
+
 ```
 
 
