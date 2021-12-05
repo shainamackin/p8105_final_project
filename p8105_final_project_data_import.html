@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>P8105 Final Project</title>
+
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
+<link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">Only Time Will Tell</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        <li>
+  <a href="exporatory_analyses.html">Exploratory Analyses</a>
+</li>
+<li>
+  <a href="statistical_analyses.html">Statistical Analyses</a>
+</li>
+<li>
+  <a href="project_report.html">Project Report</a>
+</li>
+<li>
+  <a href="mailto:&lt;shainamackin@gmail.com&gt;">
+    <span class="fa fa-envelope fa-lg"></span>
+     
+  </a>
+</li>
+<li>
+  <a href="http://github.com/shainamackin/">
+    <span class="fa fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">P8105 Final Project</h1>
+
+</div>
+
+
+<pre class="r"><code>library(tidyverse)
+options(scipen = 50)
+knitr::opts_chunk$set(echo = TRUE)</code></pre>
+<div id="read-in-the-data" class="section level2">
+<h2>Read in the data</h2>
+<pre class="r"><code>resp_2019 = read.table(&quot;data/atusresp_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+resp_2020 = read.table(&quot;data/atusresp_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+roster_2019 = read.table(&quot;data/atusrost_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+roster_2020 = read.table(&quot;data/atusrost_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+who_2019 = read.table(&quot;data/atuswho_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+who_2020 = read.table(&quot;data/atuswho_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+activity_2019 = read.table(&quot;data/atusact_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+activity_2020 = read.table(&quot;data/atusact_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+activity_summary_2019 = read.table(&quot;data/atussum_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+activity_summary_2020 = read.table(&quot;data/atussum_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+cps_2019 = read.table(&quot;data/atuscps_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+cps_2020 = read.table(&quot;data/atuscps_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)</code></pre>
+<p>The activity summary files contains information about total minutes spent on each activity (I believe respondents were asked to fill out a time diary for one day of the week). There is only one respondent per household. The cps datasets contains geographic information as well as information about each household and each respondent in the household.</p>
+<p>Look into the data and ensure coding has been done correctly</p>
+<pre class="r"><code>head(activity_2019)</code></pre>
+<pre><code>##         TUCASEID TUACTIVITY_N TEWHERE TRTCCTOT_LN TRTCC_LN TRTCOC_LN TRTEC_LN
+## 1 20190101190022            1      -1           0       -1         0       -1
+## 2 20190101190022            2      -1           0       -1         0       -1
+## 3 20190101190022            3      12           0       -1         0       -1
+## 4 20190101190022            4       5           0       -1         0       -1
+## 5 20190101190022            5      12           0       -1         0       -1
+## 6 20190101190022            6       1           0       -1         0       -1
+##   TRTHH_LN TRTNOHH_LN TRTOHH_LN TRTONHH_LN TRTO_LN TUACTDUR TUACTDUR24 TUCC5
+## 1       -1         -1        -1         -1      -1      180        180     0
+## 2       -1         -1        -1         -1      -1       30         30     0
+## 3       -1         -1        -1         -1      -1       30         30     0
+## 4       -1         -1        -1         -1      -1      240        240     0
+## 5       -1         -1        -1         -1      -1       30         30     0
+## 6       -1         -1        -1         -1      -1       30         30     0
+##   TUCC5B TUCC7 TUCC8 TUCUMDUR TUCUMDUR24 TUDURSTOP TUEC24 TUSTARTTIM TUSTOPTIME
+## 1      0     0    97      180        180         2     -1   04:00:00   07:00:00
+## 2      0     0     0      210        210         1     -1   07:00:00   07:30:00
+## 3      0     0     0      240        240         1     -1   07:30:00   08:00:00
+## 4      0     0     0      480        480         2     -1   08:00:00   12:00:00
+## 5      0     0     0      510        510         1     -1   12:00:00   12:30:00
+## 6      0     0     0      540        540         1     -1   12:30:00   13:00:00
+##   TUTIER1CODE TUTIER2CODE TUTIER3CODE TRCODE TRTIER2 TXWHERE
+## 1           1           1           1  10101     101       0
+## 2           1           2           1  10201     102       0
+## 3          18          14           1 181401    1814       0
+## 4          14           1           1 140101    1401       0
+## 5          18          14           1 181401    1814       0
+## 6          11           1           1 110101    1101       0</code></pre>
+<pre class="r"><code>unique(resp_2019$TEHRUSLT) # -1 might be incorrect coding to exclude for hours worked</code></pre>
+<pre><code>##  [1]  -1  20  -4  40  33  50  52  54  15  32  14  26  36  43  60  37  45  57  24
+## [20]  42  70  25  28  30  12  72  44  35  65  18  29  55  58  48   4  10  23  88
+## [39]  16  38  34   5  84   2  17  99  56  49  90  27  67  80  39  47  85   3  46
+## [58]  75  66   8  62   6  86  51   1   7  21  53  76  95  68 120  94  64  77  41
+## [77]   9   0  61  13  31  83 100  73  22  11  63 144  19  98  81  59</code></pre>
+<pre class="r"><code>unique(roster_2019$TESEX)</code></pre>
+<pre><code>## [1] 2 1</code></pre>
+<pre class="r"><code>activity_summary_2020_long = 
+  pivot_longer(data = activity_summary_2020, 
+               cols = t010101:t500107, 
+               names_to = &quot;activity_codes&quot;, 
+               values_to = &quot;total_minutes&quot;) %&gt;%
+  select(TUCASEID, TU20FWGT, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %&gt;% #selected mostly demographic variables 
+  mutate(year = 2020) %&gt;% 
+  rename(weight = TU20FWGT, 
+         race = PTDTRACE, 
+         labor_force_status = TELFS, 
+         age = TEAGE, 
+         sex = TESEX)
+
+
+activity_summary_2019_long = 
+  pivot_longer(data = activity_summary_2019, 
+               cols = t010101:t500107, 
+               names_to = &quot;activity_codes&quot;, 
+               values_to = &quot;total_minutes&quot;) %&gt;%
+  select(TUCASEID, TUFINLWGT, PTDTRACE, TEAGE, TELFS, TESEX, activity_codes, total_minutes) %&gt;% #selected mostly demographic variables 
+  mutate(year = 2019) %&gt;% 
+  rename(weight = TUFINLWGT,
+         race = PTDTRACE, 
+         labor_force_status = TELFS, 
+         age = TEAGE, 
+         sex = TESEX)
+
+actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) %&gt;% 
+  mutate(activity_codes = recode(activity_codes, 
+                                 t010101 = &quot;Sleeping&quot;, 
+                                 t010102 = &quot;Sleeplessness&quot;,
+                                 t090301 = &quot;Using pet services&quot;,
+                                 t010201 = &quot;Washing, dressing and grooming oneself&quot;,
+                                 t010299 = &quot;Grooming, n.e.c.*&quot;,
+                                 t010301 = &quot;Health-related self care&quot;,
+                                 t010399 = &quot;Self care, n.e.c.*&quot;,
+                                 t010401 = &quot;Personal/Private activities&quot;,
+                                 t010499 = &quot;Personal activities, n.e.c.*&quot;,
+                                 t010501 = &quot;Personal emergencies&quot;,
+                                 t019999 = &quot;Personal care, n.e.c.*&quot;,
+                                 t020101 = &quot;Interior cleaning&quot;,
+                                 t020102 = &quot;Laundry&quot;,
+                                 t020103 = &quot;Sewing, repairing, and maintaining textiles&quot;,
+                                 t020104 = &quot;Storing interior hh items, inc. food&quot;,
+                                 t020199 = &quot;Housework, n.e.c.*&quot;,
+                                 t020201 = &quot;Food and drink preparation&quot;,
+                                 t020202 = &quot;Food presentation&quot;,
+                                 t020203 = &quot;Kitchen and food clean-up&quot;,
+                                 t020299 = &quot;Food and drink prep, presentation, and clean-up, n.e.c.*&quot;,
+                                 t020301 = &quot;Interior arrangement, decoration, and repairs&quot;,
+                                 t020302 = &quot;Building and repairing furniture&quot;,
+                                 t020303 = &quot;Heating and cooling&quot;,
+                                 t020399 = &quot;Interior maintenance, repair, and decoration, n.e.c.*&quot;,
+                                 t020401 = &quot;Exterior cleaning&quot;,
+                                 t020402 = &quot;Exterior repair, improvements, and decoration&quot;,
+                                 t020499 = &quot;Exterior maintenance, repair and decoration, n.e.c.*&quot;,
+                                 t020501 = &quot;Lawn, garden, and houseplant care&quot;,
+                                 t020502 = &quot;Ponds, pools, and hot tubs&quot;,
+                                 t020599 = &quot;Lawn and garden, n.e.c.*&quot;,
+                                 t020601 = &quot;Care for animals and pets (not veterinary care)&quot;,
+                                 t020602 = &quot;Walking / exercising / playing with animals&quot;,
+                                 t020699 = &quot;Pet and animal care, n.e.c.*&quot;,
+                                 t020701 = &quot;Vehicle repair and maintenance (by self)&quot;,
+                                 t020799 = &quot;Vehicles, n.e.c.*&quot;,
+                                 t020801 = &quot;Appliance, tool, and toy set-up, repair, and maintenance (by self)&quot;,
+                                 t020899 = &quot;Appliances and tools, n.e.c.*&quot;,
+                                 t020901 = &quot;Financial management&quot;,
+                                 t020902 = &quot;Household and personal organization and planning&quot;,
+                                 t020903 = &quot;HH and personal mail and messages (except e-mail)&quot;,
+                                 t020904 = &quot;HH and personal e-mail and messages&quot;,
+                                 t020905 = &quot;Home security&quot;,
+                                 t020999 = &quot;Household management, n.e.c.*&quot;,
+                                 t029999 = &quot;Household activities, n.e.c.*&quot;,
+                                 t030101 = &quot;Physical care for hh children&quot;,
+                                 t030102 = &quot;Reading to/with hh children&quot;,
+                                 t030103 = &quot;Playing with hh children, not sports&quot;,
+                                 t030104 = &quot;Arts and crafts with hh children&quot;,
+                                 t030105 = &quot;Playing sports with hh children&quot;,
+                                 t030106 = &quot;Talking with/listening to hh children&quot;,
+                                 t030108 = &quot;Organization and planning for hh children&quot;,
+                                 t030109 = &quot;Looking after hh children (as a primary activity)&quot;,
+                                 t030110 = &quot;Attending hh children&#39;s events&quot;,
+                                 t030111 = &quot;Waiting for/with hh children&quot;,
+                                 t030112 = &quot;Picking up/dropping off hh children&quot;,
+                                 t030199 = &quot;Caring for and helping hh children, n.e.c.*&quot;,
+                                 t030201 = &quot;Homework (hh children)&quot;,
+                                 t030202 = &quot;Meetings and school conferences (hh children)&quot;,
+                                 t030203 = &quot;Home schooling of hh children&quot;,
+                                 t030204 = &quot;Waiting associated with hh children&#39;s education&quot;,
+                                 t030299 = &quot;Activities related to hh child&#39;s education, n.e.c.*&quot;,
+                                 t030301 = &quot;Providing medical care to hh children&quot;,
+                                 t030302 = &quot;Obtaining medical care for hh children&quot;,
+                                 t030303 = &quot;Waiting associated with hh children&#39;s health&quot;,
+                                 t030399 = &quot;Activities related to hh child&#39;s health, n.e.c.*&quot;,
+                                 t030401 = &quot;Physical care for hh adults&quot;,
+                                 t030402 = &quot;Looking after hh adult (as a primary activity)&quot;,
+                                 t030403 = &quot;Providing medical care to hh adult&quot;,
+                                 t030404 = &quot;Obtaining medical and care services for hh adult&quot;,
+                                 t030405 = &quot;Waiting associated with caring for household adults&quot;,
+                                 t030499 = &quot;Caring for household adults, n.e.c.*&quot;,
+                                 t030501 = &quot;Helping hh adults&quot;,
+                                 t030502 = &quot;Organization and planning for hh adults&quot;,
+                                 t030503 = &quot;Picking up/dropping off hh adult&quot;,
+                                 t030504 = &quot;Waiting associated with helping hh adults&quot;,
+                                 t030599 = &quot;Helping household adults, n.e.c.*&quot;,
+                                 t040101 = &quot;Physical care for nonhh children&quot;,
+                                 t040102 = &quot;Reading to/with nonhh children&quot;,
+                                 t040103 = &quot;Playing with nonhh children, not sports&quot;,
+                                 t040104 = &quot;Arts and crafts with nonhh children&quot;,
+                                 t040105 = &quot;Playing sports with nonhh children&quot;,
+                                 t040106 = &quot;Talking with/listening to nonhh children&quot;,
+                                 t040108 = &quot;Organization and planning for nonhh children&quot;,
+                                 t040109 = &quot;Looking after nonhh children (as primary activity)&quot;,
+                                 t040110 = &quot;Attending nonhh children&#39;s events&quot;,
+                                 t040111 = &quot;Waiting for/with nonhh children&quot;,
+                                 t040112 = &quot;Dropping off/picking up nonhh children&quot;,
+                                 t040199 = &quot;Caring for and helping nonhh children, n.e.c.*&quot;,
+                                 t040201 = &quot;Homework (nonhh children)&quot;,
+                                 t040202 = &quot;Meetings and school conferences (nonhh children)&quot;,
+                                 t040301 = &quot;Providing medical care to nonhh children&quot;,
+                                 t040302 = &quot;Obtaining medical care for nonhh children&quot;,
+                                 t040399 = &quot;Activities related to nonhh child&#39;s health, n.e.c.*&quot;,
+                                 t040401 = &quot;Physical care for nonhh adults&quot;,
+                                 t040402 = &quot;Looking after nonhh adult (as a primary activity)&quot;,
+                                 t040403 = &quot;Providing medical care to nonhh adult&quot;,
+                                 t040404 = &quot;Obtaining medical and care services for nonhh adult&quot;,
+                                 t040405 = &quot;Waiting associated with caring for nonhh adults&quot;,
+                                 t040499 = &quot;Caring for nonhh adults, n.e.c.*&quot;,
+                                 t040501 = &quot;Housework, cooking, and shopping assistance for nonhh adults&quot;,
+                                 t040502 = &quot;House and lawn maintenance and repair assistance for nonhh adults&quot;,
+                                 t040503 = &quot;Animal and pet care assistance for nonhh adults&quot;,
+                                 t040504 = &quot;Vehicle and appliance maintenance/repair assistance for nonhh adults&quot;,
+                                 t040505 = &quot;Financial management assistance for nonhh adults&quot;,
+                                 t040506 = &quot;Household management and paperwork assistance for nonhh adults&quot;,
+                                 t040507 = &quot;Picking up/dropping off nonhh adult&quot;,
+                                 t040508 = &quot;Waiting associated with helping nonhh adults&quot;,
+                                 t040599 = &quot;Helping nonhh adults, n.e.c.*&quot;,
+                                 t049999 = &quot;Caring for and helping nonhh members, n.e.c.*&quot;,
+                                 t050101 = &quot;Work, main job&quot;,
+                                 t050102 = &quot;Work, other job(s)&quot;,
+                                 t050103 = &quot;Security procedures related to work&quot;,
+                                 t050104 = &quot;Waiting associated with working&quot;,
+                                 t050199 = &quot;Working, n.e.c.*&quot;,
+                                 t050202 = &quot;Eating and drinking as part of job&quot;,
+                                 t050205 = &quot;Waiting associated with work-related activities&quot;,
+                                 t050299 = &quot;Work-related activities, n.e.c.*&quot;,
+                                 t050301 = &quot;Income-generating hobbies, crafts, and food&quot;,
+                                 t050302 = &quot;Income-generating performances&quot;,
+                                 t050303 = &quot;Income-generating services&quot;,
+                                 t050304 = &quot;Income-generating rental property activities&quot;,
+                                 t050399 = &quot;Other income-generating activities, n.e.c.*&quot;,
+                                 t050401 = &quot;Job search activities&quot;,
+                                 t050403 = &quot;Job interviewing&quot;,
+                                 t050404 = &quot;Waiting associated with job search or interview&quot;,
+                                 t059999 = &quot;Work and work-related activities, n.e.c.*&quot;,
+                                 t060101 = &quot;Taking class for degree, certification, or licensure&quot;,
+                                 t060102 = &quot;Taking class for personal interest&quot;,
+                                 t060103 = &quot;Waiting associated with taking classes&quot;,
+                                 t060199 = &quot;Taking class, n.e.c.*&quot;,
+                                 t060201 = &quot;Extracurricular club activities&quot;,
+                                 t060202 = &quot;Extracurricular music and performance activities&quot;,
+                                 t060204 = &quot;Waiting associated with extracurricular activities&quot;,
+                                 t060301 = &quot;Research/homework for class for degree, certification, or licensure&quot;,
+                                 t060302 = &quot;Research/homework for class for pers. interest&quot;,
+                                 t060399 = &quot;Research/homework n.e.c.*&quot;,
+                                 t060401 = &quot;Administrative activities: class for degree, certification, or licensure&quot;,
+                                 t060402 = &quot;Administrative activities: class for personal interest&quot;,
+                                 t060499 = &quot;Administrative for education, n.e.c.*&quot;,
+                                 t069999 = &quot;Education, n.e.c.*&quot;,
+                                 t070101 = &quot;Grocery shopping&quot;,
+                                 t070102 = &quot;Purchasing gas&quot;,
+                                 t070103 = &quot;Purchasing food (not groceries)&quot;,
+                                 t070104 = &quot;Shopping, except groceries, food and gas&quot;,
+                                 t070105 = &quot;Waiting associated with shopping&quot;,
+                                 t070199 = &quot;Shopping, n.e.c.*&quot;,
+                                 t070201 = &quot;Comparison shopping&quot;,
+                                 t070301 = &quot;Security procedures rel. to consumer purchases&quot;,
+                                 t080101 = &quot;Using paid childcare services&quot;,
+                                 t080201 = &quot;Banking&quot;,
+                                 t080202 = &quot;Using other financial services&quot;,
+                                 t080203 = &quot;Waiting associated w/banking/financial services&quot;,
+                                 t080301 = &quot;Using legal services&quot;,
+                                 t080399 = &quot;Using legal services, n.e.c.*&quot;,
+                                 t080401 = &quot;Using health and care services outside the home&quot;,
+                                 t080402 = &quot;Using in-home health and care services&quot;,
+                                 t080403 = &quot;Waiting associated with medical services&quot;,
+                                 t080501 = &quot;Using personal care services&quot;,
+                                 t080502 = &quot;Waiting associated w/personal care services&quot;,
+                                 t080601 = &quot;Activities rel. to purchasing/selling real estate&quot;,
+                                 t080701 = &quot;Using veterinary services&quot;,
+                                 t080702 = &quot;Waiting associated with veterinary services&quot;,
+                                 t089999 = &quot;Professional and personal services, n.e.c.*&quot;,
+                                 t090101 = &quot;Using interior cleaning services&quot;,
+                                 t090103 = &quot;Using clothing repair and cleaning services&quot;,
+                                 t090104 = &quot;Waiting associated with using household services&quot;,
+                                 t090199 = &quot;Using household services, n.e.c.*&quot;,
+                                 t090201 = &quot;Using home maint/repair/d�cor/construction svcs&quot;,
+                                 t090202 = &quot;Waiting associated w/ home main/repair/d�cor/constr&quot;,
+                                 t090299 = &quot;Using home maint/repair/d�cor/constr services, n.e.c.*&quot;,
+                                 t090302 = &quot;Waiting associated with pet services&quot;,
+                                 t090399 = &quot;Using pet services, n.e.c.*&quot;,
+                                 t090401 = &quot;Using lawn and garden services&quot;,
+                                 t090402 = &quot;Waiting associated with using lawn and garden services&quot;,
+                                 t090501 = &quot;Using vehicle maintenance or repair services&quot;,
+                                 t090502 = &quot;Waiting associated with vehicle main. or repair svcs&quot;,
+                                 t090599 = &quot;Using vehicle maint. and repair svcs, n.e.c.*&quot;,
+                                 t099999 = &quot;Using household services, n.e.c.*&quot;,
+                                 t100101 = &quot;Using police and fire services&quot;,
+                                 t100102 = &quot;Using social services&quot;,
+                                 t100103 = &quot;Obtaining licenses and paying fines, fees, taxes&quot;,
+                                 t100199 = &quot;Using government services, n.e.c.*&quot;,
+                                 t100201 = &quot;Civic obligations and participation&quot;,
+                                 t100299 = &quot;Civic obligations and participation, n.e.c.*&quot;,
+                                 t100304 = &quot;Waiting associated with using government services&quot;,
+                                 t110101 = &quot;Eating and drinking&quot;,
+                                 t110201 = &quot;Waiting associated w/eating and drinking&quot;,
+                                 t120101 = &quot;Socializing and communicating with others&quot;,
+                                 t120201 = &quot;Attending or hosting parties/receptions/ceremonies&quot;,
+                                 t120202 = &quot;Attending meetings for personal interest (not volunteering)&quot;,
+                                 t120299 = &quot;Attending/hosting social events, n.e.c.*&quot;,
+                                 t120301 = &quot;Relaxing, thinking&quot;,
+                                 t120302 = &quot;Tobacco and drug use&quot;,
+                                 t120303 = &quot;Television and movies (not religious)&quot;,
+                                 t120304 = &quot;Television (religious)&quot;,
+                                 t120305 = &quot;Listening to the radio&quot;,
+                                 t120306 = &quot;Listening to/playing music (not radio)&quot;,
+                                 t120307 = &quot;Playing games&quot;,
+                                 t120308 = &quot;Computer use for leisure (exc. Games)&quot;,
+                                 t120309 = &quot;Arts and crafts as a hobby&quot;,
+                                 t120310 = &quot;Collecting as a hobby&quot;,
+                                 t120311 = &quot;Hobbies, except arts and crafts and collecting&quot;,
+                                 t120312 = &quot;Reading for personal interest&quot;,
+                                 t120313 = &quot;Writing for personal interest&quot;,
+                                 t120399 = &quot;Relaxing and leisure, n.e.c.*&quot;,
+                                 t120401 = &quot;Attending performing arts&quot;,
+                                 t120402 = &quot;Attending museums&quot;,
+                                 t120403 = &quot;Attending movies/film&quot;,
+                                 t120404 = &quot;Attending gambling establishments&quot;,
+                                 t120405 = &quot;Security procedures rel. to arts and entertainment&quot;,
+                                 t120499 = &quot;Arts and entertainment, n.e.c.*&quot;,
+                                 t120501 = &quot;Waiting assoc. w/socializing and communicating&quot;,
+                                 t120502 = &quot;Waiting assoc. w/attending/hosting social events&quot;,
+                                 t120503 = &quot;Waiting associated with relaxing/leisure&quot;,
+                                 t120504 = &quot;Waiting associated with arts and entertainment&quot;,
+                                 t129999 = &quot;Socializing, relaxing, and leisure, n.e.c.*&quot;,
+                                 t130101 = &quot;Doing aerobics&quot;,
+                                 t130102 = &quot;Playing baseball&quot;,
+                                 t130103 = &quot;Playing basketball&quot;,
+                                 t130104 = &quot;Biking&quot;,
+                                 t130105 = &quot;Playing billiards&quot;,
+                                 t130106 = &quot;Boating&quot;,
+                                 t130107 = &quot;Bowling&quot;,
+                                 t130108 = &quot;Climbing, spelunking, caving&quot;,
+                                 t130109 = &quot;Dancing&quot;,
+                                 t130110 = &quot;Participating in equestrian sports&quot;,
+                                 t130112 = &quot;Fishing&quot;,
+                                 t130113 = &quot;Playing football&quot;,
+                                 t130114 = &quot;Golfing&quot;,
+                                 t130116 = &quot;Hiking&quot;,
+                                 t130117 = &quot;Playing hockey&quot;,
+                                 t130118 = &quot;Hunting&quot;,
+                                 t130119 = &quot;Participating in martial arts&quot;,
+                                 t130120 = &quot;Playing racquet sports&quot;,
+                                 t130122 = &quot;Rollerblading&quot;,
+                                 t130124 = &quot;Running&quot;,
+                                 t130125 = &quot;Skiing, ice skating, snowboarding&quot;,
+                                 t130126 = &quot;Playing soccer&quot;,
+                                 t130127 = &quot;Softball&quot;,
+                                 t130128 = &quot;Using cardiovascular equipment&quot;,
+                                 t130129 = &quot;Vehicle touring/racing&quot;,
+                                 t130130 = &quot;Playing volleyball&quot;,
+                                 t130131 = &quot;Walking&quot;,
+                                 t130132 = &quot;Participating in water sports&quot;,
+                                 t130133 = &quot;Weightlifting/strength training&quot;,
+                                 t130134 = &quot;Working out, unspecified&quot;,
+                                 t130136 = &quot;Doing yoga&quot;,
+                                 t130199 = &quot;Playing sports n.e.c.*&quot;,
+                                 t130202 = &quot;Watching baseball&quot;,
+                                 t130203 = &quot;Watching basketball&quot;,
+                                 t130207 = &quot;Watching bowling&quot;,
+                                 t130209 = &quot;Watching dancing&quot;,
+                                 t130210 = &quot;Watching equestrian sports&quot;,
+                                 t130213 = &quot;Watching football&quot;,
+                                 t130214 = &quot;Watching golfing&quot;,
+                                 t130216 = &quot;Watching hockey&quot;,
+                                 t130218 = &quot;Watching racquet sports&quot;,
+                                 t130219 = &quot;Watching rodeo competitions&quot;,
+                                 t130222 = &quot;Watching running&quot;,
+                                 t130224 = &quot;Watching soccer&quot;,
+                                 t130225 = &quot;Watching softball&quot;,
+                                 t130226 = &quot;Watching vehicle touring/racing&quot;,
+                                 t130227 = &quot;Watching volleyball&quot;,
+                                 t130232 = &quot;Watching wrestling&quot;,
+                                 t130299 = &quot;Attending sporting events, n.e.c.*&quot;,
+                                 t130301 = &quot;Waiting related to playing sports or exercising&quot;,
+                                 t130302 = &quot;Waiting related to attending sporting events&quot;,
+                                 t130399 = &quot;Waiting associated with sports, exercise, and recreation, n.e.c.*&quot;,
+                                 t130402 = &quot;Security related to attending sporting events&quot;,
+                                 t139999 = &quot;Sports, exercise, and recreation, n.e.c.*&quot;,
+                                 t140101 = &quot;Attending religious services&quot;,
+                                 t140102 = &quot;Participation in religious practices&quot;,
+                                 t140103 = &quot;Waiting associated w/religious and spiritual activities&quot;,
+                                 t140105 = &quot;Religious education activities&quot;,
+                                 t149999 = &quot;Religious and spiritual activities, n.e.c.*&quot;,
+                                 t150101 = &quot;Computer use&quot;,
+                                 t150102 = &quot;Organizing and preparing&quot;,
+                                 t150103 = &quot;Reading&quot;,
+                                 t150104 = &quot;Telephone calls (except hotline counseling)&quot;,
+                                 t150105 = &quot;Writing&quot;,
+                                 t150106 = &quot;Fundraising&quot;,
+                                 t150199 = &quot;Administrative and support activities, n.e.c.*&quot;,
+                                 t150201 = &quot;Food preparation, presentation, clean-up&quot;,
+                                 t150202 = &quot;Collecting and delivering clothing and other goods&quot;,
+                                 t150203 = &quot;Providing care&quot;,
+                                 t150204 = &quot;Teaching, leading, counseling, mentoring&quot;,
+                                 t150299 = &quot;Social service and care activities, n.e.c.*&quot;,
+                                 t150301 = &quot;Building houses, wildlife sites, and other structures&quot;,
+                                 t150302 = &quot;Indoor and outdoor maintenance, repair, and clean-up&quot;,
+                                 t150399 = &quot;Indoor and outdoor maintenance, building and clean-up activities, n.e.c.*&quot;,
+                                 t150401 = &quot;Performing&quot;,
+                                 t150402 = &quot;Serving at volunteer events and cultural activities&quot;,
+                                 t150499 = &quot;Participating in performance and cultural activities, n.e.c.*&quot;,
+                                 t150501 = &quot;Attending meetings, conferences, and training&quot;,
+                                 t150602 = &quot;Public safety activities&quot;,
+                                 t150699 = &quot;Public health and safety activities, n.e.c.*&quot;,
+                                 t150701 = &quot;Waiting associated with volunteer activities&quot;,
+                                 t150799 = &quot;Waiting associated with volunteer activities, n.e.c.*&quot;,
+                                 t150801 = &quot;Security procedures related to volunteer activities&quot;,
+                                 t150899 = &quot;Security procedures related to volunteer activities, n.e.c.*&quot;,
+                                 t159999 = &quot;Volunteer activities, n.e.c.*&quot;,
+                                 t160101 = &quot;Telephone calls to/from family members&quot;,
+                                 t160102 = &quot;Telephone calls to/from friends, neighbors, or acquaintances&quot;,
+                                 t160103 = &quot;Telephone calls to/from education services providers&quot;,
+                                 t160104 = &quot;Telephone calls to/from salespeople&quot;,
+                                 t160105 = &quot;Telephone calls to/from professional or personal care svcs providers&quot;,
+                                 t160106 = &quot;Telephone calls to/from household services providers&quot;,
+                                 t160107 = &quot;Telephone calls to/from paid child or adult care providers&quot;,
+                                 t160108 = &quot;Telephone calls to/from government officials&quot;,
+                                 t160199 = &quot;Telephone calls (to or from), n.e.c.*&quot;,
+                                 t160201 = &quot;Waiting associated with telephone calls&quot;,
+                                 t169999 = &quot;Telephone calls, n.e.c.*&quot;,
+                                 t180101 = &quot;Travel related to personal care&quot;,
+                                 t180201 = &quot;Travel related to housework&quot;,
+                                 t180202 = &quot;Travel related to food and drink prep., clean-up, and presentation&quot;,
+                                 t180203 = &quot;Travel related to interior maintenance, repair, and decoration&quot;,
+                                 t180204 = &quot;Travel related to exterior maintenance, repair, and decoration&quot;,
+                                 t180205 = &quot;Travel related to lawn, garden, and houseplant care&quot;,
+                                 t180206 = &quot;Travel related to care for animals and pets (not vet care)&quot;,
+                                 t180207 = &quot;Travel related to vehicle care and maintenance (by self)&quot;,
+                                 t180208 = &quot;Travel related to appliance, tool, and toy set-up, repair, and maintenance (by self)&quot;,
+                                 t180209 = &quot;Travel related to household management&quot;,
+                                 t180299 = &quot;Travel related to household activities, n.e.c.*&quot;,
+                                 t180301 = &quot;Travel related to caring for and helping hh children&quot;,
+                                 t180302 = &quot;Travel related to hh children&#39;s education&quot;,
+                                 t180303 = &quot;Travel related to hh children&#39;s health&quot;,
+                                 t180304 = &quot;Travel related to caring for hh adults&quot;,
+                                 t180305 = &quot;Travel related to helping hh adults&quot;,
+                                 t180401 = &quot;Travel related to caring for and helping nonhh children&quot;,
+                                 t180402 = &quot;Travel related to nonhh children&#39;s education&quot;,
+                                 t180403 = &quot;Travel related to nonhh children&#39;s health&quot;,
+                                 t180404 = &quot;Travel related to caring for nonhh adults&quot;,
+                                 t180405 = &quot;Travel related to helping nonhh adults&quot;,
+                                 t180499 = &quot;Travel rel. to caring for and helping nonhh members, n.e.c.*&quot;,
+                                 t180501 = &quot;Travel related to working&quot;,
+                                 t180502 = &quot;Travel related to work-related activities&quot;,
+                                 t180503 = &quot;Travel related to income-generating activities&quot;,
+                                 t180504 = &quot;Travel related to job search and interviewing&quot;,
+                                 t180599 = &quot;Travel related to work, n.e.c.*&quot;,
+                                 t180601 = &quot;Travel related to taking class&quot;,
+                                 t180602 = &quot;Travel related to extracurricular activities (ex. Sports)&quot;,
+                                 t180603 = &quot;Travel related to research/homework&quot;,
+                                 t180604 = &quot;Travel related to registration/administrative activities&quot;,
+                                 t180699 = &quot;Travel related to education, n.e.c.*&quot;,
+                                 t180701 = &quot;Travel related to grocery shopping&quot;,
+                                 t180702 = &quot;Travel related to purchasing gas&quot;,
+                                 t180703 = &quot;Travel related to purchasing food (not groceries)&quot;,
+                                 t180704 = &quot;Travel related to shopping, ex groceries, food, and gas&quot;,
+                                 t180799 = &quot;Travel related to consumer purchases, n.e.c.*&quot;,
+                                 t180801 = &quot;Travel related to using childcare services&quot;,
+                                 t180802 = &quot;Travel related to using financial services and banking&quot;,
+                                 t180803 = &quot;Travel related to using legal services&quot;,
+                                 t180804 = &quot;Travel related to using medical services&quot;,
+                                 t180805 = &quot;Travel related to using personal care services&quot;,
+                                 t180806 = &quot;Travel related to using real estate services&quot;,
+                                 t180807 = &quot;Travel related to using veterinary services&quot;,
+                                 t180899 = &quot;Travel rel. to using prof. and personal care services, n.e.c.*&quot;,
+                                 t180901 = &quot;Travel related to using household services&quot;,
+                                 t180902 = &quot;Travel related to using home main./repair/d�cor./construction svcs&quot;,
+                                 t180903 = &quot;Travel related to using pet services (not vet)&quot;,
+                                 t180905 = &quot;Travel related to using vehicle maintenance and repair services&quot;,
+                                 t181001 = &quot;Travel related to using government services&quot;,
+                                 t181002 = &quot;Travel related to civic obligations and participation&quot;,
+                                 t181101 = &quot;Travel related to eating and drinking&quot;,
+                                 t181201 = &quot;Travel related to socializing and communicating&quot;,
+                                 t181202 = &quot;Travel related to attending or hosting social events&quot;,
+                                 t181203 = &quot;Travel related to relaxing and leisure&quot;,
+                                 t181204 = &quot;Travel related to arts and entertainment&quot;,
+                                 t181205 = &quot;Travel as a form of entertainment&quot;,
+                                 t181299 = &quot;Travel rel. to socializing, relaxing, and leisure, n.e.c.*&quot;,
+                                 t181301 = &quot;Travel related to participating in sports/exercise/recreation&quot;,
+                                 t181302 = &quot;Travel related to attending sporting/recreational events&quot;,
+                                 t181399 = &quot;Travel related to sports, exercise, and recreation, n.e.c.*&quot;,
+                                 t181401 = &quot;Travel related to religious/spiritual practices&quot;,
+                                 t181499 = &quot;Travel rel. to religious/spiritual activities, n.e.c.*&quot;,
+                                 t181501 = &quot;Travel related to volunteering&quot;,
+                                 t181599 = &quot;Travel related to volunteer activities, n.e.c.*&quot;,
+                                 t181601 = &quot;Travel related to phone calls&quot;,
+                                 t181801 = &quot;Security procedures related to traveling&quot;,
+                                 t181899 = &quot;Security procedures related to traveling, n.e.c.*&quot;,
+                                 t189999 = &quot;Traveling, n.e.c.*&quot;,
+                                 t500101 = &quot;Insufficient detail in verbatim&quot;,
+                                 t500103 = &quot;Missing travel or destination&quot;,
+                                 t500105 = &quot;Respondent refused to provide information/&#39;none of your business&#39;&quot;,
+                                 t500106 = &quot;Gap/can&#39;t remember&quot;,
+                                 t500107 = &quot;Unable to code activity at 1st tier&quot;,
+                                 t040203 = &quot;Home schooling of nonhh children&quot;,                                          
+                                 t050201 = &quot;Socializing, relaxing, and leisure as part of job&quot;,                                                           t050203 = &quot;Sports and exercise as part of job&quot;,                                                                              
+                                 t050305 = &quot;Waiting associated with other income-generating activities&quot;,                                                                              
+                                 t050499 = &quot;Job search and Interviewing, n.e.c.*&quot;,                                                                            
+                                 t060203 = &quot;Extracurricular student government activities&quot;,                                                                             
+                                 t060299 =  &quot;Education-related extracurricular activities, n.e.c.*&quot;,                                                                             
+                                 t060303  = &quot;Waiting associated with research/homework&quot;,                                                                            
+                                 t080299  =  &quot;Using financial services and banking, n.e.c.*&quot;,                                                                            
+                                 t080499  = &quot;Using medical services, n.e.c.*&quot;,                                                                             
+                                 t080599  = &quot;Using personal care services, n.e.c.*&quot;,                                                                            
+                                 t080602  = &quot;Waiting associated w/purchasing/selling real estate&quot;,                                                                            
+                                 t080801  = &quot;Security procedures rel. to professional/personal svcs.&quot;,                                                                            
+                                 t100305   =  &quot;Waiting associated with civic obligations and participation&quot;,                                                                           
+                                 t120199   = &quot;Socializing and communicating, n.e.c.*&quot;,                                                                            
+                                 t130211  = &quot;Watching fencing&quot;,                                                                         
+                                 t130212 = &quot;Watching fishing&quot;,                                                                             
+                                 t130220 = &quot;Watching rollerblading&quot;,                                                                             
+                                 t130229 = &quot;Watching water sports&quot;,                                                                             
+                                 t150599  = &quot;Attending meetings, conferences, and training, n.e.c.*&quot;,                                                                            
+                                 t150601 = &quot;Public health activities&quot;,                                                                             
+                                 t180399 = &quot;Travel rel. to caring for and helping hh members, n.e.c.*&quot;,
+                                 t039999 = &quot;Caring for and helping hh members, n.e.c.*&quot;
+                                 )
+                                                      )
+
+actsum_combined_categorized = actsum_combined %&gt;% 
+  mutate(category = case_when(
+    activity_codes %in% c(&quot;Sleeping&quot;, 
+                          &quot;Sleeplessness&quot;) ~ &quot;sleep&quot;, 
+    activity_codes %in% c(&quot;Using pet services&quot;,
+                          &quot;Washing, dressing and grooming oneself&quot;,
+                          &quot;Grooming, n.e.c.*&quot;,
+                          &quot;Health-related self care&quot;,
+                          &quot;Self care, n.e.c.*&quot;,
+                          &quot;Personal/Private activities&quot;,
+                          &quot;Personal activities, n.e.c.*&quot;,
+                          &quot;Personal emergencies&quot;,
+                          &quot;Personal care, n.e.c.*&quot;,
+                          &quot;Public health activities&quot; #unsure
+                          ) ~ &quot;personal_care&quot;,
+    activity_codes %in% c(&quot;Interior cleaning&quot;,
+                            &quot;Laundry&quot;,
+                            &quot;Sewing, repairing, and maintaining textiles&quot;,
+                            &quot;Storing interior hh items, inc. food&quot;,
+                            &quot;Housework, n.e.c.*&quot;,
+                            &quot;Food and drink preparation&quot;,
+                            &quot;Food presentation&quot;,
+                            &quot;Kitchen and food clean-up&quot;,
+                            &quot;Food and drink prep, presentation, and clean-up, n.e.c.*&quot;,
+                            &quot;Interior arrangement, decoration, and repairs&quot;,
+                            &quot;Building and repairing furniture&quot;,
+                            &quot;Heating and cooling&quot;,
+                            &quot;Interior maintenance, repair, and decoration, n.e.c.*&quot;,
+                            &quot;Exterior cleaning&quot;,
+                            &quot;Exterior repair, improvements, and decoration&quot;,
+                            &quot;Exterior maintenance, repair and decoration, n.e.c.*&quot;,
+                            &quot;Lawn, garden, and houseplant care&quot;,
+                            &quot;Ponds, pools, and hot tubs&quot;,
+                            &quot;Lawn and garden, n.e.c.*&quot;,
+                            &quot;Care for animals and pets (not veterinary care)&quot;,
+                            &quot;Walking / exercising / playing with animals&quot;,
+                            &quot;Pet and animal care, n.e.c.*&quot;,
+                            &quot;Vehicle repair and maintenance (by self)&quot;,
+                            &quot;Vehicles, n.e.c.*&quot;,
+                            &quot;Appliance, tool, and toy set-up, repair, and maintenance (by self)&quot;,
+                            &quot;Appliances and tools, n.e.c.*&quot;,
+                            &quot;Financial management&quot;,
+                            &quot;Household and personal organization and planning&quot;,
+                            &quot;HH and personal mail and messages (except e-mail)&quot;,
+                            &quot;HH and personal e-mail and messages&quot;,
+                            &quot;Home security&quot;,
+                            &quot;Household management, n.e.c.*&quot;,
+                            &quot;Household activities, n.e.c.*&quot;) ~ &quot;household&quot;, 
+activity_codes %in% c(&quot;Physical care for hh children&quot;,
+                            &quot;Reading to/with hh children&quot;,
+                            &quot;Playing with hh children, not sports&quot;,
+                            &quot;Arts and crafts with hh children&quot;,
+                            &quot;Playing sports with hh children&quot;,
+                            &quot;Talking with/listening to hh children&quot;,
+                            &quot;Organization and planning for hh children&quot;,
+                            &quot;Looking after hh children (as a primary activity)&quot;,
+                            &quot;Attending hh children&#39;s events&quot;,
+                            &quot;Waiting for/with hh children&quot;,
+                            &quot;Picking up/dropping off hh children&quot;,
+                            &quot;Caring for and helping hh children, n.e.c.*&quot;,
+                            &quot;Homework (hh children)&quot;,
+                            &quot;Meetings and school conferences (hh children)&quot;,
+                            &quot;Home schooling of hh children&quot;,
+                            &quot;Waiting associated with hh children&#39;s education&quot;,
+                            &quot;Activities related to hh child&#39;s education, n.e.c.*&quot;,
+                            &quot;Providing medical care to hh children&quot;,
+                            &quot;Obtaining medical care for hh children&quot;,
+                            &quot;Waiting associated with hh children&#39;s health&quot;,
+                            &quot;Activities related to hh child&#39;s health, n.e.c.*&quot;,
+                            &quot;Physical care for hh adults&quot;,
+                            &quot;Looking after hh adult (as a primary activity)&quot;,
+                            &quot;Providing medical care to hh adult&quot;,
+                            &quot;Obtaining medical and care services for hh adult&quot;,
+                            &quot;Waiting associated with caring for household adults&quot;,
+                            &quot;Caring for household adults, n.e.c.*&quot;,
+                            &quot;Helping hh adults&quot;,
+                            &quot;Organization and planning for hh adults&quot;,
+                            &quot;Picking up/dropping off hh adult&quot;,
+                            &quot;Waiting associated with helping hh adults&quot;,
+                            &quot;Helping household adults, n.e.c.*&quot;,
+                            &quot;Physical care for nonhh children&quot;,
+                            &quot;Reading to/with nonhh children&quot;,
+                            &quot;Playing with nonhh children, not sports&quot;,
+                            &quot;Arts and crafts with nonhh children&quot;,
+                            &quot;Playing sports with nonhh children&quot;,
+                            &quot;Talking with/listening to nonhh children&quot;,
+                            &quot;Organization and planning for nonhh children&quot;,
+                            &quot;Looking after nonhh children (as primary activity)&quot;,
+                            &quot;Attending nonhh children&#39;s events&quot;,
+                            &quot;Waiting for/with nonhh children&quot;,
+                            &quot;Dropping off/picking up nonhh children&quot;,
+                            &quot;Caring for and helping nonhh children, n.e.c.*&quot;,
+                            &quot;Homework (nonhh children)&quot;,
+                            &quot;Meetings and school conferences (nonhh children)&quot;,
+                            &quot;Providing medical care to nonhh children&quot;,
+                            &quot;Obtaining medical care for nonhh children&quot;,
+                            &quot;Activities related to nonhh child&#39;s health, n.e.c.*&quot;,
+                            &quot;Physical care for nonhh adults&quot;,
+                            &quot;Looking after nonhh adult (as a primary activity)&quot;,
+                            &quot;Providing medical care to nonhh adult&quot;,
+                            &quot;Obtaining medical and care services for nonhh adult&quot;,
+                            &quot;Waiting associated with caring for nonhh adults&quot;,
+                            &quot;Caring for nonhh adults, n.e.c.*&quot;, 
+                            &quot;Housework, cooking, and shopping assistance for nonhh adults&quot;,
+                            &quot;House and lawn maintenance and repair assistance for nonhh adults&quot;,
+                            &quot;Animal and pet care assistance for nonhh adults&quot;,
+                            &quot;Vehicle and appliance maintenance/repair assistance for nonhh adults&quot;,
+                            &quot;Financial management assistance for nonhh adults&quot;,
+                            &quot;Household management and paperwork assistance for nonhh adults&quot;,
+                            &quot;Picking up/dropping off nonhh adult&quot;,
+                            &quot;Waiting associated with helping nonhh adults&quot;,
+                            &quot;Helping nonhh adults, n.e.c.*&quot;,
+                            &quot;Caring for and helping nonhh members, n.e.c.*&quot;,
+                            &quot;Home schooling of nonhh children&quot;,
+                            &quot;Caring for and helping hh members, n.e.c.*&quot;) ~ &quot;caring_duties&quot;, 
+activity_codes %in% c(&quot;Work, main job&quot;,
+                            &quot;Work, other job(s)&quot;,
+                            &quot;Security procedures related to work&quot;,
+                            &quot;Waiting associated with working&quot;,
+                            &quot;Working, n.e.c.*&quot;,
+                            &quot;Eating and drinking as part of job&quot;,
+                            &quot;Waiting associated with work-related activities&quot;,
+                            &quot;Work-related activities, n.e.c.*&quot;,
+                            &quot;Income-generating hobbies, crafts, and food&quot;,
+                            &quot;Income-generating performances&quot;,
+                            &quot;Income-generating services&quot;,
+                            &quot;Income-generating rental property activities&quot;,
+                            &quot;Other income-generating activities, n.e.c.*&quot;,
+                            &quot;Job search activities&quot;,
+                            &quot;Job interviewing&quot;,
+                            &quot;Waiting associated with job search or interview&quot;,
+                            &quot;Work and work-related activities, n.e.c.*&quot;,
+                            &quot;Socializing, relaxing, and leisure as part of job&quot;,
+                            &quot;Sports and exercise as part of job&quot;,
+                             &quot;Waiting associated with other income-generating activities&quot;, 
+                            &quot;Job search and Interviewing, n.e.c.*&quot;,
+                             &quot;Attending meetings, conferences, and training, n.e.c.*&quot;) ~ &quot;work&quot;, 
+activity_codes %in% c(&quot;Taking class for degree, certification, or licensure&quot;,
+                            &quot;Taking class for personal interest&quot;,
+                            &quot;Waiting associated with taking classes&quot;,
+                            &quot;Taking class, n.e.c.*&quot;,
+                            &quot;Extracurricular club activities&quot;,
+                            &quot;Extracurricular music and performance activities&quot;,
+                            &quot;Waiting associated with extracurricular activities&quot;,
+                            &quot;Research/homework for class for degree, certification, or licensure&quot;,
+                            &quot;Research/homework for class for pers. interest&quot;,
+                            &quot;Research/homework n.e.c.*&quot;,
+                            &quot;Administrative activities: class for degree, certification, or licensure&quot;,
+                            &quot;Administrative activities: class for personal interest&quot;,
+                            &quot;Administrative for education, n.e.c.*&quot;,
+                            &quot;Education, n.e.c.*&quot;,
+                            &quot;Extracurricular student government activities&quot;, 
+                            &quot;Education-related extracurricular activities, n.e.c.*&quot;,   
+                            &quot;Waiting associated with research/homework&quot;) ~ &quot;education&quot;, 
+activity_codes %in% c(&quot;Grocery shopping&quot;,
+                            &quot;Purchasing gas&quot;,
+                            &quot;Purchasing food (not groceries)&quot;,
+                            &quot;Shopping, except groceries, food and gas&quot;,
+                            &quot;Waiting associated with shopping&quot;,
+                            &quot;Shopping, n.e.c.*&quot;,
+                            &quot;Comparison shopping&quot;) ~ &quot;shopping&quot;, 
+activity_codes %in% c(&quot;Security procedures rel. to consumer purchases&quot;,
+                            &quot;Using paid childcare services&quot;,
+                            &quot;Banking&quot;,
+                            &quot;Using other financial services&quot;,
+                            &quot;Waiting associated w/banking/financial services&quot;,
+                            &quot;Using legal services&quot;,
+                            &quot;Using legal services, n.e.c.*&quot;,
+                            &quot;Using health and care services outside the home&quot;,
+                            &quot;Using in-home health and care services&quot;,
+                            &quot;Waiting associated with medical services&quot;,
+                            &quot;Using personal care services&quot;,
+                            &quot;Waiting associated w/personal care services&quot;,
+                            &quot;Activities rel. to purchasing/selling real estate&quot;,
+                            &quot;Using veterinary services&quot;,
+                            &quot;Waiting associated with veterinary services&quot;,
+                            &quot;Professional and personal services, n.e.c.*&quot;,
+                            &quot;Using interior cleaning services&quot;,
+                            &quot;Using clothing repair and cleaning services&quot;,
+                            &quot;Waiting associated with using household services&quot;,
+                            &quot;Using household services, n.e.c.*&quot;,
+                            &quot;Using home maint/repair/d�cor/construction svcs&quot;,
+                            &quot;Waiting associated w/ home main/repair/d�cor/constr&quot;,
+                            &quot;Using home maint/repair/d�cor/constr services, n.e.c.*&quot;,
+                            &quot;Waiting associated with pet services&quot;,
+                            &quot;Using pet services, n.e.c.*&quot;,
+                            &quot;Using lawn and garden services&quot;,
+                            &quot;Waiting associated with using lawn and garden services&quot;,
+                            &quot;Using vehicle maintenance or repair services&quot;,
+                            &quot;Waiting associated with vehicle main. or repair svcs&quot;,
+                            &quot;Using vehicle maint. and repair svcs, n.e.c.*&quot;,
+                            &quot;Using household services, n.e.c.*&quot;,
+                            &quot;Using police and fire services&quot;,
+                            &quot;Using social services&quot;,
+                            &quot;Obtaining licenses and paying fines, fees, taxes&quot;,
+                            &quot;Using financial services and banking, n.e.c.*&quot;,
+                             &quot;Using medical services, n.e.c.*&quot;, 
+                             &quot;Using personal care services, n.e.c.*&quot;,
+                             &quot;Waiting associated w/purchasing/selling real estate&quot;, 
+                            &quot;Security procedures rel. to professional/personal svcs.&quot;) ~ &quot;professional_services&quot;, 
+activity_codes %in% c(&quot;Using government services, n.e.c.*&quot;,
+                            &quot;Civic obligations and participation&quot;,
+                            &quot;Civic obligations and participation, n.e.c.*&quot;,
+                            &quot;Waiting associated with using government services&quot;,
+                             &quot;Waiting associated with civic obligations and participation&quot;) ~ &quot;gov_civic_obligations&quot;, 
+activity_codes %in% c(&quot;Eating and drinking&quot;,
+                            &quot;Waiting associated w/eating and drinking&quot;) ~ &quot;eating_drinking&quot;, 
+activity_codes %in% c(&quot;Socializing and communicating with others&quot;,
+                      &quot;Attending or hosting parties/receptions/ceremonies&quot;,
+                      &quot;Attending meetings for personal interest (not volunteering)&quot;,
+                      &quot;Attending/hosting social events, n.e.c.*&quot;,
+                      &quot;Relaxing, thinking&quot;,
+                      &quot;Tobacco and drug use&quot;,
+                      &quot;Television and movies (not religious)&quot;,
+                      &quot;Television (religious)&quot;,
+                      &quot;Listening to the radio&quot;,
+                      &quot;Listening to/playing music (not radio)&quot;,
+                      &quot;Playing games&quot;,
+                      &quot;Computer use for leisure (exc. Games)&quot;,
+                      &quot;Arts and crafts as a hobby&quot;,
+                      &quot;Collecting as a hobby&quot;,
+                      &quot;Hobbies, except arts and crafts and collecting&quot;,
+                      &quot;Reading for personal interest&quot;,
+                      &quot;Writing for personal interest&quot;,
+                      &quot;Relaxing and leisure, n.e.c.*&quot;,
+                      &quot;Attending performing arts&quot;,
+                      &quot;Attending museums&quot;,
+                      &quot;Attending movies/film&quot;,
+                      &quot;Attending gambling establishments&quot;,
+                      &quot;Security procedures rel. to arts and entertainment&quot;,
+                      &quot;Arts and entertainment, n.e.c.*&quot;,
+                      &quot;Watching baseball&quot;,
+                      &quot;Watching basketball&quot;,
+                      &quot;Watching bowling&quot;,
+                      &quot;Watching dancing&quot;,
+                      &quot;Watching equestrian sports&quot;,
+                      &quot;Watching football&quot;,
+                      &quot;Watching golfing&quot;,
+                      &quot;Watching hockey&quot;,
+                      &quot;Watching racquet sports&quot;,
+                      &quot;Watching rodeo competitions&quot;,
+                      &quot;Watching running&quot;,
+                      &quot;Watching soccer&quot;,
+                      &quot;Watching softball&quot;,
+                      &quot;Watching vehicle touring/racing&quot;,
+                      &quot;Watching volleyball&quot;,
+                      &quot;Watching wrestling&quot;,
+                      &quot;Attending sporting events, n.e.c.*&quot;,
+                      &quot;Waiting assoc. w/socializing and communicating&quot;,
+                      &quot;Waiting assoc. w/attending/hosting social events&quot;,
+                      &quot;Waiting associated with relaxing/leisure&quot;,
+                      &quot;Waiting associated with arts and entertainment&quot;,
+                      &quot;Socializing, relaxing, and leisure, n.e.c.*&quot;,
+                      &quot;Socializing and communicating, n.e.c.*&quot;,
+                      &quot;Watching fencing&quot;,   
+                      &quot;Watching fishing&quot;,       
+                      &quot;Watching rollerblading&quot;, 
+                       &quot;Watching water sports&quot;) ~ &quot;leisure&quot;, 
+activity_codes %in% c(&quot;Doing aerobics&quot;,
+                      &quot;Playing baseball&quot;,
+                      &quot;Playing basketball&quot;,
+                      &quot;Biking&quot;,
+                      &quot;Playing billiards&quot;,
+                      &quot;Boating&quot;,
+                      &quot;Bowling&quot;,
+                      &quot;Climbing, spelunking, caving&quot;,
+                      &quot;Dancing&quot;,
+                      &quot;Participating in equestrian sports&quot;,
+                      &quot;Fishing&quot;,
+                      &quot;Playing football&quot;,
+                      &quot;Golfing&quot;,
+                      &quot;Hiking&quot;,
+                      &quot;Playing hockey&quot;,
+                      &quot;Hunting&quot;,
+                      &quot;Participating in martial arts&quot;,
+                      &quot;Playing racquet sports&quot;,
+                      &quot;Rollerblading&quot;,
+                      &quot;Running&quot;,
+                      &quot;Skiing, ice skating, snowboarding&quot;,
+                      &quot;Playing soccer&quot;,
+                      &quot;Softball&quot;,
+                      &quot;Using cardiovascular equipment&quot;,
+                      &quot;Vehicle touring/racing&quot;,
+                      &quot;Playing volleyball&quot;,
+                      &quot;Walking&quot;,
+                      &quot;Participating in water sports&quot;,
+                      &quot;Weightlifting/strength training&quot;,
+                      &quot;Working out, unspecified&quot;,
+                      &quot;Doing yoga&quot;,
+                      &quot;Playing sports n.e.c.*&quot;,
+                      &quot;Waiting related to playing sports or exercising&quot;,
+                      &quot;Waiting related to attending sporting events&quot;,
+                      &quot;Waiting associated with sports, exercise, and recreation, n.e.c.*&quot;,
+                      &quot;Security related to attending sporting events&quot;,
+                      &quot;Sports, exercise, and recreation, n.e.c.*&quot;) ~ &quot;exercise&quot;, 
+activity_codes %in% c(&quot;Attending religious services&quot;,
+                      &quot;Participation in religious practices&quot;,
+                      &quot;Waiting associated w/religious and spiritual activities&quot;,
+                      &quot;Religious education activities&quot;,
+                      &quot;Religious and spiritual activities, n.e.c.*&quot;) ~ &quot;religious_spiritual&quot;, 
+activity_codes %in% c(&quot;Computer use&quot;,
+                      &quot;Organizing and preparing&quot;,
+                      &quot;Reading&quot;,
+                      &quot;Telephone calls (except hotline counseling)&quot;,
+                      &quot;Writing&quot;,
+                      &quot;Fundraising&quot;,
+                      &quot;Administrative and support activities, n.e.c.*&quot;,
+                      &quot;Food preparation, presentation, clean-up&quot;,
+                      &quot;Collecting and delivering clothing and other goods&quot;,
+                      &quot;Providing care&quot;,
+                      &quot;Teaching, leading, counseling, mentoring&quot;,
+                      &quot;Social service and care activities, n.e.c.*&quot;,
+                      &quot;Building houses, wildlife sites, and other structures&quot;,
+                      &quot;Indoor and outdoor maintenance, repair, and clean-up&quot;,
+                      &quot;Indoor and outdoor maintenance, building and clean-up activities, n.e.c.*&quot;,
+                      &quot;Performing&quot;,
+                      &quot;Serving at volunteer events and cultural activities&quot;,
+                      &quot;Participating in performance and cultural activities, n.e.c.*&quot;,
+                      &quot;Attending meetings, conferences, and training&quot;,
+                      &quot;Public safety activities&quot;,
+                      &quot;Public health and safety activities, n.e.c.*&quot;,
+                      &quot;Waiting associated with volunteer activities&quot;,
+                      &quot;Waiting associated with volunteer activities, n.e.c.*&quot;,
+                      &quot;Security procedures related to volunteer activities&quot;,
+                      &quot;Security procedures related to volunteer activities, n.e.c.*&quot;,
+                      &quot;Volunteer activities, n.e.c.*&quot;) ~ &quot;volunteer&quot;, 
+activity_codes %in% c(&quot;Telephone calls to/from family members&quot;,
+                      &quot;Telephone calls to/from friends, neighbors, or acquaintances&quot;,
+                      &quot;Telephone calls to/from education services providers&quot;,
+                      &quot;Telephone calls to/from salespeople&quot;,
+                      &quot;Telephone calls to/from professional or personal care svcs providers&quot;,
+                      &quot;Telephone calls to/from household services providers&quot;,
+                      &quot;Telephone calls to/from paid child or adult care providers&quot;,
+                      &quot;Telephone calls to/from government officials&quot;,
+                      &quot;Telephone calls (to or from), n.e.c.*&quot;,
+                      &quot;Waiting associated with telephone calls&quot;,
+                      &quot;Telephone calls, n.e.c.*&quot;) ~ &quot;telephone&quot;, 
+activity_codes %in% c(&quot;Travel related to personal care&quot;,
+                      &quot;Travel related to housework&quot;,
+                      &quot;Travel related to food and drink prep., clean-up, and presentation&quot;,
+                      &quot;Travel related to interior maintenance, repair, and decoration&quot;,
+                      &quot;Travel related to exterior maintenance, repair, and decoration&quot;,
+                      &quot;Travel related to lawn, garden, and houseplant care&quot;,
+                      &quot;Travel related to care for animals and pets (not vet care)&quot;,
+                      &quot;Travel related to vehicle care and maintenance (by self)&quot;,
+                      &quot;Travel related to appliance, tool, and toy set-up, repair, and maintenance (by self)&quot;,
+                      &quot;Travel related to household management&quot;,
+                      &quot;Travel related to household activities, n.e.c.*&quot;,
+                      &quot;Travel related to caring for and helping hh children&quot;,
+                      &quot;Travel related to hh children&#39;s education&quot;,
+                      &quot;Travel related to hh children&#39;s health&quot;,
+                      &quot;Travel related to caring for hh adults&quot;,
+                      &quot;Travel related to helping hh adults&quot;,
+                      &quot;Travel related to caring for and helping nonhh children&quot;,
+                      &quot;Travel related to nonhh children&#39;s education&quot;,
+                      &quot;Travel related to nonhh children&#39;s health&quot;,
+                      &quot;Travel related to caring for nonhh adults&quot;,
+                      &quot;Travel related to helping nonhh adults&quot;,
+                      &quot;Travel rel. to caring for and helping nonhh members, n.e.c.*&quot;,
+                      &quot;Travel related to working&quot;,
+                      &quot;Travel related to work-related activities&quot;,
+                      &quot;Travel related to income-generating activities&quot;,
+                      &quot;Travel related to job search and interviewing&quot;,
+                      &quot;Travel related to work, n.e.c.*&quot;,
+                      &quot;Travel related to taking class&quot;,
+                      &quot;Travel related to extracurricular activities (ex. Sports)&quot;,
+                      &quot;Travel related to research/homework&quot;,
+                      &quot;Travel related to registration/administrative activities&quot;,
+                      &quot;Travel related to education, n.e.c.*&quot;,
+                      &quot;Travel related to grocery shopping&quot;,
+                      &quot;Travel related to purchasing gas&quot;,
+                      &quot;Travel related to purchasing food (not groceries)&quot;,
+                      &quot;Travel related to shopping, ex groceries, food, and gas&quot;,
+                      &quot;Travel related to consumer purchases, n.e.c.*&quot;,
+                      &quot;Travel related to using childcare services&quot;,
+                      &quot;Travel related to using financial services and banking&quot;,
+                      &quot;Travel related to using legal services&quot;,
+                      &quot;Travel related to using medical services&quot;,
+                      &quot;Travel related to using personal care services&quot;,
+                      &quot;Travel related to using real estate services&quot;,
+                      &quot;Travel related to using veterinary services&quot;,
+                      &quot;Travel rel. to using prof. and personal care services, n.e.c.*&quot;,
+                      &quot;Travel related to using household services&quot;,
+                      &quot;Travel related to using home main./repair/d�cor./construction svcs&quot;,
+                      &quot;Travel related to using pet services (not vet)&quot;,
+                      &quot;Travel related to using vehicle maintenance and repair services&quot;,
+                      &quot;Travel related to using government services&quot;,
+                      &quot;Travel related to civic obligations and participation&quot;,
+                      &quot;Travel related to eating and drinking&quot;,
+                      &quot;Travel related to socializing and communicating&quot;,
+                      &quot;Travel related to attending or hosting social events&quot;,
+                      &quot;Travel related to relaxing and leisure&quot;,
+                      &quot;Travel related to arts and entertainment&quot;,
+                      &quot;Travel as a form of entertainment&quot;,
+                      &quot;Travel rel. to socializing, relaxing, and leisure, n.e.c.*&quot;,
+                      &quot;Travel related to participating in sports/exercise/recreation&quot;,
+                      &quot;Travel related to attending sporting/recreational events&quot;,
+                      &quot;Travel related to sports, exercise, and recreation, n.e.c.*&quot;,
+                      &quot;Travel related to religious/spiritual practices&quot;,
+                      &quot;Travel rel. to religious/spiritual activities, n.e.c.*&quot;,
+                      &quot;Travel related to volunteering&quot;,
+                      &quot;Travel related to volunteer activities, n.e.c.*&quot;,
+                      &quot;Travel related to phone calls&quot;,
+                      &quot;Security procedures related to traveling&quot;,
+                      &quot;Security procedures related to traveling, n.e.c.*&quot;,
+                      &quot;Traveling, n.e.c.*&quot;,
+                      &quot;Travel rel. to caring for and helping hh members, n.e.c.*&quot;) ~ &quot;traveling&quot;
+))</code></pre>
+<p>Let’s read in and tidy the cps files that have the geographic information. First we’ll select the appropriate columns from cps and then rename the columns to be more useful. Then we’ll recode the column values.</p>
+<pre class="r"><code>cps_2020_sub = cps_2020 %&gt;% #select geographic variables
+  select(TUCASEID:GTCO, PRTAGE, PESEX) %&gt;% 
+  mutate(year = 2020)
+
+cps_2019_sub = cps_2019 %&gt;% #select geographic variables
+  select(TUCASEID:GTCO, PRTAGE, PESEX) %&gt;% 
+  mutate(year = 2019)
+
+#stack the 2019 and 2020 cps datasets
+
+cps_combined = rbind(cps_2019_sub, cps_2020_sub) %&gt;% 
+  rename(division = GEDIV, 
+         region = GEREG, 
+         state = GESTFIPS, 
+         metro_area = GTCBSA, 
+         metro_status = GTMETSTA, 
+         county = GTCO,
+         age = PRTAGE, 
+         sex = PESEX) %&gt;% 
+  mutate(state = recode(state,
+`1 ` = &quot;AL&quot;, `17`= &quot;IL&quot;, `30` = &quot;MT&quot;, `44` = &quot;RI&quot;,
+`2 ` = &quot;AK&quot;, `18`= &quot;IN&quot;, `31` = &quot;NE&quot;, `45` = &quot;SC&quot;,
+`4 ` = &quot;AZ&quot;, `19`= &quot;IA&quot;, `32` = &quot;NV&quot;, `46` = &quot;SD&quot;,
+`5 ` = &quot;AR&quot;, `20`= &quot;KS&quot;, `33` = &quot;NH&quot;, `47` = &quot;TN&quot;,
+`6 ` = &quot;CA&quot;, `21`= &quot;KY&quot;, `34` = &quot;NJ&quot;, `48` = &quot;TX&quot;,
+`8 ` = &quot;CO&quot;, `22`= &quot;LA&quot;, `35` = &quot;NM&quot;, `49` = &quot;UT&quot;,
+`9 ` = &quot;CT&quot;, `23`= &quot;ME&quot;, `36` = &quot;NY&quot;, `50` = &quot;VT&quot;,
+`10` = &quot;DE&quot;, `24`= &quot;MD&quot;, `37` = &quot;NC&quot;, `51` = &quot;VA&quot;,
+`11` = &quot;DC&quot;, `25`= &quot;MA&quot;, `38` = &quot;ND&quot;, `53` = &quot;WA&quot;,
+`12` = &quot;FL&quot;, `26`= &quot;MI&quot;, `39` = &quot;OH&quot;, `54` = &quot;WV&quot;,
+`13` = &quot;GA&quot;, `27`= &quot;MN&quot;, `40` = &quot;OK&quot;, `55` = &quot;WI&quot;,
+`15` = &quot;HI&quot;, `28`= &quot;MS&quot;, `41` = &quot;OR&quot;, `56` = &quot;WY&quot;,
+`16` = &quot;ID&quot;, `29`= &quot;MO&quot;, `42` = &quot;PA&quot;), 
+        region = recode(region, 
+                        `1` = &quot;Northeast&quot;, 
+                        `2` = &quot;Midwest&quot;, 
+                        `3` = &quot;South&quot;, 
+                        `4` = &quot;West&quot;), 
+        division = recode(division, 
+                          `1` = &quot;New England&quot;,
+                          `2` = &quot;Middle Atlantic&quot;,
+                          `3` = &quot;East North Central&quot;,
+                          `4` = &quot;West North Central&quot;,
+                          `5` = &quot;South Atlantic&quot;,
+                          `6` = &quot;East South Central&quot;,
+                          `7` = &quot;West South Central&quot;,
+                          `8` = &quot;Mountain&quot;,
+                          `9` = &quot;Pacific&quot;
+                          ), 
+        metro_status = recode(metro_status, 
+                            `1` = &quot;metropolitan&quot;, 
+                            `2` = &quot;non-metropolitan&quot;, 
+                            `3` = &quot;not identified&quot;)) </code></pre>
+<p>Merge the cps and summary datafiles.</p>
+<pre class="r"><code>cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c(&quot;TUCASEID&quot;, &quot;age&quot;, &quot;year&quot;, &quot;sex&quot;))</code></pre>
+<p>Let’s write a function to do the calculations how many hours are spent on a category of activity daily.</p>
+<p>Average daily hours for a category = (sum(minutes spent on category of activity * weight)/sum of weights)/60.</p>
+<pre class="r"><code>daily_time = function(catgry, yr){
+  data = cps_summary_merged %&gt;% 
+  filter(category == catgry, 
+         year == yr) %&gt;% 
+  mutate(time_weight_product = total_minutes*weight) %&gt;% 
+    group_by(TUCASEID, weight) %&gt;% 
+    summarize(weighted_minutes = sum(time_weight_product))
+  
+  avg_daily = (sum(data$weighted_minutes) / #in hours 
+  sum(data$weight))/60
+  
+  print(avg_daily)
+
+}
+
+daily_time(&quot;work&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 3.384798</code></pre>
+<pre class="r"><code>daily_time(&quot;leisure&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 4.703647</code></pre>
+<pre class="r"><code>daily_time(&quot;sleep&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 8.964998</code></pre>
+<pre class="r"><code>daily_time_categories = data.frame(category = 
+                                     c(&quot;sleep&quot;, &quot;caring_duties&quot;, &quot;shopping&quot;, &quot;eating_drinking&quot;, &quot;religious_spiritual&quot;, &quot;traveling&quot;, &quot;personal_care&quot;, &quot;work&quot;, &quot;professional_services&quot;, &quot;leisure&quot;, &quot;volunteer&quot;, &quot;household&quot;, &quot;education&quot;, &quot;gov_civic_obligations&quot;, &quot;exercise&quot;, &quot;telephone&quot;), 
+                                   average_daily_hours_2019 = 
+                                     c(daily_time(&quot;sleep&quot;, 2019),
+                                       daily_time(&quot;caring_duties&quot;, 2019),
+                                       daily_time(&quot;shopping&quot;, 2019), 
+                                       daily_time(&quot;eating_drinking&quot;, 2019),
+                                       daily_time(&quot;religious_spiritual&quot;, 2019),
+                                       daily_time(&quot;traveling&quot;, 2019),
+                                       daily_time(&quot;personal_care&quot;, 2019),
+                                       daily_time(&quot;work&quot;, 2019),
+                                       daily_time(&quot;professional_services&quot;, 2019),
+                                       daily_time(&quot;leisure&quot;, 2019),
+                                       daily_time(&quot;volunteer&quot;, 2019),
+                                       daily_time(&quot;household&quot;, 2019),
+                                       daily_time(&quot;education&quot;, 2019),
+                                       daily_time(&quot;gov_civic_obligations&quot;, 2019),
+                                       daily_time(&quot;exercise&quot;, 2019),
+                                       daily_time(&quot;telephone&quot;, 2019)),
+                                   average_daily_hours_2020 = 
+                                     c(daily_time(&quot;sleep&quot;, 2020),
+                                       daily_time(&quot;caring_duties&quot;, 2020),
+                                       daily_time(&quot;shopping&quot;, 2020), 
+                                       daily_time(&quot;eating_drinking&quot;, 2020),
+                                       daily_time(&quot;religious_spiritual&quot;, 2020),
+                                       daily_time(&quot;traveling&quot;, 2020),
+                                       daily_time(&quot;personal_care&quot;, 2020),
+                                       daily_time(&quot;work&quot;, 2020),
+                                       daily_time(&quot;professional_services&quot;, 2020),
+                                       daily_time(&quot;leisure&quot;, 2020),
+                                       daily_time(&quot;volunteer&quot;, 2020),
+                                       daily_time(&quot;household&quot;, 2020),
+                                       daily_time(&quot;education&quot;, 2020),
+                                       daily_time(&quot;gov_civic_obligations&quot;, 2020),
+                                       daily_time(&quot;exercise&quot;, 2020),
+                                       daily_time(&quot;telephone&quot;, 2020)))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 8.964998</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.5437622</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.3568846</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 1.086427</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.1362347</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 1.230181</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.7758412</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 3.384798</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.1063825</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 4.703647</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.1269646</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 1.789539</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.4559226</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.001825903</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.3239333</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.1105222</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 9.080455</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.5631527</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.2916197</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 1.060366</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.1021077</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.8579818</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.6979618</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 3.135812</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.1107308</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 5.104354</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.08924755</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 1.985039</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.4243409</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.001089081</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.3437513</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 0.1526762</code></pre>
+<pre class="r"><code>daily_time_categories %&gt;% 
+  mutate(average_daily_hours_2019 = round(average_daily_hours_2019, 2)) %&gt;% 
+    mutate(average_daily_hours_2020 = round(average_daily_hours_2020, 2))</code></pre>
+<pre><code>##                 category average_daily_hours_2019 average_daily_hours_2020
+## 1                  sleep                     8.96                     9.08
+## 2          caring_duties                     0.54                     0.56
+## 3               shopping                     0.36                     0.29
+## 4        eating_drinking                     1.09                     1.06
+## 5    religious_spiritual                     0.14                     0.10
+## 6              traveling                     1.23                     0.86
+## 7          personal_care                     0.78                     0.70
+## 8                   work                     3.38                     3.14
+## 9  professional_services                     0.11                     0.11
+## 10               leisure                     4.70                     5.10
+## 11             volunteer                     0.13                     0.09
+## 12             household                     1.79                     1.99
+## 13             education                     0.46                     0.42
+## 14 gov_civic_obligations                     0.00                     0.00
+## 15              exercise                     0.32                     0.34
+## 16             telephone                     0.11                     0.15</code></pre>
+<p>Let’s create a function to calculate the average daily time among people who actually engage in the category of activity.</p>
+<pre class="r"><code>daily_time_2 = function(catgry, yr){
+  data = cps_summary_merged %&gt;% 
+  filter(category == catgry, 
+         year == yr) %&gt;% 
+    filter(total_minutes &gt; 0) %&gt;%
+  mutate(time_weight_product = total_minutes*weight) %&gt;% 
+    group_by(TUCASEID, weight) %&gt;% 
+    summarize(weighted_minutes = sum(time_weight_product))
+  
+  avg_daily = (sum(data$weighted_minutes) / #in hours 
+  sum(data$weight))/60
+  
+  print(avg_daily)
+
+}
+
+daily_time_2(&quot;work&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 7.600836</code></pre>
+<p>Let’s see what the average number of hours spent on leisure activities is by state.</p>
+<pre class="r"><code>leisure_data_state =
+  cps_summary_merged %&gt;% 
+  filter(category == &quot;leisure&quot;) %&gt;% 
+  mutate(time_weight_product = total_minutes*weight) %&gt;%  
+  group_by(state, year) %&gt;% 
+  summarize(avg_leisure_time = sum(time_weight_product)/sum(weight), 
+            n = n()
+            )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;state&#39;. You can override using the `.groups` argument.</code></pre>
+<p>Map the average number of hours spent on leisure activities is by state.</p>
+<pre class="r"><code>library(usmap)
+library(ggplot2)
+
+plot_usmap(data = leisure_data_state, values = &quot;avg_leisure_time&quot;, color = &quot;red&quot;) + 
+  scale_fill_viridis_b(name = &quot;Average leisure time&quot;, label = scales::comma, direction = -1) + 
+  theme(legend.position = &quot;right&quot;) +
+  facet_wrap(~ year)</code></pre>
+<p><img src="p8105_final_project_data_import_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="plotly" class="section level2">
+<h2>Plotly</h2>
+</div>
+<div id="regression" class="section level2">
+<h2>Regression</h2>
+<p>Regression analysis with race and time spent on leisure activities</p>
+<pre class="r"><code>cps_summary_leisure_2019 = cps_summary_merged %&gt;% 
+  filter(category == &quot;leisure&quot;, year == &quot;2019&quot;) %&gt;% 
+  mutate(
+    race = recode(race, 
+        &#39;1&#39; = &#39;White only&#39;,
+        &#39;2&#39; = &#39;Black only&#39;,
+        &#39;3&#39; = &#39;American Indian, Alaskan Native only&#39;,
+        &#39;4&#39; = &#39;Asian only&#39;,
+        &#39;5&#39; = &#39;Hawaiian/Pacific Islander only&#39;,
+        &#39;6&#39; = &#39;White-Black&#39;,
+        &#39;7&#39; = &#39;White-American Indian&#39;,
+        &#39;8&#39; = &#39;White-Asian&#39;,
+        &#39;9&#39; = &#39;White-Hawaiian&#39;,
+        &#39;10&#39; = &#39;Black-American Indian&#39;,
+        &#39;11&#39; = &#39;Black-Asian&#39;,
+        &#39;12&#39; = &#39;Black-Hawaiian&#39;,
+        &#39;13&#39; = &#39;American Indian-Asian&#39;,
+        &#39;14&#39; = &#39;American Indian-Hawaiian&#39;,
+        &#39;15&#39; = &#39;Asian-Hawaiian&#39;,
+        &#39;16&#39; = &#39;White-Black-American Indian&#39;,
+        &#39;17&#39; = &#39;White-Black-Asian&#39;,
+        &#39;18&#39; = &#39;White-Black-Hawaiian&#39;,
+        &#39;19&#39; = &#39;White-American Indian-Asian&#39;,
+        &#39;20&#39; = &#39;White-American Indian-Hawaiian&#39;,
+        &#39;21&#39; = &#39;White-Asian-Hawaiian&#39;,
+        &#39;22&#39; = &#39;Black-American Indian-Asian&#39;,
+        &#39;23&#39; = &#39;White-Black-American Indian-Asian&#39;,
+        &#39;24&#39; = &#39;White-American Indian-Asian-Hawaiian&#39;,
+        &#39;25&#39; = &#39;Other 3 race combinations&#39;,
+        &#39;26&#39; = &#39;Other 4 and 5 race combinations&#39;,
+    ))
+
+cps_summary_leisure_2020 = cps_summary_merged %&gt;% 
+  filter(category == &quot;leisure&quot;, year == &quot;2020&quot;)</code></pre>
+<pre class="r"><code>fit_leisure_2019 = lm(total_minutes ~ race, data = cps_summary_leisure_2019)
+
+fit_leisure_2019 %&gt;% 
+  broom::tidy() %&gt;% 
+  select(term, estimate, p.value) %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">6.605</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">raceAsian-Hawaiian</td>
+<td align="right">-5.627</td>
+<td align="right">0.414</td>
+</tr>
+<tr class="odd">
+<td align="left">raceAsian only</td>
+<td align="right">-1.782</td>
+<td align="right">0.045</td>
+</tr>
+<tr class="even">
+<td align="left">raceBlack-American Indian</td>
+<td align="right">-0.974</td>
+<td align="right">0.758</td>
+</tr>
+<tr class="odd">
+<td align="left">raceBlack-Asian</td>
+<td align="right">11.982</td>
+<td align="right">0.082</td>
+</tr>
+<tr class="even">
+<td align="left">raceBlack-Hawaiian</td>
+<td align="right">-5.735</td>
+<td align="right">0.405</td>
+</tr>
+<tr class="odd">
+<td align="left">raceBlack only</td>
+<td align="right">1.092</td>
+<td align="right">0.197</td>
+</tr>
+<tr class="even">
+<td align="left">raceHawaiian/Pacific Islander only</td>
+<td align="right">0.112</td>
+<td align="right">0.949</td>
+</tr>
+<tr class="odd">
+<td align="left">raceWhite-American Indian</td>
+<td align="right">0.723</td>
+<td align="right">0.557</td>
+</tr>
+<tr class="even">
+<td align="left">raceWhite-American Indian-Asian</td>
+<td align="right">-3.344</td>
+<td align="right">0.628</td>
+</tr>
+<tr class="odd">
+<td align="left">raceWhite-Asian</td>
+<td align="right">0.197</td>
+<td align="right">0.920</td>
+</tr>
+<tr class="even">
+<td align="left">raceWhite-Asian-Hawaiian</td>
+<td align="right">0.337</td>
+<td align="right">0.933</td>
+</tr>
+<tr class="odd">
+<td align="left">raceWhite-Black</td>
+<td align="right">-1.794</td>
+<td align="right">0.225</td>
+</tr>
+<tr class="even">
+<td align="left">raceWhite-Black-American Indian</td>
+<td align="right">1.663</td>
+<td align="right">0.568</td>
+</tr>
+<tr class="odd">
+<td align="left">raceWhite-Black-American Indian-Asian</td>
+<td align="right">-6.605</td>
+<td align="right">0.338</td>
+</tr>
+<tr class="even">
+<td align="left">raceWhite-Black-Asian</td>
+<td align="right">-2.148</td>
+<td align="right">0.755</td>
+</tr>
+<tr class="odd">
+<td align="left">raceWhite-Hawaiian</td>
+<td align="right">-3.518</td>
+<td align="right">0.610</td>
+</tr>
+<tr class="even">
+<td align="left">raceWhite only</td>
+<td align="right">0.098</td>
+<td align="right">0.906</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>fit_leisure_2020 = lm(total_minutes ~ age, data = cps_summary_leisure_2020)
+
+fit_leisure_2020 %&gt;% 
+  broom::tidy() %&gt;% 
+  select(term, estimate, p.value) %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">3.894</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">age</td>
+<td align="right">0.079</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
