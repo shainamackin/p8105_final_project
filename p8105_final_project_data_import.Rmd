@@ -950,6 +950,14 @@ Merge the cps and summary datafiles.
 
 ```{r}
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
+
+summary_subject_category <- cps_summary_merged %>% #each row is a unique subject ID with unique category, category_sum_min: the sum of mins a subject spent on a specific category during that year; category_sum_hour: the sum of hours a subject spent on a specific category during that year
+  group_by(TUCASEID,category) %>% 
+  mutate(category_sum_min = sum(total_minutes), 
+         category_sum_hour = category_sum_min/60, 
+         category_sum_hour_weight = category_sum_hour*weight) %>% 
+  filter(row_number() == 1) %>%
+  select(-c("activity_codes","total_minutes"))
 ```
 
 Let's write a function to do the calculations how many hours are spent on a category of activity daily.
@@ -1044,17 +1052,27 @@ daily_time_2("work", 2019)
 
 
 Let's see what the average number of hours spent on leisure activities is by state.
-
 ```{r}
-
 leisure_data_state =
   cps_summary_merged %>% 
   filter(category == "leisure") %>% 
   mutate(time_weight_product = total_minutes*weight) %>%  
   group_by(state, year) %>% 
-  summarize(avg_leisure_time = sum(time_weight_product)/sum(weight), 
+  summarize(avg_leisure_time = sum(time_weight_product)/weight, 
             n = n()
             )
+leisure_data_state = summary_subject_category %>% 
+  filter(category == "leisure") %>% 
+  group_by(state,year) %>% 
+  summarise(avg_leisure_time = sum(category_sum_hour*weight)/sum(weight))
+
+leisure_data_state1 = summary_subject_category %>% 
+  filter(category == "leisure") %>%
+  group_by(state,year) %>% 
+  summarise(n = n(),sum(category_sum_hour)/n)
+
+  ##sum(category_sum_hour)/n
+  ##sum(category_sum_hour*weight)/sum(weight)
 ```
 
 Map the average number of hours spent on leisure activities is by state.
@@ -1069,9 +1087,20 @@ plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red"
 ```
 
 ## Plotly 
-
 ```{r}
+library(plotly)
+fig <- plotly::plot_geo(leisure_data_state, locationmode = 'USA-states')
+fig <- fig %>% add_trace(
+    z = ~total.exports, text = ~hover, locations = ~code,
+    color = ~total.exports, colors = 'Purples'
+  )
+fig <- fig %>% colorbar(title = "xx")
+fig <- fig %>% layout(
+    title = 'xx',
+    geo = g
+  )
 
+fig
 ```
 
 
