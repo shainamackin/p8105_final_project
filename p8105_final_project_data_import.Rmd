@@ -952,9 +952,9 @@ Merge the cps and summary datafiles.
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
 ```
 
-Let's calculate average hours per day spent on leisure activities. We will sum the product of the total minutes spent on leisure activities and the weight and divide this by the sum of the weights. Average leisure hours per day = sum(minutes spent on leisure * weight)/sum of weights.
+Let's write a function to do the calculations how many hours are spent on a category of activity daily.
 
-Let's write a function to do the same calculations for the other categories of activities. 
+Average daily hours for a category = (sum(minutes spent on category of activity * weight)/sum of weights)/60.
 
 ```{r}
 daily_time = function(catgry, yr){
@@ -971,6 +971,11 @@ daily_time = function(catgry, yr){
   print(avg_daily)
 
 }
+
+daily_time("work", 2019)
+daily_time("leisure", 2019)
+daily_time("sleep", 2019)
+
 
 daily_time_categories = data.frame(category = 
                                      c("sleep", "caring_duties", "shopping", "eating_drinking", "religious_spiritual", "traveling", "personal_care", "work", "professional_services", "leisure", "volunteer", "household", "education", "gov_civic_obligations", "exercise", "telephone"), 
@@ -1013,14 +1018,35 @@ daily_time_categories = data.frame(category =
 daily_time_categories %>% 
   mutate(average_daily_hours_2019 = round(average_daily_hours_2019, 2)) %>% 
     mutate(average_daily_hours_2020 = round(average_daily_hours_2020, 2))
-
-
-
 ```
+
+Let's create a function to calculate the average daily time among people who actually engage in the category of activity. 
+
+```{r}
+daily_time_2 = function(catgry, yr){
+  data = cps_summary_merged %>% 
+  filter(category == catgry, 
+         year == yr) %>% 
+    filter(total_minutes > 0) %>%
+  mutate(time_weight_product = total_minutes*weight) %>% 
+    group_by(TUCASEID, weight) %>% 
+    summarize(weighted_minutes = sum(time_weight_product))
+  
+  avg_daily = (sum(data$weighted_minutes) / #in hours 
+  sum(data$weight))/60
+  
+  print(avg_daily)
+
+}
+
+daily_time_2("work", 2019)
+```
+
 
 Let's see what the average number of hours spent on leisure activities is by state.
 
 ```{r}
+
 leisure_data_state =
   cps_summary_merged %>% 
   filter(category == "leisure") %>% 

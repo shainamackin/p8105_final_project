@@ -1241,8 +1241,8 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %&gt;%
                             `3` = &quot;not identified&quot;)) </code></pre>
 <p>Merge the cps and summary datafiles.</p>
 <pre class="r"><code>cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c(&quot;TUCASEID&quot;, &quot;age&quot;, &quot;year&quot;, &quot;sex&quot;))</code></pre>
-<p>Let’s calculate average hours per day spent on leisure activities. We will sum the product of the total minutes spent on leisure activities and the weight and divide this by the sum of the weights. Average leisure hours per day = sum(minutes spent on leisure * weight)/sum of weights.</p>
-<p>Let’s write a function to do the same calculations for the other categories of activities.</p>
+<p>Let’s write a function to do the calculations how many hours are spent on a category of activity daily.</p>
+<p>Average daily hours for a category = (sum(minutes spent on category of activity * weight)/sum of weights)/60.</p>
 <pre class="r"><code>daily_time = function(catgry, yr){
   data = cps_summary_merged %&gt;% 
   filter(category == catgry, 
@@ -1258,7 +1258,16 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %&gt;%
 
 }
 
-daily_time_categories = data.frame(category = 
+daily_time(&quot;work&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 3.384798</code></pre>
+<pre class="r"><code>daily_time(&quot;leisure&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 4.703647</code></pre>
+<pre class="r"><code>daily_time(&quot;sleep&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 8.964998</code></pre>
+<pre class="r"><code>daily_time_categories = data.frame(category = 
                                      c(&quot;sleep&quot;, &quot;caring_duties&quot;, &quot;shopping&quot;, &quot;eating_drinking&quot;, &quot;religious_spiritual&quot;, &quot;traveling&quot;, &quot;personal_care&quot;, &quot;work&quot;, &quot;professional_services&quot;, &quot;leisure&quot;, &quot;volunteer&quot;, &quot;household&quot;, &quot;education&quot;, &quot;gov_civic_obligations&quot;, &quot;exercise&quot;, &quot;telephone&quot;), 
                                    average_daily_hours_2019 = 
                                      c(daily_time(&quot;sleep&quot;, 2019),
@@ -1378,6 +1387,26 @@ daily_time_categories = data.frame(category =
 ## 14 gov_civic_obligations                     0.00                     0.00
 ## 15              exercise                     0.32                     0.34
 ## 16             telephone                     0.11                     0.15</code></pre>
+<p>Let’s create a function to calculate the average daily time among people who actually engage in the category of activity.</p>
+<pre class="r"><code>daily_time_2 = function(catgry, yr){
+  data = cps_summary_merged %&gt;% 
+  filter(category == catgry, 
+         year == yr) %&gt;% 
+    filter(total_minutes &gt; 0) %&gt;%
+  mutate(time_weight_product = total_minutes*weight) %&gt;% 
+    group_by(TUCASEID, weight) %&gt;% 
+    summarize(weighted_minutes = sum(time_weight_product))
+  
+  avg_daily = (sum(data$weighted_minutes) / #in hours 
+  sum(data$weight))/60
+  
+  print(avg_daily)
+
+}
+
+daily_time_2(&quot;work&quot;, 2019)</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## [1] 7.600836</code></pre>
 <p>Let’s see what the average number of hours spent on leisure activities is by state.</p>
 <pre class="r"><code>leisure_data_state =
   cps_summary_merged %&gt;% 
@@ -1396,7 +1425,7 @@ plot_usmap(data = leisure_data_state, values = &quot;avg_leisure_time&quot;, col
   scale_fill_viridis_b(name = &quot;Average leisure time&quot;, label = scales::comma, direction = -1) + 
   theme(legend.position = &quot;right&quot;) +
   facet_wrap(~ year)</code></pre>
-<p><img src="p8105_final_project_data_import_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p><img src="p8105_final_project_data_import_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
 </div>
 <div id="plotly" class="section level2">
 <h2>Plotly</h2>
