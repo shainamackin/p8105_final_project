@@ -13,8 +13,8 @@
 
 <title>P8105 Final Project</title>
 
-<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -1466,7 +1466,12 @@ plot_usmap(data = leisure_data_state, values = &quot;avg_leisure_time&quot;, col
     ))
 
 cps_summary_leisure_2020 = cps_summary_merged %&gt;% 
-  filter(category == &quot;leisure&quot;, year == &quot;2020&quot;)</code></pre>
+  filter(category == &quot;leisure&quot;, year == &quot;2020&quot;)
+
+# model1 = lm(total_minutes ~ ., data = cps_summary_leisure_2019) %&gt;% 
+#  MASS::stepAIC(direction = &quot;backward&quot;, trace = FALSE)
+
+# model1 %&gt;% broom::tidy() %&gt;% knitr::kable(digits = 3)</code></pre>
 <pre class="r"><code>fit_leisure_2019 = lm(total_minutes ~ race, data = cps_summary_leisure_2019)
 
 fit_leisure_2019 %&gt;% 
@@ -1488,34 +1493,34 @@ fit_leisure_2019 %&gt;%
 <td align="right">0.000</td>
 </tr>
 <tr class="even">
-<td align="left">raceAsian-Hawaiian</td>
-<td align="right">-5.627</td>
-<td align="right">0.414</td>
-</tr>
-<tr class="odd">
 <td align="left">raceAsian only</td>
 <td align="right">-1.782</td>
 <td align="right">0.045</td>
 </tr>
+<tr class="odd">
+<td align="left">raceAsian-Hawaiian</td>
+<td align="right">-5.627</td>
+<td align="right">0.414</td>
+</tr>
 <tr class="even">
+<td align="left">raceBlack only</td>
+<td align="right">1.092</td>
+<td align="right">0.197</td>
+</tr>
+<tr class="odd">
 <td align="left">raceBlack-American Indian</td>
 <td align="right">-0.974</td>
 <td align="right">0.758</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">raceBlack-Asian</td>
 <td align="right">11.982</td>
 <td align="right">0.082</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">raceBlack-Hawaiian</td>
 <td align="right">-5.735</td>
 <td align="right">0.405</td>
-</tr>
-<tr class="odd">
-<td align="left">raceBlack only</td>
-<td align="right">1.092</td>
-<td align="right">0.197</td>
 </tr>
 <tr class="even">
 <td align="left">raceHawaiian/Pacific Islander only</td>
@@ -1523,54 +1528,54 @@ fit_leisure_2019 %&gt;%
 <td align="right">0.949</td>
 </tr>
 <tr class="odd">
+<td align="left">raceWhite only</td>
+<td align="right">0.098</td>
+<td align="right">0.906</td>
+</tr>
+<tr class="even">
 <td align="left">raceWhite-American Indian</td>
 <td align="right">0.723</td>
 <td align="right">0.557</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">raceWhite-American Indian-Asian</td>
 <td align="right">-3.344</td>
 <td align="right">0.628</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">raceWhite-Asian</td>
 <td align="right">0.197</td>
 <td align="right">0.920</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">raceWhite-Asian-Hawaiian</td>
 <td align="right">0.337</td>
 <td align="right">0.933</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">raceWhite-Black</td>
 <td align="right">-1.794</td>
 <td align="right">0.225</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">raceWhite-Black-American Indian</td>
 <td align="right">1.663</td>
 <td align="right">0.568</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">raceWhite-Black-American Indian-Asian</td>
 <td align="right">-6.605</td>
 <td align="right">0.338</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left">raceWhite-Black-Asian</td>
 <td align="right">-2.148</td>
 <td align="right">0.755</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left">raceWhite-Hawaiian</td>
 <td align="right">-3.518</td>
 <td align="right">0.610</td>
-</tr>
-<tr class="even">
-<td align="left">raceWhite only</td>
-<td align="right">0.098</td>
-<td align="right">0.906</td>
 </tr>
 </tbody>
 </table>
