@@ -1144,6 +1144,11 @@ cps_summary_leisure_2019 = cps_summary_merged %>%
 
 cps_summary_leisure_2020 = cps_summary_merged %>% 
   filter(category == "leisure", year == "2020")
+
+# model1 = lm(total_minutes ~ ., data = cps_summary_leisure_2019) %>% 
+#  MASS::stepAIC(direction = "backward", trace = FALSE)
+
+# model1 %>% broom::tidy() %>% knitr::kable(digits = 3)
 ```
 
 ```{r}
@@ -1165,3 +1170,5 @@ fit_leisure_2020 %>%
   knitr::kable(digits = 3)
 
 ```
+
+
