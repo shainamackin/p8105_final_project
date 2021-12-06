@@ -1230,7 +1230,8 @@ resp_2020_tidied = resp_2020 %>%
   filter(TUYEAR == 2020) %>%
   select(-TUYEAR, -TUMONTH, -TULINENO) %>%
   mutate(
-    tudiaryday = factor(TUDIARYDAY, levels = c(1,2,3,4,5,6,7), labels = c("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday")))
+    tudiaryday = factor(TUDIARYDAY, levels = c(1,2,3,4,5,6,7), labels = c("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"))) %>%
+  arrange(TUCASEID, month, date, year, TUDIARYDATE, tudiaryday)
 
 merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c("TUCASEID")) %>% janitor::clean_names()
 ```
