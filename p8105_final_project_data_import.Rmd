@@ -1,6 +1,8 @@
 ---
 title: "P8105 Final Project"
 output: github_document
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, message = FALSE}
@@ -1211,6 +1213,29 @@ fit_leisure_2020 %>%
   knitr::kable(digits = 3)
 
 ```
+
+
+```{r 2020_time_trends}
+
+actsum_categorized_2020 = actsum_combined_categorized %>%
+  filter(year == 2020)
+# merge on case id, age, year, sex
+# TRCHILDNUM, TRYHHCHILD, TELFS, TRETRNWA, TEMJOT, TRDPFTPT, TEHRUSLT, TRTEC, TRTHH, TESCHENR, TESCHLVL, TRSPRRES, TUDIARY, TRTEC, TRTHH, TESCHENR TESCHLVL, TESPEMPNOT, TRSPFTPTTRHOLiDAT, TUFINLWGT, TU06FWGT, TU20FWGT
+
+
+resp_2020_tidied = resp_2020 %>% 
+  select(TUCASEID, TULINENO, TERRP, TWSEX, TEAGE, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %>%
+  filter(TUYEAR == 2020)
+```
+
+
+
+
+
+
+
+
+
 <<<<<<< HEAD
 =======
 
