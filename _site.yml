@@ -7,6 +7,8 @@ navbar:
       href: exporatory_analyses.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html
+    - text: "Data Visualizations"
+      href: data_vis.html
     - text: "Project Report"
       href: project_report.html
     - icon: fa-envelope fa-lg
