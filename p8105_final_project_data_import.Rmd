@@ -1226,6 +1226,7 @@ resp_2020_tidied = resp_2020 %>%
   separate(date, c("year", "month", "date")) %>%
   mutate(month = month.name[as.numeric(month)]) %>%
   mutate(year = as.numeric(year)) %>%
+  mutate(TUDIARYDATE = str_replace(TUDIARYDATE, "2020", "")) %>%
   filter(TUYEAR == 2020) %>%
   select(-TUYEAR, -TUMONTH, -TULINENO) %>%
   mutate(
@@ -1234,16 +1235,13 @@ resp_2020_tidied = resp_2020 %>%
 merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c("TUCASEID")) %>% janitor::clean_names()
 ```
 
+Plotting 2020 activity trends over time:
+```{r}
+merged_actsum_cps_resp_2020_leisure = merged_actsum_cps_resp_2020 %>%
+  filter(category == "leisure")
 
+#if tudiarydate values are equal, then collapse and sum category_sum_hours
+#https://stackoverflow.com/questions/16777972/r-collapse-rows-and-sum-the-values-in-the-column 
+#ggplot(aes(tudiarydate, category_sum_hour)) + geom_line() 
+```
 
-
-
-
-
-
-
-<<<<<<< HEAD
-=======
-
-
->>>>>>> f1f26cc0df79f3f3d303899ddbe90e3d80cdb6d2
