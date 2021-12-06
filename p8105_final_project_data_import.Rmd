@@ -1215,17 +1215,23 @@ fit_leisure_2020 %>%
 ```
 
 
+Merging respondent data with 2020 categorized actsum data:
 ```{r 2020_time_trends}
-
-actsum_categorized_2020 = actsum_combined_categorized %>%
+actsum_cps_2020 = summary_household_category %>%
   filter(year == 2020)
-# merge on case id, age, year, sex
-# TRCHILDNUM, TRYHHCHILD, TELFS, TRETRNWA, TEMJOT, TRDPFTPT, TEHRUSLT, TRTEC, TRTHH, TESCHENR, TESCHLVL, TRSPRRES, TUDIARY, TRTEC, TRTHH, TESCHENR TESCHLVL, TESPEMPNOT, TRSPFTPTTRHOLiDAT, TUFINLWGT, TU06FWGT, TU20FWGT
-
 
 resp_2020_tidied = resp_2020 %>% 
-  select(TUCASEID, TULINENO, TERRP, TWSEX, TEAGE, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %>%
-  filter(TUYEAR == 2020)
+  select(TUCASEID, TULINENO, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %>%
+  mutate(date = lubridate::ymd(TUDIARYDATE)) %>%
+  separate(date, c("year", "month", "date")) %>%
+  mutate(month = month.name[as.numeric(month)]) %>%
+  mutate(year = as.numeric(year)) %>%
+  filter(TUYEAR == 2020) %>%
+  select(-TUYEAR, -TUMONTH, -TULINENO) %>%
+  mutate(
+    tudiaryday = factor(TUDIARYDAY, levels = c(1,2,3,4,5,6,7), labels = c("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday")))
+
+merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c("TUCASEID")) %>% janitor::clean_names()
 ```
 
 
