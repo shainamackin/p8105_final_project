@@ -950,6 +950,55 @@ Merge the cps and summary datafiles.
 
 ```{r}
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
+
+summary_household_category <- cps_summary_merged %>% #each row is a unique subject ID with unique category, category_sum_min: the sum of mins a subject spent on a specific category during that year; category_sum_hour: the sum of hours a subject spent on a specific category during that year
+  group_by(TUCASEID,category) %>% 
+  mutate(category_sum_min = sum(total_minutes), 
+         category_sum_hour = category_sum_min/60, 
+         category_sum_hour_weight = category_sum_hour*weight) %>% 
+  filter(row_number() == 1) %>%
+  select(-c("activity_codes","total_minutes"))
+```
+
+## Demographic table
+```{r}
+#race, age, sex, labor force status, and state 
+#First we need to recode race, sex, and labor force status
+library(table1)
+table(summary_household_category$race)
+
+summary_household_category$race <- # Need to review race categorization
+  as_factor(case_when(
+    summary_household_category$race %in% c(4, 7, 10, 11, 13, 16, 17, 19, 22, 23) ~ "Asian",
+    summary_household_category$race %in% c(1) ~ "White", 
+    summary_household_category$race %in% c(2, 6, 12) ~ "Black",
+    summary_household_category$race %in% c(5, 9, 18, 21) ~ "Hawaiian/Pacific Islander",
+    TRUE ~ "unknown"
+  ))
+
+summary_household_category$labor_force_status <-
+  as_factor(case_when(
+    summary_household_category$labor_force_status == 1 ~ "Employed-At work",
+    summary_household_category$labor_force_status == 2 ~ "Employed-Absent",
+    summary_household_category$labor_force_status == 3 ~ "Unemployed-On layoff",
+    summary_household_category$labor_force_status == 4 ~ "Unemployed-Looking",
+    summary_household_category$labor_force_status == 5 ~ "Retired",
+    TRUE ~ "unknown"
+  ))
+
+summary_household_category$sex <-
+  as_factor(case_when(
+    summary_household_category$sex == 1 ~ "Male",
+    summary_household_category$sex == 2 ~ "Female",
+    TRUE ~ "unknown"
+  ))
+
+unique_household <- summary_household_category %>%
+  group_by(TUCASEID) %>% 
+  filter(row_number() == 1) 
+
+table1(~ race + age + sex + labor_force_status + state|year, data = unique_household)
+
 ```
 
 Let's write a function to do the calculations how many hours are spent on a category of activity daily.
@@ -1044,17 +1093,27 @@ daily_time_2("work", 2019)
 
 
 Let's see what the average number of hours spent on leisure activities is by state.
-
 ```{r}
-
 leisure_data_state =
   cps_summary_merged %>% 
   filter(category == "leisure") %>% 
   mutate(time_weight_product = total_minutes*weight) %>%  
   group_by(state, year) %>% 
-  summarize(avg_leisure_time = sum(time_weight_product)/sum(weight), 
+  summarize(avg_leisure_time = sum(time_weight_product)/weight, 
             n = n()
             )
+leisure_data_state = summary_household_category %>% 
+  filter(category == "leisure") %>% 
+  group_by(state,year) %>% 
+  summarise(avg_leisure_time = sum(category_sum_hour*weight)/sum(weight))
+
+leisure_data_state1 = summary_household_category %>% 
+  filter(category == "leisure") %>%
+  group_by(state,year) %>% 
+  summarise(n = n(),sum(category_sum_hour)/n)
+
+  ##sum(category_sum_hour)/n
+  ##sum(category_sum_hour*weight)/sum(weight)
 ```
 
 Map the average number of hours spent on leisure activities is by state.
@@ -1069,9 +1128,20 @@ plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red"
 ```
 
 ## Plotly 
-
 ```{r}
+library(plotly)
+fig <- plotly::plot_geo(leisure_data_state, locationmode = 'USA-states')
+fig <- fig %>% add_trace(
+    z = ~total.exports, text = ~hover, locations = ~code,
+    color = ~total.exports, colors = 'Purples'
+  )
+fig <- fig %>% colorbar(title = "xx")
+fig <- fig %>% layout(
+    title = 'xx',
+    geo = g
+  )
 
+fig
 ```
 
 
@@ -1115,6 +1185,11 @@ cps_summary_leisure_2019 = cps_summary_merged %>%
 
 cps_summary_leisure_2020 = cps_summary_merged %>% 
   filter(category == "leisure", year == "2020")
+
+# model1 = lm(total_minutes ~ ., data = cps_summary_leisure_2019) %>% 
+#  MASS::stepAIC(direction = "backward", trace = FALSE)
+
+# model1 %>% broom::tidy() %>% knitr::kable(digits = 3)
 ```
 
 ```{r}
@@ -1136,3 +1211,8 @@ fit_leisure_2020 %>%
   knitr::kable(digits = 3)
 
 ```
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> f1f26cc0df79f3f3d303899ddbe90e3d80cdb6d2
