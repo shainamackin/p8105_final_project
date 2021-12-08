@@ -13,8 +13,8 @@
 
 <title>P8105 Final Project</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
-<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -1243,7 +1243,7 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %&gt;%
                             `1` = &quot;metropolitan&quot;, 
                             `2` = &quot;non-metropolitan&quot;, 
                             `3` = &quot;not identified&quot;)) </code></pre>
-<p>Merge the cps and summary datafiles.</p>
+<p>Merge the cps and summary datafiles and then group the merged dataset by case ID (TUCASEID) and category.</p>
 <pre class="r"><code>cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c(&quot;TUCASEID&quot;, &quot;age&quot;, &quot;year&quot;, &quot;sex&quot;))
 
 summary_household_category &lt;- cps_summary_merged %&gt;% #each row is a unique subject ID with unique category, category_sum_min: the sum of mins a subject spent on a specific category during that year; category_sum_hour: the sum of hours a subject spent on a specific category during that year
@@ -1253,6 +1253,60 @@ summary_household_category &lt;- cps_summary_merged %&gt;% #each row is a unique
          category_sum_hour_weight = category_sum_hour*weight) %&gt;% 
   filter(row_number() == 1) %&gt;%
   select(-c(&quot;activity_codes&quot;,&quot;total_minutes&quot;))</code></pre>
+<p>Let’s create a table showing average daily hours spent on each category of activity (among those who engage in the activity), and the % change from 2019 to 2020.</p>
+<pre class="r"><code>#check
+category_time = 
+ summary_household_category %&gt;% 
+  drop_na() %&gt;% 
+  filter(category_sum_min &gt; 0) %&gt;% 
+  group_by(year, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  pivot_wider(names_from = &quot;year&quot;, 
+              values_from = &quot;average_hours&quot;) %&gt;% 
+  mutate(percent_change = round((`2020`-`2019`)*100/`2019`, 1)) %&gt;% 
+  arrange(desc(`2019`))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>print(category_time)</code></pre>
+<pre><code>## # A tibble: 16 x 4
+##    category              `2019` `2020` percent_change
+##    &lt;chr&gt;                  &lt;dbl&gt;  &lt;dbl&gt;          &lt;dbl&gt;
+##  1 sleep                    9      9.1            1.1
+##  2 work                     7.6    7.6            0  
+##  3 education                5.8    5.3           -8.6
+##  4 leisure                  5.1    5.4            5.9
+##  5 household                2.3    2.5            8.7
+##  6 volunteer                2.3    2            -13  
+##  7 caring_duties            1.7    2             17.6
+##  8 exercise                 1.7    1.5          -11.8
+##  9 religious_spiritual      1.5    1.4           -6.7
+## 10 traveling                1.4    1.2          -14.3
+## 11 eating_drinking          1.1    1.1            0  
+## 12 professional_services    1.1    1.3           18.2
+## 13 personal_care            0.9    0.9            0  
+## 14 shopping                 0.9    0.8          -11.1
+## 15 gov_civic_obligations    0.8    0.4          -50  
+## 16 telephone                0.8    1.1           37.5</code></pre>
+<p>There was increased time spent on caring duties, household activities, leisure activities, professional services and on the telephone. Notably, there were decreases in time spent on educational activities, exercise, government and civic obligations, religious/spiritual activities, shopping and traveling.</p>
+<p>To visualize some of these changes, let’s create a grouped bar chart comparing time spent on different categories of activities in 2019 and 2020.</p>
+<pre class="r"><code>category_time_long = summary_household_category %&gt;% 
+  drop_na() %&gt;% 
+  filter(category_sum_min &gt; 0) %&gt;% 
+  group_by(year, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  mutate(year = factor(year))</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the `.groups` argument.</code></pre>
+<pre class="r"><code>category_time_long %&gt;% 
+  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
+  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</code></pre>
+<p><img src="p8105_final_project_data_import_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>#note that the stacked bar chart wasn&#39;t very informative, so it hasn&#39;t been included. </code></pre>
 </div>
 <div id="demographic-table" class="section level2">
 <h2>Demographic table</h2>
@@ -1751,172 +1805,6 @@ table1(~ race + age + sex + labor_force_status + state|year, data = unique_house
 </tbody>
 </table>
 </div>
-<p>Let’s write a function to do the calculations how many hours are spent on a category of activity daily.</p>
-<p>Average daily hours for a category = (sum(minutes spent on category of activity * weight)/sum of weights)/60.</p>
-<pre class="r"><code>daily_time = function(catgry, yr){
-  data = cps_summary_merged %&gt;% 
-  filter(category == catgry, 
-         year == yr) %&gt;% 
-  mutate(time_weight_product = total_minutes*weight) %&gt;% 
-    group_by(TUCASEID, weight) %&gt;% 
-    summarize(weighted_minutes = sum(time_weight_product))
-  
-  avg_daily = (sum(data$weighted_minutes) / #in hours 
-  sum(data$weight))/60
-  
-  print(avg_daily)
-
-}
-
-daily_time(&quot;work&quot;, 2019)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 3.384798</code></pre>
-<pre class="r"><code>daily_time(&quot;leisure&quot;, 2019)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 4.703647</code></pre>
-<pre class="r"><code>daily_time(&quot;sleep&quot;, 2019)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 8.964998</code></pre>
-<pre class="r"><code>daily_time_categories = data.frame(category = 
-                                     c(&quot;sleep&quot;, &quot;caring_duties&quot;, &quot;shopping&quot;, &quot;eating_drinking&quot;, &quot;religious_spiritual&quot;, &quot;traveling&quot;, &quot;personal_care&quot;, &quot;work&quot;, &quot;professional_services&quot;, &quot;leisure&quot;, &quot;volunteer&quot;, &quot;household&quot;, &quot;education&quot;, &quot;gov_civic_obligations&quot;, &quot;exercise&quot;, &quot;telephone&quot;), 
-                                   average_daily_hours_2019 = 
-                                     c(daily_time(&quot;sleep&quot;, 2019),
-                                       daily_time(&quot;caring_duties&quot;, 2019),
-                                       daily_time(&quot;shopping&quot;, 2019), 
-                                       daily_time(&quot;eating_drinking&quot;, 2019),
-                                       daily_time(&quot;religious_spiritual&quot;, 2019),
-                                       daily_time(&quot;traveling&quot;, 2019),
-                                       daily_time(&quot;personal_care&quot;, 2019),
-                                       daily_time(&quot;work&quot;, 2019),
-                                       daily_time(&quot;professional_services&quot;, 2019),
-                                       daily_time(&quot;leisure&quot;, 2019),
-                                       daily_time(&quot;volunteer&quot;, 2019),
-                                       daily_time(&quot;household&quot;, 2019),
-                                       daily_time(&quot;education&quot;, 2019),
-                                       daily_time(&quot;gov_civic_obligations&quot;, 2019),
-                                       daily_time(&quot;exercise&quot;, 2019),
-                                       daily_time(&quot;telephone&quot;, 2019)),
-                                   average_daily_hours_2020 = 
-                                     c(daily_time(&quot;sleep&quot;, 2020),
-                                       daily_time(&quot;caring_duties&quot;, 2020),
-                                       daily_time(&quot;shopping&quot;, 2020), 
-                                       daily_time(&quot;eating_drinking&quot;, 2020),
-                                       daily_time(&quot;religious_spiritual&quot;, 2020),
-                                       daily_time(&quot;traveling&quot;, 2020),
-                                       daily_time(&quot;personal_care&quot;, 2020),
-                                       daily_time(&quot;work&quot;, 2020),
-                                       daily_time(&quot;professional_services&quot;, 2020),
-                                       daily_time(&quot;leisure&quot;, 2020),
-                                       daily_time(&quot;volunteer&quot;, 2020),
-                                       daily_time(&quot;household&quot;, 2020),
-                                       daily_time(&quot;education&quot;, 2020),
-                                       daily_time(&quot;gov_civic_obligations&quot;, 2020),
-                                       daily_time(&quot;exercise&quot;, 2020),
-                                       daily_time(&quot;telephone&quot;, 2020)))</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 8.964998</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.5437622</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.3568846</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 1.086427</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.1362347</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 1.230181</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.7758412</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 3.384798</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.1063825</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 4.703647</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.1269646</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 1.789539</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.4559226</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.001825903</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.3239333</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.1105222</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 9.080455</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.5631527</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.2916197</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 1.060366</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.1021077</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.8579818</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.6979618</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 3.135812</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.1107308</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 5.104354</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.08924755</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 1.985039</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.4243409</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.001089081</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.3437513</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 0.1526762</code></pre>
-<pre class="r"><code>daily_time_categories %&gt;% 
-  mutate(average_daily_hours_2019 = round(average_daily_hours_2019, 2)) %&gt;% 
-    mutate(average_daily_hours_2020 = round(average_daily_hours_2020, 2))</code></pre>
-<pre><code>##                 category average_daily_hours_2019 average_daily_hours_2020
-## 1                  sleep                     8.96                     9.08
-## 2          caring_duties                     0.54                     0.56
-## 3               shopping                     0.36                     0.29
-## 4        eating_drinking                     1.09                     1.06
-## 5    religious_spiritual                     0.14                     0.10
-## 6              traveling                     1.23                     0.86
-## 7          personal_care                     0.78                     0.70
-## 8                   work                     3.38                     3.14
-## 9  professional_services                     0.11                     0.11
-## 10               leisure                     4.70                     5.10
-## 11             volunteer                     0.13                     0.09
-## 12             household                     1.79                     1.99
-## 13             education                     0.46                     0.42
-## 14 gov_civic_obligations                     0.00                     0.00
-## 15              exercise                     0.32                     0.34
-## 16             telephone                     0.11                     0.15</code></pre>
-<p>Let’s create a function to calculate the average daily time among people who actually engage in the category of activity.</p>
-<pre class="r"><code>daily_time_2 = function(catgry, yr){
-  data = cps_summary_merged %&gt;% 
-  filter(category == catgry, 
-         year == yr) %&gt;% 
-    filter(total_minutes &gt; 0) %&gt;%
-  mutate(time_weight_product = total_minutes*weight) %&gt;% 
-    group_by(TUCASEID, weight) %&gt;% 
-    summarize(weighted_minutes = sum(time_weight_product))
-  
-  avg_daily = (sum(data$weighted_minutes) / #in hours 
-  sum(data$weight))/60
-  
-  print(avg_daily)
-
-}
-
-daily_time_2(&quot;work&quot;, 2019)</code></pre>
-<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;. You can override using the `.groups` argument.</code></pre>
-<pre><code>## [1] 7.600836</code></pre>
 <p>Let’s see what the average number of hours spent on leisure activities is by state.</p>
 <pre class="r"><code>leisure_data_state =
   cps_summary_merged %&gt;% 

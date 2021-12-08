@@ -948,7 +948,7 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
                             `3` = "not identified")) 
 ```
 
-Merge the cps and summary datafiles. 
+Merge the cps and summary datafiles and then group the merged dataset by case ID (TUCASEID) and category. 
 
 ```{r}
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
@@ -960,6 +960,53 @@ summary_household_category <- cps_summary_merged %>% #each row is a unique subje
          category_sum_hour_weight = category_sum_hour*weight) %>% 
   filter(row_number() == 1) %>%
   select(-c("activity_codes","total_minutes"))
+```
+
+Let's create a table showing average daily hours spent on each category of activity (among those who engage in the activity), and the % change from 2019 to 2020. 
+
+```{r}
+
+#check
+category_time = 
+ summary_household_category %>% 
+  drop_na() %>% 
+  filter(category_sum_min > 0) %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  pivot_wider(names_from = "year", 
+              values_from = "average_hours") %>% 
+  mutate(percent_change = round((`2020`-`2019`)*100/`2019`, 1)) %>% 
+  arrange(desc(`2019`))
+
+print(category_time)
+
+```
+
+There was increased time spent on caring duties, household activities, leisure activities, professional services and on the telephone. Notably, there were decreases in time spent on educational activities, exercise, government and civic obligations, religious/spiritual activities, shopping and traveling. 
+
+To visualize some of these changes, let's create a grouped bar chart comparing time spent on different categories of activities in 2019 and 2020. 
+
+```{r}
+category_time_long = summary_household_category %>% 
+  drop_na() %>% 
+  filter(category_sum_min > 0) %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  mutate(year = factor(year))
+
+category_time_long %>% 
+  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+#note that the stacked bar chart wasn't very informative, so it hasn't been included. 
+
 ```
 
 ## Demographic table
@@ -1005,95 +1052,6 @@ table1(~ race + age + sex + labor_force_status + state|year, data = unique_house
 
 ```
 
-Let's write a function to do the calculations how many hours are spent on a category of activity daily.
-
-Average daily hours for a category = (sum(minutes spent on category of activity * weight)/sum of weights)/60.
-
-```{r}
-daily_time = function(catgry, yr){
-  data = cps_summary_merged %>% 
-  filter(category == catgry, 
-         year == yr) %>% 
-  mutate(time_weight_product = total_minutes*weight) %>% 
-    group_by(TUCASEID, weight) %>% 
-    summarize(weighted_minutes = sum(time_weight_product))
-  
-  avg_daily = (sum(data$weighted_minutes) / #in hours 
-  sum(data$weight))/60
-  
-  print(avg_daily)
-
-}
-
-daily_time("work", 2019)
-daily_time("leisure", 2019)
-daily_time("sleep", 2019)
-
-
-daily_time_categories = data.frame(category = 
-                                     c("sleep", "caring_duties", "shopping", "eating_drinking", "religious_spiritual", "traveling", "personal_care", "work", "professional_services", "leisure", "volunteer", "household", "education", "gov_civic_obligations", "exercise", "telephone"), 
-                                   average_daily_hours_2019 = 
-                                     c(daily_time("sleep", 2019),
-                                       daily_time("caring_duties", 2019),
-                                       daily_time("shopping", 2019), 
-                                       daily_time("eating_drinking", 2019),
-                                       daily_time("religious_spiritual", 2019),
-                                       daily_time("traveling", 2019),
-                                       daily_time("personal_care", 2019),
-                                       daily_time("work", 2019),
-                                       daily_time("professional_services", 2019),
-                                       daily_time("leisure", 2019),
-                                       daily_time("volunteer", 2019),
-                                       daily_time("household", 2019),
-                                       daily_time("education", 2019),
-                                       daily_time("gov_civic_obligations", 2019),
-                                       daily_time("exercise", 2019),
-                                       daily_time("telephone", 2019)),
-                                   average_daily_hours_2020 = 
-                                     c(daily_time("sleep", 2020),
-                                       daily_time("caring_duties", 2020),
-                                       daily_time("shopping", 2020), 
-                                       daily_time("eating_drinking", 2020),
-                                       daily_time("religious_spiritual", 2020),
-                                       daily_time("traveling", 2020),
-                                       daily_time("personal_care", 2020),
-                                       daily_time("work", 2020),
-                                       daily_time("professional_services", 2020),
-                                       daily_time("leisure", 2020),
-                                       daily_time("volunteer", 2020),
-                                       daily_time("household", 2020),
-                                       daily_time("education", 2020),
-                                       daily_time("gov_civic_obligations", 2020),
-                                       daily_time("exercise", 2020),
-                                       daily_time("telephone", 2020)))
-
-   
-daily_time_categories %>% 
-  mutate(average_daily_hours_2019 = round(average_daily_hours_2019, 2)) %>% 
-    mutate(average_daily_hours_2020 = round(average_daily_hours_2020, 2))
-```
-
-Let's create a function to calculate the average daily time among people who actually engage in the category of activity. 
-
-```{r}
-daily_time_2 = function(catgry, yr){
-  data = cps_summary_merged %>% 
-  filter(category == catgry, 
-         year == yr) %>% 
-    filter(total_minutes > 0) %>%
-  mutate(time_weight_product = total_minutes*weight) %>% 
-    group_by(TUCASEID, weight) %>% 
-    summarize(weighted_minutes = sum(time_weight_product))
-  
-  avg_daily = (sum(data$weighted_minutes) / #in hours 
-  sum(data$weight))/60
-  
-  print(avg_daily)
-
-}
-
-daily_time_2("work", 2019)
-```
 
 
 Let's see what the average number of hours spent on leisure activities is by state.
