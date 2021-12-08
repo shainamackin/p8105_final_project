@@ -1979,48 +1979,21 @@ plot_usmap(data = leisure_data_state, values = &quot;avg_leisure_time&quot;, col
 <div id="regression" class="section level2">
 <h2>Regression</h2>
 <p>Regression analysis with race and time spent on leisure activities</p>
-<pre class="r"><code>cps_summary_leisure_2019 = cps_summary_merged %&gt;% 
-  filter(category == &quot;leisure&quot;, year == &quot;2019&quot;) %&gt;% 
-  mutate(
-    race = recode(race, 
-        &#39;1&#39; = &#39;White only&#39;,
-        &#39;2&#39; = &#39;Black only&#39;,
-        &#39;3&#39; = &#39;American Indian, Alaskan Native only&#39;,
-        &#39;4&#39; = &#39;Asian only&#39;,
-        &#39;5&#39; = &#39;Hawaiian/Pacific Islander only&#39;,
-        &#39;6&#39; = &#39;White-Black&#39;,
-        &#39;7&#39; = &#39;White-American Indian&#39;,
-        &#39;8&#39; = &#39;White-Asian&#39;,
-        &#39;9&#39; = &#39;White-Hawaiian&#39;,
-        &#39;10&#39; = &#39;Black-American Indian&#39;,
-        &#39;11&#39; = &#39;Black-Asian&#39;,
-        &#39;12&#39; = &#39;Black-Hawaiian&#39;,
-        &#39;13&#39; = &#39;American Indian-Asian&#39;,
-        &#39;14&#39; = &#39;American Indian-Hawaiian&#39;,
-        &#39;15&#39; = &#39;Asian-Hawaiian&#39;,
-        &#39;16&#39; = &#39;White-Black-American Indian&#39;,
-        &#39;17&#39; = &#39;White-Black-Asian&#39;,
-        &#39;18&#39; = &#39;White-Black-Hawaiian&#39;,
-        &#39;19&#39; = &#39;White-American Indian-Asian&#39;,
-        &#39;20&#39; = &#39;White-American Indian-Hawaiian&#39;,
-        &#39;21&#39; = &#39;White-Asian-Hawaiian&#39;,
-        &#39;22&#39; = &#39;Black-American Indian-Asian&#39;,
-        &#39;23&#39; = &#39;White-Black-American Indian-Asian&#39;,
-        &#39;24&#39; = &#39;White-American Indian-Asian-Hawaiian&#39;,
-        &#39;25&#39; = &#39;Other 3 race combinations&#39;,
-        &#39;26&#39; = &#39;Other 4 and 5 race combinations&#39;,
-    ))
+<pre class="r"><code>cps_summary_leisure = summary_household_category %&gt;% 
+  filter(category == &quot;leisure&quot;)
 
-cps_summary_leisure_2020 = cps_summary_merged %&gt;% 
+cps_summary_leisure_2019 = summary_household_category %&gt;% 
+  filter(category == &quot;leisure&quot;, year == &quot;2019&quot;)
+
+cps_summary_leisure_2020 = summary_household_category %&gt;% 
   filter(category == &quot;leisure&quot;, year == &quot;2020&quot;)
 
-# model1 = lm(total_minutes ~ ., data = cps_summary_leisure_2019) %&gt;% 
-#  MASS::stepAIC(direction = &quot;backward&quot;, trace = FALSE)
+model_full = lm(category_sum_hour_weight ~ race, data = cps_summary_leisure)
 
-# model1 %&gt;% broom::tidy() %&gt;% knitr::kable(digits = 3)</code></pre>
-<pre class="r"><code>fit_leisure_2019 = lm(total_minutes ~ race, data = cps_summary_leisure_2019)
+model1 = 
+  lm(category_sum_hour_weight ~ race, data = cps_summary_leisure_2019)
 
-fit_leisure_2019 %&gt;% 
+model1 %&gt;% 
   broom::tidy() %&gt;% 
   select(term, estimate, p.value) %&gt;% 
   knitr::kable(digits = 3)</code></pre>
@@ -2035,123 +2008,49 @@ fit_leisure_2019 %&gt;%
 <tbody>
 <tr class="odd">
 <td align="left">(Intercept)</td>
-<td align="right">6.605</td>
+<td align="right">49935378</td>
 <td align="right">0.000</td>
 </tr>
 <tr class="even">
-<td align="left">raceAsian only</td>
-<td align="right">-1.782</td>
-<td align="right">0.045</td>
+<td align="left">raceWhite</td>
+<td align="right">-2102844</td>
+<td align="right">0.241</td>
 </tr>
 <tr class="odd">
-<td align="left">raceAsian-Hawaiian</td>
-<td align="right">-5.627</td>
-<td align="right">0.414</td>
+<td align="left">raceAsian</td>
+<td align="right">-9708835</td>
+<td align="right">0.004</td>
 </tr>
 <tr class="even">
-<td align="left">raceBlack only</td>
-<td align="right">1.092</td>
-<td align="right">0.197</td>
+<td align="left">raceAmerican Indian</td>
+<td align="right">6978062</td>
+<td align="right">0.336</td>
 </tr>
 <tr class="odd">
-<td align="left">raceBlack-American Indian</td>
-<td align="right">-0.974</td>
-<td align="right">0.758</td>
+<td align="left">race2+ races</td>
+<td align="right">1583297</td>
+<td align="right">0.775</td>
 </tr>
 <tr class="even">
-<td align="left">raceBlack-Asian</td>
-<td align="right">11.982</td>
-<td align="right">0.082</td>
-</tr>
-<tr class="odd">
-<td align="left">raceBlack-Hawaiian</td>
-<td align="right">-5.735</td>
-<td align="right">0.405</td>
-</tr>
-<tr class="even">
-<td align="left">raceHawaiian/Pacific Islander only</td>
-<td align="right">0.112</td>
-<td align="right">0.949</td>
-</tr>
-<tr class="odd">
-<td align="left">raceWhite only</td>
-<td align="right">0.098</td>
-<td align="right">0.906</td>
-</tr>
-<tr class="even">
-<td align="left">raceWhite-American Indian</td>
-<td align="right">0.723</td>
-<td align="right">0.557</td>
-</tr>
-<tr class="odd">
-<td align="left">raceWhite-American Indian-Asian</td>
-<td align="right">-3.344</td>
-<td align="right">0.628</td>
-</tr>
-<tr class="even">
-<td align="left">raceWhite-Asian</td>
-<td align="right">0.197</td>
-<td align="right">0.920</td>
-</tr>
-<tr class="odd">
-<td align="left">raceWhite-Asian-Hawaiian</td>
-<td align="right">0.337</td>
-<td align="right">0.933</td>
-</tr>
-<tr class="even">
-<td align="left">raceWhite-Black</td>
-<td align="right">-1.794</td>
-<td align="right">0.225</td>
-</tr>
-<tr class="odd">
-<td align="left">raceWhite-Black-American Indian</td>
-<td align="right">1.663</td>
-<td align="right">0.568</td>
-</tr>
-<tr class="even">
-<td align="left">raceWhite-Black-American Indian-Asian</td>
-<td align="right">-6.605</td>
-<td align="right">0.338</td>
-</tr>
-<tr class="odd">
-<td align="left">raceWhite-Black-Asian</td>
-<td align="right">-2.148</td>
-<td align="right">0.755</td>
-</tr>
-<tr class="even">
-<td align="left">raceWhite-Hawaiian</td>
-<td align="right">-3.518</td>
-<td align="right">0.610</td>
+<td align="left">raceHawaiian/Pacific Islander</td>
+<td align="right">9196566</td>
+<td align="right">0.497</td>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>fit_leisure_2020 = lm(total_minutes ~ age, data = cps_summary_leisure_2020)
-
-fit_leisure_2020 %&gt;% 
-  broom::tidy() %&gt;% 
-  select(term, estimate, p.value) %&gt;% 
-  knitr::kable(digits = 3)</code></pre>
-<table>
-<thead>
-<tr class="header">
-<th align="left">term</th>
-<th align="right">estimate</th>
-<th align="right">p.value</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">(Intercept)</td>
-<td align="right">3.894</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">age</td>
-<td align="right">0.079</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
+<pre class="r"><code>model_full %&gt;% 
+MASS::stepAIC(direction = &quot;backward&quot;, trace = FALSE)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = category_sum_hour_weight ~ race, data = cps_summary_leisure)
+## 
+## Coefficients:
+##                   (Intercept)                      raceWhite  
+##                      52800861                       -5109805  
+##                     raceAsian            raceAmerican Indian  
+##                     -12573207                       -5804761  
+##                  race2+ races  raceHawaiian/Pacific Islander  
+##                      -4509640                        7879010</code></pre>
 <p>Merging respondent data with 2020 categorized actsum data:</p>
 <pre class="r"><code>actsum_cps_2020 = summary_household_category %&gt;%
   filter(year == 2020)
