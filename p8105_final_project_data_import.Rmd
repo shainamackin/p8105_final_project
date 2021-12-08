@@ -971,12 +971,14 @@ table(summary_household_category$race)
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
-    summary_household_category$race %in% c(4, 7, 10, 11, 13, 16, 17, 19, 22, 23) ~ "Asian",
-    summary_household_category$race %in% c(1) ~ "White", 
-    summary_household_category$race %in% c(2, 6, 12) ~ "Black",
-    summary_household_category$race %in% c(5, 9, 18, 21) ~ "Hawaiian/Pacific Islander",
-    TRUE ~ "unknown"
+    summary_household_category$race %in% c(1) ~ "White",
+    summary_household_category$race %in% c(2) ~ "Black", 
+    summary_household_category$race %in% c(3) ~ "American Indian",
+    summary_household_category$race %in% c(4) ~ "Asian",
+    summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
+    TRUE ~ "2+ races"
   ))
+
 
 summary_household_category$labor_force_status <-
   as_factor(case_when(
@@ -1132,18 +1134,18 @@ plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red"
 ## Plotly 
 ```{r}
 library(plotly)
-fig <- plotly::plot_geo(leisure_data_state, locationmode = 'USA-states')
-fig <- fig %>% add_trace(
-    z = ~total.exports, text = ~hover, locations = ~code,
-    color = ~total.exports, colors = 'Purples'
-  )
-fig <- fig %>% colorbar(title = "xx")
-fig <- fig %>% layout(
-    title = 'xx',
-    geo = g
-  )
+#fig <- plotly::plot_geo(leisure_data_state, locationmode = 'USA-states')
+# fig <- fig %>% add_trace(
+#    z = ~total.exports, text = ~hover, locations = ~code,
+#    color = ~total.exports, colors = 'Purples'
+#  )
+# fig <- fig %>% colorbar(title = "xx")
+# fig <- fig %>% layout(
+#    title = 'xx',
+#    geo = g
+#  )
 
-fig
+#fig
 ```
 
 
