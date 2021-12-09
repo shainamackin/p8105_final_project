@@ -14,7 +14,7 @@ navbar:
     - icon: fa-envelope fa-lg
       href: mailto:<shainamackin@gmail.com>
     - icon: fa-github fa-lg
-      href: http://github.com/shainamackin/
+      href: http://github.com/shainamackin/p8105_final_project
 output:
   html_document:
     theme: cosmo

@@ -3,6 +3,7 @@ title: "P8105 Final Project"
 output: github_document
 editor_options: 
   chunk_output_type: console
+always_allow_html: true
 ---
 
 ```{r setup, message = FALSE}
