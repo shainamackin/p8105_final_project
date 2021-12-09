@@ -3,8 +3,10 @@ output_dir: "."
 navbar:
   title: "Only Time Will Tell"
   right:
+    - text: "Index"
+      href: index.html
     - text: "Exploratory Analyses"
-      href: exporatory_analyses.html
+      href: exploratory_analyses.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html
     - text: "Data Visualizations"
