@@ -1090,6 +1090,18 @@ plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red"
   facet_wrap(~ year)
 ```
 
+```{r}
+library(usmap)
+library(ggplot2)
+library(plotly)
+
+ggplotly(plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "white") + 
+  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
+  theme(legend.position = "right") +
+  facet_wrap(~ year))
+```
+
+
 ## Plotly 
 ```{r}
 library(plotly)
