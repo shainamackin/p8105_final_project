@@ -22,7 +22,7 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 
 
-![](https://upload.wikimedia.org/wikipedia/commons/f/f4/Analog_clock_animation.gif) 
+
 
 <p>&nbsp;</p>
 <p align="center">
