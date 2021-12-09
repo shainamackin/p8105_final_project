@@ -2,7 +2,8 @@
 title: "P8105 Final Project"
 output: github_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
+always_allow_html: true
 ---
 
 ```{r setup, message = FALSE}
@@ -948,7 +949,7 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
                             `3` = "not identified")) 
 ```
 
-Merge the cps and summary datafiles. 
+Merge the cps and summary datafiles and then group the merged dataset by case ID (TUCASEID) and category. 
 
 ```{r}
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
@@ -962,6 +963,53 @@ summary_household_category <- cps_summary_merged %>% #each row is a unique subje
   select(-c("activity_codes","total_minutes"))
 ```
 
+Let's create a table showing average daily hours spent on each category of activity (among those who engage in the activity), and the % change from 2019 to 2020. 
+
+```{r}
+
+#check
+category_time = 
+ summary_household_category %>% 
+  drop_na() %>% 
+  filter(category_sum_min > 0) %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  pivot_wider(names_from = "year", 
+              values_from = "average_hours") %>% 
+  mutate(percent_change = round((`2020`-`2019`)*100/`2019`, 1)) %>% 
+  arrange(desc(`2019`))
+
+print(category_time)
+
+```
+
+There was increased time spent on caring duties, household activities, leisure activities, professional services and on the telephone. Notably, there were decreases in time spent on educational activities, exercise, government and civic obligations, religious/spiritual activities, shopping and traveling. 
+
+To visualize some of these changes, let's create a grouped bar chart comparing time spent on different categories of activities in 2019 and 2020. 
+
+```{r}
+category_time_long = summary_household_category %>% 
+  drop_na() %>% 
+  filter(category_sum_min > 0) %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  mutate(year = factor(year))
+
+category_time_long %>% 
+  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+#note that the stacked bar chart wasn't very informative, so it hasn't been included. 
+
+```
+
 ## Demographic table
 ```{r}
 #race, age, sex, labor force status, and state 
@@ -971,12 +1019,22 @@ table(summary_household_category$race)
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
+<<<<<<< HEAD
     summary_household_category$race %in% c(4, 7) ~ "Asian",
     summary_household_category$race %in% c(1) ~ "White", 
     summary_household_category$race %in% c(2, 6) ~ "Black",
     summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
     TRUE ~ "unknown"
+=======
+    summary_household_category$race %in% c(1) ~ "White",
+    summary_household_category$race %in% c(2) ~ "Black", 
+    summary_household_category$race %in% c(3) ~ "American Indian",
+    summary_household_category$race %in% c(4) ~ "Asian",
+    summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
+    TRUE ~ "2+ races"
+>>>>>>> 81951feed56a5a86aabff0445b2d62fed122419e
   ))
+
 
 summary_household_category$labor_force_status <-
   as_factor(case_when(
@@ -1003,95 +1061,6 @@ table1(~ race + age + sex + labor_force_status + region|year, data = unique_hous
 
 ```
 
-Let's write a function to do the calculations how many hours are spent on a category of activity daily.
-
-Average daily hours for a category = (sum(minutes spent on category of activity * weight)/sum of weights)/60.
-
-```{r}
-daily_time = function(catgry, yr){
-  data = cps_summary_merged %>% 
-  filter(category == catgry, 
-         year == yr) %>% 
-  mutate(time_weight_product = total_minutes*weight) %>% 
-    group_by(TUCASEID, weight) %>% 
-    summarize(weighted_minutes = sum(time_weight_product))
-  
-  avg_daily = (sum(data$weighted_minutes) / #in hours 
-  sum(data$weight))/60
-  
-  print(avg_daily)
-
-}
-
-daily_time("work", 2019)
-daily_time("leisure", 2019)
-daily_time("sleep", 2019)
-
-
-daily_time_categories = data.frame(category = 
-                                     c("sleep", "caring_duties", "shopping", "eating_drinking", "religious_spiritual", "traveling", "personal_care", "work", "professional_services", "leisure", "volunteer", "household", "education", "gov_civic_obligations", "exercise", "telephone"), 
-                                   average_daily_hours_2019 = 
-                                     c(daily_time("sleep", 2019),
-                                       daily_time("caring_duties", 2019),
-                                       daily_time("shopping", 2019), 
-                                       daily_time("eating_drinking", 2019),
-                                       daily_time("religious_spiritual", 2019),
-                                       daily_time("traveling", 2019),
-                                       daily_time("personal_care", 2019),
-                                       daily_time("work", 2019),
-                                       daily_time("professional_services", 2019),
-                                       daily_time("leisure", 2019),
-                                       daily_time("volunteer", 2019),
-                                       daily_time("household", 2019),
-                                       daily_time("education", 2019),
-                                       daily_time("gov_civic_obligations", 2019),
-                                       daily_time("exercise", 2019),
-                                       daily_time("telephone", 2019)),
-                                   average_daily_hours_2020 = 
-                                     c(daily_time("sleep", 2020),
-                                       daily_time("caring_duties", 2020),
-                                       daily_time("shopping", 2020), 
-                                       daily_time("eating_drinking", 2020),
-                                       daily_time("religious_spiritual", 2020),
-                                       daily_time("traveling", 2020),
-                                       daily_time("personal_care", 2020),
-                                       daily_time("work", 2020),
-                                       daily_time("professional_services", 2020),
-                                       daily_time("leisure", 2020),
-                                       daily_time("volunteer", 2020),
-                                       daily_time("household", 2020),
-                                       daily_time("education", 2020),
-                                       daily_time("gov_civic_obligations", 2020),
-                                       daily_time("exercise", 2020),
-                                       daily_time("telephone", 2020)))
-
-   
-daily_time_categories %>% 
-  mutate(average_daily_hours_2019 = round(average_daily_hours_2019, 2)) %>% 
-    mutate(average_daily_hours_2020 = round(average_daily_hours_2020, 2))
-```
-
-Let's create a function to calculate the average daily time among people who actually engage in the category of activity. 
-
-```{r}
-daily_time_2 = function(catgry, yr){
-  data = cps_summary_merged %>% 
-  filter(category == catgry, 
-         year == yr) %>% 
-    filter(total_minutes > 0) %>%
-  mutate(time_weight_product = total_minutes*weight) %>% 
-    group_by(TUCASEID, weight) %>% 
-    summarize(weighted_minutes = sum(time_weight_product))
-  
-  avg_daily = (sum(data$weighted_minutes) / #in hours 
-  sum(data$weight))/60
-  
-  print(avg_daily)
-
-}
-
-daily_time_2("work", 2019)
-```
 
 
 Let's see what the average number of hours spent on leisure activities is by state.
@@ -1122,10 +1091,23 @@ plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red"
   facet_wrap(~ year)
 ```
 
+```{r}
+library(usmap)
+library(ggplot2)
+library(plotly)
+
+ggplotly(plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "white") + 
+  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
+  theme(legend.position = "right") +
+  facet_wrap(~ year))
+```
+
+
 ## Plotly 
 ```{r}
 
 library(plotly)
+<<<<<<< HEAD
 df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
 
 l <- list(color = toRGB("white"), width = 2)
@@ -1177,76 +1159,116 @@ fig
 
 
 
+=======
+#fig <- plotly::plot_geo(leisure_data_state, locationmode = 'USA-states')
+# fig <- fig %>% add_trace(
+#    z = ~total.exports, text = ~hover, locations = ~code,
+#    color = ~total.exports, colors = 'Purples'
+#  )
+# fig <- fig %>% colorbar(title = "xx")
+# fig <- fig %>% layout(
+#    title = 'xx',
+#    geo = g
+#  )
+
+#fig
+>>>>>>> 81951feed56a5a86aabff0445b2d62fed122419e
 ```
 
 
 ## Regression
 
-Regression analysis with race and time spent on leisure activities
+Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities, using the statistically weighted data that compensates for aspects of the sampling and data collection process such as differences in response rates across demographics. There we cannot interpret the associations assuming hours spent is the outcome, and we will instead focus on the direction of the association.
+
+#### Models
+First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
 
 ```{r}
+cps_summary_leisure = summary_household_category %>% 
+  filter(category == "leisure")
 
-cps_summary_leisure_2019 = cps_summary_merged %>% 
-  filter(category == "leisure", year == "2019") %>% 
+model_year = lm(category_sum_hour_weight ~ year, data = cps_summary_leisure)
+model_year %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>% 
+  knitr::kable(digits = 3)
+```
+
+However, we can see from the table above that the differences between the 2 years is not significant, with a p-value > 0.05, so there is not a significant difference in time spent on leisure activities between the 2 years.
+
+Next, we want to fit a couple of models that we hypothesize may predict time spent on leisure activities, as well 1 model fitted using backwards selection.
+
+(1): Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are retired (reference group), employed at work, employed but absent from work, unemployed and looking, and unemployed on layoff.
+
+```{r}
+model1 = 
+  lm(category_sum_hour_weight ~ labor_force_status, data = cps_summary_leisure)
+
+model1 %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>% 
+  mutate(term = str_replace(term, "^labor_force_status", "Employment Status: ")) %>% 
+  knitr::kable(digits = 3)
+```
+
+From the table above, we can see that employment status is infact a strong predictor of time spent on leisure activities. Specifically, we see a positive association between unemployment categories and time spent on leisure activities, and a negative association between employment categories and time spent on leisure activities. This indicates that those who are unemployed are likely to spend more time on leisure activities, while those are unemployed are likely to spend less time on leisure activities.
+
+(2) Demographic characteristics: race, age, and sex
+(3) Demographic characteristics: race, age, and sex, and their interactions
+
+```{r}
+model2 = 
+  lm(category_sum_hour_weight ~ age + race + sex, data = cps_summary_leisure)
+
+model2 %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>%
   mutate(
-    race = recode(race, 
-        '1' = 'White only',
-        '2' = 'Black only',
-        '3' = 'American Indian, Alaskan Native only',
-        '4' = 'Asian only',
-        '5' = 'Hawaiian/Pacific Islander only',
-        '6' = 'White-Black',
-        '7' = 'White-American Indian',
-        '8' = 'White-Asian',
-        '9' = 'White-Hawaiian',
-        '10' = 'Black-American Indian',
-        '11' = 'Black-Asian',
-        '12' = 'Black-Hawaiian',
-        '13' = 'American Indian-Asian',
-        '14' = 'American Indian-Hawaiian',
-        '15' = 'Asian-Hawaiian',
-        '16' = 'White-Black-American Indian',
-        '17' = 'White-Black-Asian',
-        '18' = 'White-Black-Hawaiian',
-        '19' = 'White-American Indian-Asian',
-        '20' = 'White-American Indian-Hawaiian',
-        '21' = 'White-Asian-Hawaiian',
-        '22' = 'Black-American Indian-Asian',
-        '23' = 'White-Black-American Indian-Asian',
-        '24' = 'White-American Indian-Asian-Hawaiian',
-        '25' = 'Other 3 race combinations',
-        '26' = 'Other 4 and 5 race combinations',
-    ))
+    term = str_replace(term, "^race", "Race: "),
+    term = str_replace(term, "sexMale", "Sex: Male"),
+    term = str_replace(term, "age", "Age")
+    ) %>% 
+  knitr::kable(digits = 3)
 
-cps_summary_leisure_2020 = cps_summary_merged %>% 
-  filter(category == "leisure", year == "2020")
+model3 = 
+  lm(
+    category_sum_hour_weight ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
+    data = cps_summary_leisure)
 
-# model1 = lm(total_minutes ~ ., data = cps_summary_leisure_2019) %>% 
-#  MASS::stepAIC(direction = "backward", trace = FALSE)
-
-# model1 %>% broom::tidy() %>% knitr::kable(digits = 3)
-```
-
-```{r}
-fit_leisure_2019 = lm(total_minutes ~ race, data = cps_summary_leisure_2019)
-
-fit_leisure_2019 %>% 
+model3 %>% 
   broom::tidy() %>% 
-  select(term, estimate, p.value) %>% 
+  select(term, estimate, p.value) %>%
+  mutate(
+    term = str_replace(term, "^race", "Race: "),
+    term = str_replace(term, "sexMale", "Sex: Male"),
+    term = str_replace(term, "age", "Age")
+    ) %>% 
   knitr::kable(digits = 3)
 
 ```
 
+The 3 main effect predictors in Model 2 are all significant (p-value < 0.05), however, in the model with the interaction terms (Model 3), there are several predictors that are nonsignificant. 
+
+#### Diagnostics
+
+Before we proceed, it is also important to look at residuals and fitted values in our models 
 ```{r}
-fit_leisure_2020 = lm(total_minutes ~ age, data = cps_summary_leisure_2020)
+cps_summary_leisure %>% 
+  modelr::add_residuals(model1) %>% 
+  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
 
-fit_leisure_2020 %>% 
-  broom::tidy() %>% 
-  select(term, estimate, p.value) %>% 
-  knitr::kable(digits = 3)
+cps_summary_leisure %>% 
+  modelr::add_residuals(model2) %>% 
+  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
 
+cps_summary_leisure %>% 
+  modelr::add_residuals(model3) %>% 
+  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
 ```
 
+We see a few outliers that will be noted and can be addressed in future analyses. Additionally, we would expect to see that the residuals are of random size across the outcome, and we can see that our residuals are extremely skewed, but for the purposes of this project, we will continue with our model comparisons.
+
+#### Cross Validation
 
 Merging respondent data with 2020 categorized actsum data:
 ```{r 2020_time_trends}
@@ -1267,15 +1289,42 @@ resp_2020_tidied = resp_2020 %>%
   arrange(TUCASEID, month, date, year, TUDIARYDATE, tudiaryday)
 
 merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c("TUCASEID")) %>% janitor::clean_names()
+
 ```
 
-Plotting 2020 activity trends over time:
-```{r}
-merged_actsum_cps_resp_2020_leisure = merged_actsum_cps_resp_2020 %>%
-  filter(category == "leisure")
+Ploting trends over time:
+```{r 2020_time_trends_plot}
+library(plotly)
 
-#if tudiarydate values are equal, then collapse and sum category_sum_hours
-#https://stackoverflow.com/questions/16777972/r-collapse-rows-and-sum-the-values-in-the-column 
-#ggplot(aes(tudiarydate, category_sum_hour)) + geom_line() 
+category_time_month_2020 = merged_actsum_cps_resp_2020 %>% 
+  drop_na() %>% 
+  filter(category_sum_min > 0) %>% 
+  group_by(month, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  mutate(
+    month = as.factor(month)) %>%
+  mutate(month = match(month, month.name)) %>%
+   mutate(
+     category = replace(category, category == "caring_duties", "caring duties"),
+     category = replace(category, category == "eating_drinking", "eating/drinking"),
+     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
+     category = replace(category, category == "personal_care", "personal care"),
+     category = replace(category, category == "professional_services", "professional services"),
+     category = replace(category, category == "religious_spiritual", "religious/spiritual")) %>%
+  arrange(month) 
+
+monthly_2020_plotly = category_time_month_2020 %>%
+  mutate(text_label = str_c("Activity: ", category, "\nAverage hours: ", average_hours, "\nMonth: ", month)) %>%
+  plot_ly(
+    x = ~month, y = ~average_hours, type = "scatter", mode = "line",
+    color = ~category, text = ~text_label, alpha = 0.9) %>%
+ layout(title = 'Average time spent on activities across the U.S. in 2020', xaxis = list(type = "category", title = 'Month'), yaxis = list(title = 'Average Hours'))
+
+monthly_2020_plotly
 ```
+
+
 
