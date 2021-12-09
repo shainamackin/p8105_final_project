@@ -1105,9 +1105,7 @@ ggplotly(plot_usmap(data = leisure_data_state, values = "avg_leisure_time", colo
 
 ## Plotly 
 ```{r}
-
 library(plotly)
-<<<<<<< HEAD
 df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
 
 l <- list(color = toRGB("white"), width = 2)
@@ -1119,18 +1117,18 @@ g <- list(
   lakecolor = toRGB('white')
 )
 
-fig <- plot_geo(leisure_data_state %>% filter(year == 2019), locationmode = 'USA-states')
-fig <- fig %>% add_trace(
+fig_2019 <- plot_geo(leisure_data_state %>% filter(year == 2019), locationmode = 'USA-states')
+fig_2019 <- fig_2019 %>% add_trace(
     z = ~avg_leisure_time, locations = ~state,
     color = ~avg_leisure_time, colors = 'Purples'
   )
-fig <- fig %>% colorbar(title = "hours each day")
-fig <- fig %>% layout(
+fig_2019 <- fig_2019 %>% colorbar(title = "hours each day")
+fig_2019 <- fig_2019 %>% layout(
     title = 'Average leisure time by state in 2019',
     geo = g
   )
 
-fig
+fig_2019
 
 library(plotly)
 df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
@@ -1144,35 +1142,18 @@ g <- list(
   lakecolor = toRGB('white')
 )
 
-fig <- plot_geo(leisure_data_state %>% filter(year == 2020), locationmode = 'USA-states')
-fig <- fig %>% add_trace(
+fig_2020 <- plot_geo(leisure_data_state %>% filter(year == 2020), locationmode = 'USA-states')
+fig_2020 <- fig_2020 %>% add_trace(
     z = ~avg_leisure_time, locations = ~state,
     color = ~avg_leisure_time, colors = 'Purples'
   )
-fig <- fig %>% colorbar(title = "hours each day")
-fig <- fig %>% layout(
+fig_2020 <- fig_2020 %>% colorbar(title = "hours each day")
+fig_2020 <- fig_2020 %>% layout(
     title = 'Average leisure time by state in 2019',
     geo = g
   )
 
-fig
-
-
-
-=======
-#fig <- plotly::plot_geo(leisure_data_state, locationmode = 'USA-states')
-# fig <- fig %>% add_trace(
-#    z = ~total.exports, text = ~hover, locations = ~code,
-#    color = ~total.exports, colors = 'Purples'
-#  )
-# fig <- fig %>% colorbar(title = "xx")
-# fig <- fig %>% layout(
-#    title = 'xx',
-#    geo = g
-#  )
-
-#fig
->>>>>>> 81951feed56a5a86aabff0445b2d62fed122419e
+fig_2020
 ```
 
 
