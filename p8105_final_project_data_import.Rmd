@@ -1110,33 +1110,97 @@ library(plotly)
 
 ## Regression
 
-Regression analysis with race and time spent on leisure activities
+Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities, using the statistically weighted data that compensates for aspects of the sampling and data collection process such as differences in response rates across demographics. There we cannot interpret the associations assuming hours spent is the outcome, and we will instead focus on the direction of the association.
+
+#### Models
+First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
 
 ```{r}
 cps_summary_leisure = summary_household_category %>% 
   filter(category == "leisure")
 
-cps_summary_leisure_2019 = summary_household_category %>% 
-  filter(category == "leisure", year == "2019")
+model_year = lm(category_sum_hour_weight ~ year, data = cps_summary_leisure)
+model_year %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>% 
+  knitr::kable(digits = 3)
+```
 
-cps_summary_leisure_2020 = summary_household_category %>% 
-  filter(category == "leisure", year == "2020")
+However, we can see from the table above that the differences between the 2 years is not significant, with a p-value > 0.05, so there is not a significant difference in time spent on leisure activities between the 2 years.
 
-model_full = lm(category_sum_hour_weight ~ race, data = cps_summary_leisure)
+Next, we want to fit a couple of models that we hypothesize may predict time spent on leisure activities, as well 1 model fitted using backwards selection.
 
+(1): Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are retired (reference group), employed at work, employed but absent from work, unemployed and looking, and unemployed on layoff.
+
+```{r}
 model1 = 
-  lm(category_sum_hour_weight ~ race, data = cps_summary_leisure_2019)
+  lm(category_sum_hour_weight ~ labor_force_status, data = cps_summary_leisure)
 
 model1 %>% 
   broom::tidy() %>% 
   select(term, estimate, p.value) %>% 
+  mutate(term = str_replace(term, "^labor_force_status", "Employment Status: ")) %>% 
+  knitr::kable(digits = 3)
+```
+
+From the table above, we can see that employment status is infact a strong predictor of time spent on leisure activities. Specifically, we see a positive association between unemployment categories and time spent on leisure activities, and a negative association between employment categories and time spent on leisure activities. This indicates that those who are unemployed are likely to spend more time on leisure activities, while those are unemployed are likely to spend less time on leisure activities.
+
+(2) Demographic characteristics: race, age, and sex
+(3) Demographic characteristics: race, age, and sex, and their interactions
+
+```{r}
+model2 = 
+  lm(category_sum_hour_weight ~ age + race + sex, data = cps_summary_leisure)
+
+model2 %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>%
+  mutate(
+    term = str_replace(term, "^race", "Race: "),
+    term = str_replace(term, "sexMale", "Sex: Male"),
+    term = str_replace(term, "age", "Age")
+    ) %>% 
   knitr::kable(digits = 3)
 
-model_full %>% 
-MASS::stepAIC(direction = "backward", trace = FALSE)
+model3 = 
+  lm(
+    category_sum_hour_weight ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
+    data = cps_summary_leisure)
+
+model3 %>% 
+  broom::tidy() %>% 
+  select(term, estimate, p.value) %>%
+  mutate(
+    term = str_replace(term, "^race", "Race: "),
+    term = str_replace(term, "sexMale", "Sex: Male"),
+    term = str_replace(term, "age", "Age")
+    ) %>% 
+  knitr::kable(digits = 3)
 
 ```
 
+The 3 main effect predictors in Model 2 are all significant (p-value < 0.05), however, in the model with the interaction terms (Model 3), there are several predictors that are nonsignificant. 
+
+#### Diagnostics
+
+Before we proceed, it is also important to look at residuals and fitted values in our models 
+```{r}
+cps_summary_leisure %>% 
+  modelr::add_residuals(model1) %>% 
+  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
+
+cps_summary_leisure %>% 
+  modelr::add_residuals(model2) %>% 
+  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
+
+cps_summary_leisure %>% 
+  modelr::add_residuals(model3) %>% 
+  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
+```
+
+We see a few outliers that will be noted and can be addressed in future analyses. Additionally, we would expect to see that the residuals are of random size across the outcome, and we can see that our residuals are extremely skewed, but for the purposes of this project, we will continue with our model comparisons.
+
+#### Cross Validation
 
 Merging respondent data with 2020 categorized actsum data:
 ```{r 2020_time_trends}
