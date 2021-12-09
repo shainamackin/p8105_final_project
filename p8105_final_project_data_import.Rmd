@@ -2,7 +2,7 @@
 title: "P8105 Final Project"
 output: github_document
 editor_options: 
-  chunk_output_type: inline
+  chunk_output_type: console
 ---
 
 ```{r setup, message = FALSE}
@@ -1156,15 +1156,42 @@ resp_2020_tidied = resp_2020 %>%
   arrange(TUCASEID, month, date, year, TUDIARYDATE, tudiaryday)
 
 merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c("TUCASEID")) %>% janitor::clean_names()
+
 ```
 
-Plotting 2020 activity trends over time:
-```{r}
-merged_actsum_cps_resp_2020_leisure = merged_actsum_cps_resp_2020 %>%
-  filter(category == "leisure")
+Ploting trends over time:
+```{r 2020_time_trends_plot}
+library(plotly)
 
-#if tudiarydate values are equal, then collapse and sum category_sum_hours
-#https://stackoverflow.com/questions/16777972/r-collapse-rows-and-sum-the-values-in-the-column 
-#ggplot(aes(tudiarydate, category_sum_hour)) + geom_line() 
+category_time_month_2020 = merged_actsum_cps_resp_2020 %>% 
+  drop_na() %>% 
+  filter(category_sum_min > 0) %>% 
+  group_by(month, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  mutate(
+    month = as.factor(month)) %>%
+  mutate(month = match(month, month.name)) %>%
+   mutate(
+     category = replace(category, category == "caring_duties", "caring duties"),
+     category = replace(category, category == "eating_drinking", "eating/drinking"),
+     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
+     category = replace(category, category == "personal_care", "personal care"),
+     category = replace(category, category == "professional_services", "professional services"),
+     category = replace(category, category == "religious_spiritual", "religious/spiritual")) %>%
+  arrange(month) 
+
+monthly_2020_plotly = category_time_month_2020 %>%
+  mutate(text_label = str_c("Activity: ", category, "\nAverage hours: ", average_hours, "\nMonth: ", month)) %>%
+  plot_ly(
+    x = ~month, y = ~average_hours, type = "scatter", mode = "line",
+    color = ~category, text = ~text_label, alpha = 0.9) %>%
+ layout(title = 'Average time spent on activities across the U.S. in 2020', xaxis = list(type = "category", title = 'Month'), yaxis = list(title = 'Average Hours'))
+
+monthly_2020_plotly
 ```
+
+
 
