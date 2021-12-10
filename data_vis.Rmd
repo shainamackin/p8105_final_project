@@ -947,19 +947,56 @@ summary_household_category <- cps_summary_merged %>%
 
 ### Leisure hours by state 
 ```{r map_code, message = FALSE, include = FALSE, warning = FALSE}
-leisure_data_state = summary_household_category %>% 
-  filter(category == "leisure") %>% 
-  group_by(state,year) %>% 
-  summarise(avg_leisure_time = sum(category_sum_hour*weight)/sum(weight))
+library(plotly)
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
 
-map_plot = ggplotly(plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "white") + 
-  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
-  theme(legend.position = "right") +
-  facet_wrap(~ year))
-```
+l <- list(color = toRGB("white"), width = 2)
+# specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
 
-```{r map_plot, message = FALSE, warning = FALSE, echo=FALSE}
-map_plot
+fig_2019 <- plot_geo(leisure_data_state %>% filter(year == 2019), locationmode = 'USA-states')
+
+fig_2019 <- fig_2019 %>% add_trace(
+    z = ~avg_leisure_time, locations = ~state,
+    color = ~avg_leisure_time, colors = 'Purples'
+  )
+fig_2019 <- fig_2019 %>% colorbar(title = "hours each day")
+fig_2019 <- fig_2019 %>% layout(
+    title = 'Average leisure time by state in 2019',
+    geo = g
+  )
+
+fig_2019
+
+library(plotly)
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
+
+l <- list(color = toRGB("white"), width = 2)
+# specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+fig_2020 <- plot_geo(leisure_data_state %>% filter(year == 2020), locationmode = 'USA-states')
+fig_2020 <- fig_2020 %>% add_trace(
+    z = ~avg_leisure_time, locations = ~state,
+    color = ~avg_leisure_time, colors = 'Purples'
+  )
+fig_2020 <- fig_2020 %>% colorbar(title = "hours each day")
+fig_2020 <- fig_2020 %>% layout(
+    title = 'Average leisure time by state in 2019',
+    geo = g
+  )
+
+fig_2020
 ```
 
 {data-width=350}
