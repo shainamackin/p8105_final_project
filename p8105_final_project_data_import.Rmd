@@ -1177,9 +1177,11 @@ model_year %>%
 
 However, we can see from the table above that the differences between the 2 years is not significant, with a p-value > 0.05, so there is not a significant difference in time spent on leisure activities between the 2 years.
 
-Next, we want to fit a couple of models that we hypothesize may predict time spent on leisure activities, as well 1 model fitted using backwards selection.
+Next, we want to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.
 
 (1): Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are retired (reference group), employed at work, employed but absent from work, unemployed and looking, and unemployed on layoff.
+(2) Demographic characteristics: race, age, and sex
+(3) Demographic characteristics: race, age, and sex, and their interactions
 
 ```{r}
 model1 = 
@@ -1192,10 +1194,8 @@ model1 %>%
   knitr::kable(digits = 3)
 ```
 
-From the table above, we can see that employment status is infact a strong predictor of time spent on leisure activities. Specifically, we see a positive association between unemployment categories and time spent on leisure activities, and a negative association between employment categories and time spent on leisure activities. This indicates that those who are unemployed are likely to spend more time on leisure activities, while those are unemployed are likely to spend less time on leisure activities.
+From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Specifically, we see a positive association between unemployment categories and time spent on leisure activities, and a negative association between employment categories and time spent on leisure activities. This indicates that those who are unemployed are likely to spend more time on leisure activities, while those are unemployed are likely to spend less time on leisure activities.
 
-(2) Demographic characteristics: race, age, and sex
-(3) Demographic characteristics: race, age, and sex, and their interactions
 
 ```{r}
 model2 = 
@@ -1235,21 +1235,82 @@ The 3 main effect predictors in Model 2 are all significant (p-value < 0.05), ho
 Before we proceed, it is also important to look at residuals and fitted values in our models 
 ```{r}
 cps_summary_leisure %>% 
-  modelr::add_residuals(model1) %>% 
-  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
+  modelr::add_residuals(model1) %>% modelr::add_predictions(model1) %>% 
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
+  labs(x = "Predicted Weighted Leisure Time Spent",
+       y = "Residuals",
+       title = "Model 1: Relationship between Predicted Leisure Time and Residuals")
 
 cps_summary_leisure %>% 
-  modelr::add_residuals(model2) %>% 
-  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
+  modelr::add_residuals(model2) %>% modelr::add_predictions(model2) %>% 
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
+  labs(x = "Predicted Weighted Leisure Time Spent",
+       y = "Residuals",
+       title = "Model 2: Relationship between Predicted Leisure Time and Residuals")
 
 cps_summary_leisure %>% 
-  modelr::add_residuals(model3) %>% 
-  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
+  modelr::add_residuals(model3) %>% modelr::add_predictions(model3) %>% 
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
+  labs(x = "Predicted Weighted Leisure Time Spent",
+       y = "Residuals",
+       title = "Model 3: Relationship between Predicted Leisure Time and Residuals")
 ```
 
-We see a few outliers that will be noted and can be addressed in future analyses. Additionally, we would expect to see that the residuals are of random size across the outcome, and we can see that our residuals are extremely skewed, but for the purposes of this project, we will continue with our model comparisons.
+There are some extreme outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
 
 #### Cross Validation
+
+In order to do the cross validation, we will first create the crossv_mc tibble with the train and test data
+```{r}
+cv_df = crossv_mc(cps_summary_leisure, 100) %>% 
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble)
+  )
+```
+
+Next, we will fit the models and get the root mean squared errors
+```{r}
+fitted_df = cv_df %>%
+  mutate(
+    model1 = map(train, 
+                 ~lm(category_sum_hour_weight ~ labor_force_status, 
+                     data =.x)),
+    model2 = map(train,
+                  ~lm(category_sum_hour_weight ~ age + race + sex, 
+                     data = .x)),
+    model3 = map(train,
+                  ~lm(category_sum_hour_weight ~ 
+                      age + race + sex + age*race + age*sex + race*sex + age*race*sex,
+                      data = .x))) %>% 
+  mutate(
+    rmse_model1 = map2_dbl(model1, test, ~rmse(model = .x, data = .y)),
+    rmse_model2  = map2_dbl(model2, test, ~rmse(model = .x, data = .y)),
+    rmse_model3  = map2_dbl(model3, test, ~rmse(model = .x, data = .y))
+)
+```
+
+Finally, we will plot the distribution of RMSE values to compare each candidate model
+```{r rsme_plot}
+fitted_df %>%
+  select(starts_with("rmse")) %>% 
+  pivot_longer(
+    everything(),
+    names_to = "model", 
+    values_to = "rmse",
+    names_prefix = "rmse_") %>% 
+  mutate(model = fct_inorder(model)) %>% 
+  ggplot(aes(x = model, y = rmse)) + geom_violin(alpha = 0.5) +
+  labs(
+    x = "Regression Model",
+    y = "RSME",
+    title = "Leisure Time Spent Regression Models and RSME values"
+  )
+  
+```
+
+From the violin plot, we can see that model 1, the model with only Employment Status as the predictor, has the lowest RMSE average, which means it is the best model of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar model 2 and model 3 plots.
+
 
 Merging respondent data with 2020 categorized actsum data:
 ```{r 2020_time_trends}
