@@ -17,6 +17,8 @@ navbar:
       href: mailto:<shainamackin@gmail.com>
     - icon: fa-github fa-lg
       href: http://github.com/shainamackin/p8105_final_project
+    - icon: fa-database fa-lg
+      href: https://www.bls.gov/tus/data.htm
 output:
   html_document:
     theme: cosmo

@@ -7,12 +7,13 @@ output:
     source_code: embed
 ---
 
-```{r setup, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+```{r setup, message = FALSE, include = FALSE, warning = FALSE}
 library(tidyverse)
 library(plotly)
 library(dplyr)
 library(usmap)
 library(ggplot2)
+library(flexdashboard)
 
 resp_2019 = read.table("data/atusresp_2019.dat", header = TRUE, sep = ",")
 resp_2020 = read.table("data/atusresp_2020.dat", header = TRUE, sep = ",")
@@ -938,31 +939,75 @@ summary_household_category <- cps_summary_merged %>%
   filter(row_number() == 1) %>%
   select(-c("activity_codes","total_minutes"))
 
-```
-
-
-Map {data-width=650}
------------------------------------------------------------------------
-
-```{r map_code, message = FALSE, include = FALSE, warning = FALSE}
 leisure_data_state = summary_household_category %>% 
   filter(category == "leisure") %>% 
   group_by(state,year) %>% 
   summarise(avg_leisure_time = sum(category_sum_hour*weight)/sum(weight))
 
-map_plot = ggplotly(plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "white") + 
-  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
-  theme(legend.position = "right") +
-  facet_wrap(~ year))
 ```
 
 
-```{r map_plot, message = FALSE, warning = FALSE, echo=FALSE}
-map_plot
-```
-
-2020 Activity Trends by Month {data-width=350}
+{data-width=650}
 -----------------------------------------------------------------------
+
+### Leisure hours by state 
+```{r map_code, echo = FALSE, message = FALSE, warning = FALSE}
+library(plotly)
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
+
+l <- list(color = toRGB("white"), width = 2)
+# specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+fig_2019 <- plot_geo(leisure_data_state %>% filter(year == 2019), locationmode = 'USA-states')
+
+fig_2019 <- fig_2019 %>% add_trace(
+    z = ~avg_leisure_time, locations = ~state,
+    color = ~avg_leisure_time, colors = 'Purples'
+  )
+fig_2019 <- fig_2019 %>% colorbar(title = "hours each day")
+fig_2019 <- fig_2019 %>% layout(
+    title = 'Average leisure time by state in 2019',
+    geo = g
+  )
+
+fig_2019
+
+library(plotly)
+df <- read.csv("https://raw.githubusercontent.com/plotly/datasets/master/2011_us_ag_exports.csv")
+
+l <- list(color = toRGB("white"), width = 2)
+# specify some map projection/options
+g <- list(
+  scope = 'usa',
+  projection = list(type = 'albers usa'),
+  showlakes = TRUE,
+  lakecolor = toRGB('white')
+)
+
+fig_2020 <- plot_geo(leisure_data_state %>% filter(year == 2020), locationmode = 'USA-states')
+fig_2020 <- fig_2020 %>% add_trace(
+    z = ~avg_leisure_time, locations = ~state,
+    color = ~avg_leisure_time, colors = 'Purples'
+  )
+fig_2020 <- fig_2020 %>% colorbar(title = "hours each day")
+fig_2020 <- fig_2020 %>% layout(
+    title = 'Average leisure time by state in 2019',
+    geo = g
+  )
+
+fig_2020
+```
+
+{data-width=350}
+-----------------------------------------------------------------------
+
+### 2020 Activity Trends by Month
 
 ```{r month_code, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
 actsum_cps_2020 = summary_household_category %>%
@@ -1015,12 +1060,5 @@ monthly_2020_plotly = category_time_month_2020 %>%
 
 ```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
 monthly_2020_plotly
-```
-
-Bar Graph 
------------------------------------------------------------------------
-
-```{r}
-
 ```
 

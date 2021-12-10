@@ -1058,7 +1058,7 @@ unique_household <- summary_household_category %>%
   group_by(TUCASEID) %>% 
   filter(row_number() == 1) 
 
-# table1(~ race + age + sex + labor_force_status + region|year, data = unique_household)
+table1(~ race + age + sex + labor_force_status + region|year, data = unique_household)
 
 ```
 
@@ -1102,6 +1102,7 @@ g <- list(
 )
 
 fig_2019 <- plot_geo(leisure_data_state %>% filter(year == 2019), locationmode = 'USA-states')
+
 fig_2019 <- fig_2019 %>% add_trace(
     z = ~avg_leisure_time, locations = ~state,
     color = ~avg_leisure_time, colors = 'Purples'
@@ -1152,7 +1153,7 @@ First, we wanted to explore whether there are differences in time spent on leisu
 cps_summary_leisure = summary_household_category %>% 
   filter(category == "leisure")
 
-model_year = lm(category_sum_hour_weight ~ year, data = cps_summary_leisure)
+model_year = lm(category_sum_hour ~ year, data = cps_summary_leisure)
 model_year %>% 
   broom::tidy() %>% 
   select(term, estimate, p.value) %>% 
@@ -1168,10 +1169,10 @@ Next, we want to fit a few models that we hypothesize may predict time spent on 
 (3) Demographic characteristics: race, age, and sex, and their interactions
 
 ```{r}
-ggplot(data = cps_summary_leisure, aes(x=age, y=category_sum_hour_weight)) + geom_point()
+ggplot(data = cps_summary_leisure, aes(x=age, y=category_sum_hour)) + geom_point()
 
 model1 = 
-  lm(category_sum_hour_weight ~ labor_force_status, data = cps_summary_leisure)
+  lm(category_sum_hour ~ labor_force_status, data = cps_summary_leisure)
 
 model1 %>% 
   broom::tidy() %>% 
@@ -1185,7 +1186,7 @@ From the table above, we can see that in Model 1, employment status is a very st
 
 ```{r}
 model2 = 
-  lm(category_sum_hour_weight ~ age + race + sex, data = cps_summary_leisure)
+  lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
 
 model2 %>% 
   broom::tidy() %>% 
@@ -1199,7 +1200,7 @@ model2 %>%
 
 model3 = 
   lm(
-    category_sum_hour_weight ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
+    category_sum_hour ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
     data = cps_summary_leisure)
 
 model3 %>% 
@@ -1223,21 +1224,21 @@ Before we proceed, it is also important to look at residuals and fitted values i
 cps_summary_leisure %>% 
   modelr::add_residuals(model1) %>% modelr::add_predictions(model1) %>% 
   ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
-  labs(x = "Predicted Weighted Leisure Time Spent",
+  labs(x = "Predicted Leisure Time Spent (hr)",
        y = "Residuals",
        title = "Model 1: Relationship between Predicted Leisure Time and Residuals")
 
 cps_summary_leisure %>% 
   modelr::add_residuals(model2) %>% modelr::add_predictions(model2) %>% 
   ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
-  labs(x = "Predicted Weighted Leisure Time Spent",
+  labs(x = "Predicted Leisure Time Spent (hr)",
        y = "Residuals",
        title = "Model 2: Relationship between Predicted Leisure Time and Residuals")
 
 cps_summary_leisure %>% 
   modelr::add_residuals(model3) %>% modelr::add_predictions(model3) %>% 
   ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
-  labs(x = "Predicted Weighted Leisure Time Spent",
+  labs(x = "Predicted Leisure Time Spent (hr)",
        y = "Residuals",
        title = "Model 3: Relationship between Predicted Leisure Time and Residuals")
 ```
@@ -1260,13 +1261,13 @@ Next, we will fit the models and get the root mean squared errors
 fitted_df = cv_df %>%
   mutate(
     model1 = map(train, 
-                 ~lm(category_sum_hour_weight ~ labor_force_status, 
+                 ~lm(category_sum_hour ~ labor_force_status, 
                      data =.x)),
     model2 = map(train,
-                  ~lm(category_sum_hour_weight ~ age + race + sex, 
+                  ~lm(category_sum_hour ~ age + race + sex, 
                      data = .x)),
     model3 = map(train,
-                  ~lm(category_sum_hour_weight ~ 
+                  ~lm(category_sum_hour ~ 
                       age + race + sex + age*race + age*sex + race*sex + age*race*sex,
                       data = .x))) %>% 
   mutate(
