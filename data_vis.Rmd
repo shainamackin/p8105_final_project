@@ -7,12 +7,13 @@ output:
     source_code: embed
 ---
 
-```{r setup, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+```{r setup, message = FALSE, include = FALSE, warning = FALSE}
 library(tidyverse)
 library(plotly)
 library(dplyr)
 library(usmap)
 library(ggplot2)
+library(flexdashboard)
 
 resp_2019 = read.table("data/atusresp_2019.dat", header = TRUE, sep = ",")
 resp_2020 = read.table("data/atusresp_2020.dat", header = TRUE, sep = ",")
@@ -941,9 +942,10 @@ summary_household_category <- cps_summary_merged %>%
 ```
 
 
-Map {data-width=650}
+Column {data-width=650}
 -----------------------------------------------------------------------
 
+### Leisure hours by state 
 ```{r map_code, message = FALSE, include = FALSE, warning = FALSE}
 leisure_data_state = summary_household_category %>% 
   filter(category == "leisure") %>% 
@@ -956,13 +958,14 @@ map_plot = ggplotly(plot_usmap(data = leisure_data_state, values = "avg_leisure_
   facet_wrap(~ year))
 ```
 
-
 ```{r map_plot, message = FALSE, warning = FALSE, echo=FALSE}
 map_plot
 ```
 
-2020 Activity Trends by Month {data-width=350}
+Column {data-width=350}
 -----------------------------------------------------------------------
+
+### 2020 Activity Trends by Month
 
 ```{r month_code, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
 actsum_cps_2020 = summary_household_category %>%
@@ -1016,11 +1019,3 @@ monthly_2020_plotly = category_time_month_2020 %>%
 ```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
 monthly_2020_plotly
 ```
-
-Bar Graph 
------------------------------------------------------------------------
-
-```{r}
-
-```
-
