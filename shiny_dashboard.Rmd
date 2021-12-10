@@ -1,10 +1,11 @@
 ---
-title: "Time Use Mapped Across the US"
+title: "Map Dashboard"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
     vertical_layout: fill
 runtime: shiny
+source_code: embed
 ---
 
 ```{r setup, message = FALSE, include = FALSE, warning = FALSE}
@@ -16,9 +17,6 @@ library(shiny)
 library(usmap)
 library(ggplot2)
 library(plotly)
-```
-
-```{r data_import, message = FALSE, include = FALSE, warning = FALSE}
 
 resp_2019 = read.table("data/atusresp_2019.dat", header = TRUE, sep = ",")
 resp_2020 = read.table("data/atusresp_2020.dat", header = TRUE, sep = ",")
@@ -956,7 +954,6 @@ shiny_state_map_df = summary_household_category %>%
   summarise(avg_time = sum(category_sum_hour*weight)/sum(weight))
 ```
 
-
 Column {.sidebar}
 -----------------------------------------------------------------------
 
@@ -968,7 +965,7 @@ year_choice =
 
 radioButtons(
   "year_choice",
-  label = h3("Year"),
+  label = h4("Year"),
   choices = year_choice,
   selected = "2020"
 )
@@ -980,7 +977,7 @@ category_choice =
   
 selectInput(
   "category_choice",
-  label = h3("Select Category"),
+  label = h4("Select Category"),
   choices = category_choice,
   selected = "Leisure"
 )
@@ -989,7 +986,7 @@ selectInput(
 Column {data-width=650}
 -----------------------------------------------------------------------
 
-### Chart A
+### U.S. Map
 
 ```{r map, message = FALSE, echo= FALSE, warning = FALSE}
 renderPlotly({
@@ -1025,7 +1022,7 @@ plot_geo(shiny_state_map_df %>%
 Column {data-width=350}
 -----------------------------------------------------------------------
 
-### Chart B
+### Year
 
 ```{r year, message = FALSE, echo= FALSE, warning = FALSE}
 renderPrint({
@@ -1033,7 +1030,7 @@ renderPrint({
 })
 ```
 
-### Chart C
+### Activity Category
 
 ```{r category, message = FALSE, echo= FALSE, warning = FALSE}
 renderPrint({

@@ -1019,3 +1019,4 @@ monthly_2020_plotly = category_time_month_2020 %>%
 ```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
 monthly_2020_plotly
 ```
+

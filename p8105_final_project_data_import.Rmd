@@ -1114,6 +1114,7 @@ g <- list(
 )
 
 fig_2019 <- plot_geo(leisure_data_state %>% filter(year == 2019), locationmode = 'USA-states')
+
 fig_2019 <- fig_2019 %>% add_trace(
     z = ~avg_leisure_time, locations = ~state,
     color = ~avg_leisure_time, colors = 'Purples'
