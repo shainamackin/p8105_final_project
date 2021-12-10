@@ -1025,6 +1025,11 @@ table(summary_household_category$race)
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
+    summary_household_category$race %in% c(4, 7) ~ "Asian",
+    summary_household_category$race %in% c(1) ~ "White", 
+    summary_household_category$race %in% c(2, 6) ~ "Black",
+    summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
+    TRUE ~ "unknown",
     summary_household_category$race %in% c(1) ~ "White",
     summary_household_category$race %in% c(2) ~ "Black", 
     summary_household_category$race %in% c(3) ~ "American Indian",
@@ -1066,27 +1071,10 @@ leisure_data_state = summary_household_category %>%
   filter(category == "leisure") %>% 
   group_by(state,year) %>% 
   summarise(avg_leisure_time = sum(category_sum_hour*weight)/sum(weight))
-  
-leisure_data_state1 = summary_household_category %>% 
-  filter(category == "leisure") %>%
-  group_by(state,year) %>% 
-  summarise(n = n(),sum(category_sum_hour)/n)
-
-  ##sum(category_sum_hour)/n
-  ##sum(category_sum_hour*weight)/sum(weight)
 
 ```
 
 Map the average number of hours spent on leisure activities is by state.
-```{r}
-library(usmap)
-library(ggplot2)
-
-plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red") + 
-  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
-  theme(legend.position = "right") +
-  facet_wrap(~ year)
-```
 
 ```{r}
 library(usmap)
@@ -1147,7 +1135,7 @@ fig_2020 <- fig_2020 %>% add_trace(
   )
 fig_2020 <- fig_2020 %>% colorbar(title = "hours each day")
 fig_2020 <- fig_2020 %>% layout(
-    title = 'Average leisure time by state in 2019',
+    title = 'Average leisure time by state in 2020',
     geo = g
   )
 
@@ -1163,23 +1151,35 @@ Next we will conduct some linear regression analyses to understand what factors 
 First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
 
 ```{r}
-cps_summary_leisure = summary_household_category %>% 
+cps_summary_leisure = 
+  read_csv("./data/summary_household_category.csv") %>% 
   filter(category == "leisure")
+
+cps_summary_leisure$year =
+  as_factor(case_when(
+    cps_summary_leisure$year == 2019 ~ "Pre-Pandemic 2019",
+    cps_summary_leisure$year == 2020 ~ "Post-Pandemic 2020",
+    TRUE ~ "unknown"
+  ))
 
 model_year = lm(category_sum_hour ~ year, data = cps_summary_leisure)
 model_year %>% 
   broom::tidy() %>% 
   select(term, estimate, p.value) %>% 
+  mutate(term = str_replace(term, "^year", "Year: ")) %>% 
   knitr::kable(digits = 3)
 ```
 
-However, we can see from the table above that the differences between the 2 years is not significant, with a p-value > 0.05, so there is not a significant difference in time spent on leisure activities between the 2 years.
+There is a significant difference between 2019 and 2020 in terms of leisure time spent (p-value <0.05). We expect that leisure time spent in 2020 (post-pandemic) is 0.237 hours longer per day than leisure time spent in 2019, on average. This aligns with our hypothesis that after the pandemic, people started spending additional time on leisure activities.
+
 
 Next, we want to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.
 
-(1): Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are retired (reference group), employed at work, employed but absent from work, unemployed and looking, and unemployed on layoff.
-(2) Demographic characteristics: race, age, and sex
-(3) Demographic characteristics: race, age, and sex, and their interactions
+**(Model 1)**: Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.
+
+**(Model 2)**: Demographic characteristics: race, age, and sex. Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.
+
+**(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions. This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.
 
 ```{r}
 ggplot(data = cps_summary_leisure, aes(x=age, y=category_sum_hour)) + geom_point()
@@ -1194,7 +1194,9 @@ model1 %>%
   knitr::kable(digits = 3)
 ```
 
-From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Specifically, we see a positive association between unemployment categories and time spent on leisure activities, and a negative association between employment categories and time spent on leisure activities. This indicates that those who are unemployed are likely to spend more time on leisure activities, while those are unemployed are likely to spend less time on leisure activities.
+I don't see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear.
+
+From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average. Additionally, those who are retired are expected to spend 1.5 more hours per day on leisure activities per day in comparison to those who are employed but absent from work. 
 
 
 ```{r}
@@ -1216,19 +1218,34 @@ model3 =
     category_sum_hour ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
     data = cps_summary_leisure)
 
+
 model3 %>% 
   broom::tidy() %>% 
   select(term, estimate, p.value) %>%
   mutate(
     term = str_replace(term, "^race", "Race: "),
     term = str_replace(term, "sexMale", "Sex: Male"),
-    term = str_replace(term, "age", "Age")
+    term = str_replace(term, "age", "Age"),
+    term = str_replace(term, "Age:race", "Age * Race:"),
+    term = str_replace(term, "Age:Sex", "Age * Sex"),
+    term = str_replace(term, "Race: American Indian:Sex: Male", "Race:American-Indian * Sex:Male"),
+    term = str_replace(term, "Race: Asian:Sex: Male", "Race:Asian * Sex:Male"),
+    term = str_replace(term, "Race: White:Sex: Male", "Race:White * Sex:Male"),
+    term = str_replace(term, "Race: Black:Sex: Male", "Race:Black * Sex:Male"),
+    term = str_replace(term, "Race: Hawaiian/Pacific Islander:Sex: Male", "Race:Hawaiian/Pacific Islander * Sex:Male"),
+    term = str_replace(term, "Age * Race:American Indian:Sex: Male", "Age * Race:American Indian * Sex:Male"),
+    term = str_replace(term, "Age * Race:Asian:Sex: Male", "Age * Race:Asian * Sex:Male"),
+    term = str_replace(term, "Age * Race:Black:Sex: Male", "Age * Race:Black * Sex:Male"),
+    term = str_replace(term, "Age * Race:White:Sex: Male", "Age * Race:White * Sex:Male"),
+    term = str_replace(term, "Age * Race:Hawaiian/Pacific Islander:Sex: Male", "Age * Race:Hawaiian/Pacific Islander * Sex:Male"),
     ) %>% 
   knitr::kable(digits = 3)
 
 ```
 
-The 3 main effect predictors in Model 2 are all significant (p-value < 0.05), however, in the model with the interaction terms (Model 3), there are several predictors that are nonsignificant. 
+The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
+
+However in the model with the interaction terms (Model 3), race is no longer significant, and none of the interaction terms are significant (p-value > 0.05).
 
 #### Diagnostics
 
@@ -1236,27 +1253,27 @@ Before we proceed, it is also important to look at residuals and fitted values i
 ```{r}
 cps_summary_leisure %>% 
   modelr::add_residuals(model1) %>% modelr::add_predictions(model1) %>% 
-  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
   labs(x = "Predicted Leisure Time Spent (hr)",
        y = "Residuals",
        title = "Model 1: Relationship between Predicted Leisure Time and Residuals")
 
 cps_summary_leisure %>% 
   modelr::add_residuals(model2) %>% modelr::add_predictions(model2) %>% 
-  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
   labs(x = "Predicted Leisure Time Spent (hr)",
        y = "Residuals",
        title = "Model 2: Relationship between Predicted Leisure Time and Residuals")
 
 cps_summary_leisure %>% 
   modelr::add_residuals(model3) %>% modelr::add_predictions(model3) %>% 
-  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.5) +
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
   labs(x = "Predicted Leisure Time Spent (hr)",
        y = "Residuals",
        title = "Model 3: Relationship between Predicted Leisure Time and Residuals")
 ```
 
-There are some extreme outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
+There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
 
 #### Cross Validation
 
@@ -1300,16 +1317,16 @@ fitted_df %>%
     values_to = "rmse",
     names_prefix = "rmse_") %>% 
   mutate(model = fct_inorder(model)) %>% 
-  ggplot(aes(x = model, y = rmse)) + geom_violin(alpha = 0.5) +
+  ggplot(aes(x = model, y = rmse, color = model)) + geom_violin(alpha = 0.5) +
   labs(
     x = "Regression Model",
     y = "RSME",
-    title = "Leisure Time Spent Regression Models and RSME values"
+    title = "Leisure Time Spent: Regression Models and RSME values"
   )
   
 ```
 
-From the violin plot, we can see that model 1, the model with only Employment Status as the predictor, has the lowest RMSE average, which means it is the best model of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar model 2 and model 3 plots.
+From the violin plot, we can see that model 1, the model with Employment Status as the predictor, has the lowest RMSE average, which means it is the best model of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar model 2 and model 3 plots.
 
 
 Merging respondent data with 2020 categorized actsum data:
@@ -1367,6 +1384,5 @@ monthly_2020_plotly = category_time_month_2020 %>%
 
 monthly_2020_plotly
 ```
-
 
 
