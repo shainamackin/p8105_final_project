@@ -8,3 +8,54 @@ output:
     source_code: embed 
 ---
 
+```{r setup, message = FALSE}
+
+library(tidyverse)
+options(scipen = 50)
+library(ggplot2)
+```
+
+```{r data, message = FALSE, warning = FALSE}
+summary_household_category = read_csv("data/summary_household_category.csv")
+
+```
+
+## How has time-use been impacted by COVID-19? 
+
+Has the way we spend time on different categories changed due to the pandemic? See the table below to see average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 
+
+
+```{r message = FALSE, warning = FALSE}
+ summary_household_category %>% 
+  drop_na() %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  pivot_wider(names_from = "year", 
+              values_from = "average_hours") %>% 
+  mutate(percent_change = round((`2020`-`2019`)*100/`2019`, 1)) %>% 
+  arrange(desc(`2019`)) %>% 
+  knitr::kable()
+
+```
+
+Visualize this with the bar plot shown below. 
+
+```{r message = FALSE, warning = FALSE}
+summary_household_category %>% 
+  drop_na() %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  mutate(year = as.factor(year)) %>% 
+  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
+Some notable changes from 2019 to 2020 include increases in time spent on leisure and household activities and decreases in time spent on work and travel. 
