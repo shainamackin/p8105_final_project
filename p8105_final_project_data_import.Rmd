@@ -4,6 +4,7 @@ output: github_document
 editor_options: 
   chunk_output_type: inline
 always_allow_html: true
+source
 ---
 
 ```{r setup, message = FALSE}
@@ -1024,6 +1025,11 @@ table(summary_household_category$race)
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
+    summary_household_category$race %in% c(4, 7) ~ "Asian",
+    summary_household_category$race %in% c(1) ~ "White", 
+    summary_household_category$race %in% c(2, 6) ~ "Black",
+    summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
+    TRUE ~ "unknown",
     summary_household_category$race %in% c(1) ~ "White",
     summary_household_category$race %in% c(2) ~ "Black", 
     summary_household_category$race %in% c(3) ~ "American Indian",
@@ -1065,27 +1071,10 @@ leisure_data_state = summary_household_category %>%
   filter(category == "leisure") %>% 
   group_by(state,year) %>% 
   summarise(avg_leisure_time = sum(category_sum_hour*weight)/sum(weight))
-  
-leisure_data_state1 = summary_household_category %>% 
-  filter(category == "leisure") %>%
-  group_by(state,year) %>% 
-  summarise(n = n(),sum(category_sum_hour)/n)
-
-  ##sum(category_sum_hour)/n
-  ##sum(category_sum_hour*weight)/sum(weight)
 
 ```
 
 Map the average number of hours spent on leisure activities is by state.
-```{r}
-library(usmap)
-library(ggplot2)
-
-plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red") + 
-  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
-  theme(legend.position = "right") +
-  facet_wrap(~ year)
-```
 
 ```{r}
 library(usmap)
@@ -1146,7 +1135,7 @@ fig_2020 <- fig_2020 %>% add_trace(
   )
 fig_2020 <- fig_2020 %>% colorbar(title = "hours each day")
 fig_2020 <- fig_2020 %>% layout(
-    title = 'Average leisure time by state in 2019',
+    title = 'Average leisure time by state in 2020',
     geo = g
   )
 
@@ -1395,6 +1384,5 @@ monthly_2020_plotly = category_time_month_2020 %>%
 
 monthly_2020_plotly
 ```
-
 
 
