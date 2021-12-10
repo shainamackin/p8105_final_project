@@ -2,10 +2,9 @@
 title: ""
 output: 
   html_document:
+    code_folding: hide
     toc: true
     toc_float: true
-    theme: cosmo
-    source_code: embed 
 ---
 ``` {r include = FALSE}
 library(tidyverse)

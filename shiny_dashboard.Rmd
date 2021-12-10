@@ -1,37 +1,19 @@
 ---
-title: "Map Dashboard"
+title: "Shiny Dashboard"
 output: 
-  flexdashboard::flex_dashboard:
-    orientation: columns
+    flexdashboard::flex_dashboard:
     vertical_layout: fill
-runtime: shiny
 source_code: embed
+runtime: shiny
 ---
-```{r set up, include=FALSE}
-library(tidyverse)
-library(modelr)
-library(mgcv)
-library(patchwork)
-library(knitr)
-library(MASS)
-
-theme_set(theme_minimal() + theme(legend.position = "bottom"))
-options(
-  ggplot2.continuous.colour = "viridis",
-  ggplot2.continuous.fill = "viridis",
-  digits = 3
-)
-scale_colour_discrete = scale_colour_viridis_d
-scale_fill_discrete = scale_fill_viridis_d 
-knitr::opts_chunk$set(
-  fig.height = 6,
-  fig.width = 8,
-  message = F,
-  warning = F 
-  )
-```
 
 ```{r load and clean dataset, include=FALSE}
+library(flexdashboard)
+library(tidyverse)
+library(viridis)
+library(shiny)
+library(plotly)
+
 summary_household_category <- read_csv("./data/summary_household_category.csv")
 
 shiny_state_map_df = summary_household_category %>% 
@@ -46,8 +28,10 @@ shiny_state_map_df = summary_household_category %>%
   summarise(avg_time = sum(category_sum_hour*weight)/sum(weight))
 ```
 
+# Time spent on each category 2019-2020
+
 Column {.sidebar}
------------------------------------------------------------------------
+--------------------------------------------------
 
 ```{r selectors, message = FALSE, echo= FALSE, warning = FALSE}
 year_choice = unique(shiny_state_map_df$year)
@@ -72,10 +56,10 @@ selectInput(
 )
 ```
 
-Column {data-width=650}
------------------------------------------------------------------------
+Column {data-width=800}
+---
 
-### U.S. Map
+### Map of time spent on each category
 
 ```{r map, message = FALSE, echo= FALSE, warning = FALSE}
 renderPlotly({
@@ -107,23 +91,80 @@ plot_geo(shiny_state_map_df %>%
 })
 ```
 
+Column {data-width=500}
+---
 
-Column {data-width=350}
------------------------------------------------------------------------
+### Bar chart by state 
 
-### Year
-
-```{r year, message = FALSE, echo= FALSE, warning = FALSE}
-renderPrint({
-  input[["year_choice"]]
-})
+```{r bar chart, message = FALSE, echo= FALSE, warning = FALSE}
+renderPlotly({
+  shiny_state_map_df %>% 
+             filter(
+               year == input[["year_choice"]],
+               category == input[["category_choice"]]) %>% 
+  arrange(desc(avg_time)) %>% 
+  mutate(
+    state = factor(state),
+    state = fct_reorder(state, avg_time)
+  )  %>% 
+   plot_ly(
+      x = ~state,
+      y = ~avg_time, 
+      color = ~state,
+      type = "bar", colors = "viridis") %>% 
+    layout(
+    xaxis = list(title = "State"),
+    yaxis = list(title = "Number of hours spent on the category in each day"))
+}
+)
 ```
 
-### Activity Category
+### Bar chart by region
 
-```{r category, message = FALSE, echo= FALSE, warning = FALSE}
-renderPrint({
-  input[["category_choice"]]
-})
+```{r bar chart by region, message = FALSE, echo= FALSE, warning = FALSE}
+renderPlotly({
+  summary_household_category %>%
+  group_by(region,year, category) %>%
+  mutate(
+     category = replace(category, category == "caring_duties", "caring duties"),
+     category = replace(category, category == "eating_drinking", "eating/drinking"),
+     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
+     category = replace(category, category == "personal_care", "personal care"),
+     category = replace(category, category == "professional_services", "professional services"),
+     category = replace(category, category == "religious_spiritual", "religious/spiritual")) %>%
+  summarise(avg_time = sum(category_sum_hour*weight)/sum(weight)) %>% 
+             filter(
+               year == input[["year_choice"]],
+               category == input[["category_choice"]]) %>% 
+  arrange(desc(avg_time)) %>% 
+  mutate(
+    region = factor(region),
+    region = fct_reorder(region, avg_time)
+  )  %>% 
+   plot_ly(
+      x = ~region,
+      y = ~avg_time, 
+      color = ~region,
+      type = "bar", colors = "viridis") %>% 
+    layout(
+    xaxis = list(title = "Region"),
+    yaxis = list(title = "Number of hours spent on the category in each day"))
+}
+)
 ```
 
+<!-- ### Year -->
+
+<!-- ```{r year, message = FALSE, echo= FALSE, warning = FALSE, include=FALSE} -->
+<!-- renderPrint({ -->
+<!--   input[["year_choice"]] -->
+<!-- }) -->
+<!-- ``` -->
+
+<!-- ### Activity Category -->
+
+<!-- ```{r category, message = FALSE, echo= FALSE, warning = FALSE, include=FALSE} -->
+<!-- renderPrint({ -->
+<!--   input[["category_choice"]] -->
+<!-- }) -->
+<!-- ``` -->
