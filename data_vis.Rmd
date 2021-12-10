@@ -942,7 +942,7 @@ summary_household_category <- cps_summary_merged %>%
 ```
 
 
-Column {data-width=650}
+{data-width=650}
 -----------------------------------------------------------------------
 
 ### Leisure hours by state 
@@ -962,7 +962,7 @@ map_plot = ggplotly(plot_usmap(data = leisure_data_state, values = "avg_leisure_
 map_plot
 ```
 
-Column {data-width=350}
+{data-width=350}
 -----------------------------------------------------------------------
 
 ### 2020 Activity Trends by Month
