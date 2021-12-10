@@ -958,10 +958,7 @@ Column {.sidebar}
 -----------------------------------------------------------------------
 
 ```{r selectors, message = FALSE, echo= FALSE, warning = FALSE}
-year_choice = 
-  shiny_state_map_df %>%
-  distinct(year) %>%
-  pull()
+year_choice = unique(shiny_state_map_df$year)
 
 radioButtons(
   "year_choice",
@@ -1012,7 +1009,7 @@ plot_geo(shiny_state_map_df %>%
                 ) %>% 
   colorbar(title = "hours each day") %>% 
   layout(
-    title = 'Average leisure time by state in 2019',
+    title = paste('Average leisure time by state in', input[["year_choice"]]),
     geo = g
   )
 })
