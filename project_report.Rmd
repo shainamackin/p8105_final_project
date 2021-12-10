@@ -1,5 +1,6 @@
 ---
 title: "Project Report"
+authors: Dee Wang (dtw2127), Sandya Ganesh (sg3891), Shaina Mackin (smm2350), Xin Fang (xf2226)
 output: 
   html_document:
     toc: true
@@ -7,11 +8,44 @@ output:
     theme: cosmo
     source_code: embed 
 ---
+</br>
 
-• Motivation: Provide an overview of the project goals and motivation.
-• Related work: Anything that inspired you, such as a paper, a web site, or something we discussed in class.
-• Initial questions: What questions are you trying to answer? How did these questions evolve over the course of the project? What new questions did you consider in the course of your analysis?
-• Data: Source, scraping method, cleaning, etc.
-• Exploratory analysis: Visualizations, summaries, and exploratory statistical analyses. Justify the steps you took, and show any major changes to your ideas.
-• Additional analysis: If you undertake formal statistical analyses, describe these in detail
-• Discussion: What were your findings? Are they what you expect? What insights into the data can you make?
+# Project Motivation 
+</p>
+COVID-19 has drastically impacted the ways in which we spend our time. During the height of the pandemic, stay-at-home orders, lockdown measures, and social distancing norms prevented many Americans from going into workplaces and schools and from seeing friends and family, impacting the way we spend our days -- and making us hyper aware of that. The motivation for this project was originally to understand how COVID-19 affected time use. We set out to look at how time spent on activities such as paid and unpaid work, education, sleep, and leisure may have changed from pre- to post- pandemic, especially interested in understanding how changes in time use impact our general well-being.
+</p>
+
+
+# Related Work
+•  Anything that inspired you, such as a paper, a web site, or something discussed in class
+</p>
+
+# Initial Questions
+•  What questions are you trying to answer? </br>
+•  How did these questions evolve over the course of the project? </br>
+•  What new questions did you consider in the course of your analysis? </br>
+</p>
+
+# The Data
+</p>
+### Source: <br/>
+Data for this project comes from the U.S. Bureau of Labor Statistics’ American Time Use Survey (ATUS), publicly available [here](https://www.bls.gov/tus/datafiles-2020.htm). </p> 
+•  Scraping method </br>
+•  Cleaning </br>
+</p>
+
+# Exploratory Analysis
+•  Visualizations </br>
+•  Summaries </br>
+•  Exploratory statistical analyses </br>
+•  Justify the steps you took, and show any major changes to your ideas </br>
+</p>
+
+# Additional Analysis
+• Statistical analyses, described in detail </br>
+</p>
+
+# Discussion
+•  What were your findings? </br>
+•  Are they what you expect? </br>
+•  What insights into the data can you make?</br>
