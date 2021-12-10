@@ -2,7 +2,7 @@
 title: "P8105 Final Project"
 output: github_document
 editor_options: 
-  chunk_output_type: console
+  chunk_output_type: inline
 always_allow_html: true
 ---
 
@@ -1184,6 +1184,8 @@ Next, we want to fit a few models that we hypothesize may predict time spent on 
 (3) Demographic characteristics: race, age, and sex, and their interactions
 
 ```{r}
+ggplot(data = cps_summary_leisure, aes(x=age, y=category_sum_hour_weight)) + geom_point()
+
 model1 = 
   lm(category_sum_hour_weight ~ labor_force_status, data = cps_summary_leisure)
 
