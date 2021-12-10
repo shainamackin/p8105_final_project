@@ -1024,14 +1024,11 @@ table(summary_household_category$race)
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
-<<<<<<< HEAD
     summary_household_category$race %in% c(4, 7) ~ "Asian",
     summary_household_category$race %in% c(1) ~ "White", 
     summary_household_category$race %in% c(2, 6) ~ "Black",
     summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
     TRUE ~ "unknown",
-=======
->>>>>>> 95ff27e536691d08f93fa6120063c9a47d5da79b
     summary_household_category$race %in% c(1) ~ "White",
     summary_household_category$race %in% c(2) ~ "Black", 
     summary_household_category$race %in% c(3) ~ "American Indian",
