@@ -369,25 +369,9 @@ div.tocify {
 </div>
 
 
-<pre class="r"><code>library(tidyverse)
-options(scipen = 50)
-library(ggplot2)</code></pre>
-<pre class="r"><code>summary_household_category = read_csv(&quot;data/summary_household_category.csv&quot;)</code></pre>
 <div id="how-has-time-use-been-impacted-by-covid-19" class="section level2">
 <h2>How has time-use been impacted by COVID-19?</h2>
 <p>Has the way we spend time on different categories changed due to the pandemic? See the table below to see average daily hours spent on categories of activities in 2019 versus 2020, and the percent change.</p>
-<pre class="r"><code> summary_household_category %&gt;% 
-  drop_na() %&gt;% 
-  group_by(year, category) %&gt;% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %&gt;% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
-  select(-sum_product, -sum_weight) %&gt;% 
-  pivot_wider(names_from = &quot;year&quot;, 
-              values_from = &quot;average_hours&quot;) %&gt;% 
-  mutate(percent_change = round((`2020`-`2019`)*100/`2019`, 1)) %&gt;% 
-  arrange(desc(`2019`)) %&gt;% 
-  knitr::kable()</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -497,17 +481,6 @@ library(ggplot2)</code></pre>
 </tbody>
 </table>
 <p>Visualize this with the bar plot shown below.</p>
-<pre class="r"><code>summary_household_category %&gt;% 
-  drop_na() %&gt;% 
-  group_by(year, category) %&gt;% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %&gt;% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
-  select(-sum_product, -sum_weight) %&gt;% 
-  mutate(year = as.factor(year)) %&gt;% 
-  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
-  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))</code></pre>
 <p><img src="exploratory_analyses_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <p>Some notable changes from 2019 to 2020 include increases in time spent on leisure and household activities and decreases in time spent on work and travel.</p>
 </div>

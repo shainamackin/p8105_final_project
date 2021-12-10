@@ -8,14 +8,14 @@ output:
     source_code: embed 
 ---
 
-```{r setup, message = FALSE}
+```{r setup, message = FALSE, echo = FALSE}
 
 library(tidyverse)
 options(scipen = 50)
 library(ggplot2)
 ```
 
-```{r data, message = FALSE, warning = FALSE}
+```{r data, message = FALSE, warning = FALSE, echo = FALSE}
 summary_household_category = read_csv("data/summary_household_category.csv")
 
 ```
@@ -25,7 +25,7 @@ summary_household_category = read_csv("data/summary_household_category.csv")
 Has the way we spend time on different categories changed due to the pandemic? See the table below to see average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 
 
 
-```{r message = FALSE, warning = FALSE}
+```{r message = FALSE, warning = FALSE, echo = FALSE}
  summary_household_category %>% 
   drop_na() %>% 
   group_by(year, category) %>% 
@@ -43,7 +43,7 @@ Has the way we spend time on different categories changed due to the pandemic? S
 
 Visualize this with the bar plot shown below. 
 
-```{r message = FALSE, warning = FALSE}
+```{r message = FALSE, warning = FALSE, echo = FALSE}
 summary_household_category %>% 
   drop_na() %>% 
   group_by(year, category) %>% 
