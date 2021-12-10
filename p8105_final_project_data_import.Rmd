@@ -8,6 +8,11 @@ always_allow_html: true
 
 ```{r setup, message = FALSE}
 library(tidyverse)
+library(dplyr)
+library(modelr)
+library(mgcv)
+
+
 options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -1019,22 +1024,13 @@ table(summary_household_category$race)
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
-<<<<<<< HEAD
-    summary_household_category$race %in% c(4, 7) ~ "Asian",
-    summary_household_category$race %in% c(1) ~ "White", 
-    summary_household_category$race %in% c(2, 6) ~ "Black",
-    summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
-    TRUE ~ "unknown"
-=======
     summary_household_category$race %in% c(1) ~ "White",
     summary_household_category$race %in% c(2) ~ "Black", 
     summary_household_category$race %in% c(3) ~ "American Indian",
     summary_household_category$race %in% c(4) ~ "Asian",
     summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
     TRUE ~ "2+ races"
->>>>>>> 81951feed56a5a86aabff0445b2d62fed122419e
   ))
-
 
 summary_household_category$labor_force_status <-
   as_factor(case_when(
@@ -1057,7 +1053,7 @@ unique_household <- summary_household_category %>%
   group_by(TUCASEID) %>% 
   filter(row_number() == 1) 
 
-table1(~ race + age + sex + labor_force_status + region|year, data = unique_household)
+# table1(~ race + age + sex + labor_force_status + region|year, data = unique_household)
 
 ```
 
