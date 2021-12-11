@@ -20,11 +20,10 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 <p/>
 <p/>
-<center>
 # __Only Time Will Tell:__ 
 <p/>
 __An investigation into American time use trends pre- and post- onset of COVID-19__
-</center>
+
 ![](https://upload.wikimedia.org/wikipedia/commons/f/f4/Analog_clock_animation.gif)
 
 # The Project
