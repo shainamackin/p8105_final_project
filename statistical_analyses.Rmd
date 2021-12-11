@@ -74,8 +74,14 @@ model1 %>%
 
 From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average. Additionally, those who are retired are expected to spend 1.5 more hours per day on leisure activities per day in comparison to those who are employed but absent from work. 
 
+For the 2nd and 3rd model, we did a quick check to make sure that age could be used as a continuous variable by plotting age against time spent on leisure activities. From the plot below, we don't see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear.
 
 ```{r model2, message = FALSE, warning = FALSE}
+ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
+  labs(x = "Age (yrs)",
+       y = "Time Spent on Leisure Activities (hrs/day)",
+       title = "Relationship between Age and Leisure Time")
+
 model2 = 
   lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
 
