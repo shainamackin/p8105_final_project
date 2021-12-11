@@ -9,8 +9,10 @@ navbar:
       menu: 
           - text: "COVID-19 exploratory analysis"
             href: exploratory_analyses.html
-          - text: "Group differences"
+          - text: "Differences by age and sex"
             href: group_differences.html
+          - text: "Trends from 2009-2019"
+            href: multi_year_trends.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html
     - text: "Interactive map"

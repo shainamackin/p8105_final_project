@@ -323,16 +323,28 @@ div.tocify {
       </ul>
       <ul class="nav navbar-nav navbar-right">
         <li>
-  <a href="index.html">Index</a>
+  <a href="index.html">Home</a>
 </li>
-<li>
-  <a href="exploratory_analyses.html">Exploratory Analyses</a>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+    Exploratory Analyses
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu">
+    <li>
+      <a href="exploratory_analyses.html">COVID-19 exploratory analysis</a>
+    </li>
+    <li>
+      <a href="group_differences.html">Group differences</a>
+    </li>
+  </ul>
 </li>
 <li>
   <a href="statistical_analyses.html">Statistical Analyses</a>
 </li>
 <li>
-  <a href="shiny_dashboard.html">Map Dashboard</a>
+  <a href="shiny_dashboard.html">Interactive map</a>
 </li>
 <li>
   <a href="project_report.html">Project Report</a>
@@ -378,8 +390,8 @@ COVID-19 has drastically impacted the ways in which we spend our time. During th
 </div>
 <div id="related-work" class="section level1">
 <h1>Related Work</h1>
-• Anything that inspired you, such as a paper, a web site, or something discussed in class
-</p>
+<p>The work that inspired this project was done by the <a href="https://ourworldindata.org/time-use">Our World in Data group</a>. They looked at how people all around the world spend their days. They point out that looking at how we spend our time – particularly focusing on how much time we spend on things we enjoy, can be informative about general well-being. In countries where individuals work more, and spend less time on leisure activities, there are lower levels of happiness and life satisfaction.</br></p>
+<p>A lot of individuals have used the specific datasets that we used for this project to do cool things! One example is a simulation built by a statistician at UCLA, who <a href="https://flowingdata.com/2015/12/15/a-day-in-the-life-of-americans/">simulated</a> how 1000 Americans transition from one activity to another over the course of a day. We recommend you check it out.</p>
 </div>
 <div id="initial-questions" class="section level1">
 <h1>Initial Questions</h1>
@@ -393,8 +405,12 @@ COVID-19 has drastically impacted the ways in which we spend our time. During th
 <h3>Source: <br/></h3>
 Data for this project comes from the U.S. Bureau of Labor Statistics’ American Time Use Survey (ATUS), publicly available <a href="https://www.bls.gov/tus/datafiles-2020.htm">here</a>.
 </p>
-• Scraping method </br> • Cleaning </br>
+<p>Key variables from the Activity Summary files included activity codes, total time spent on the activity, and demographic variables. We pulled dates of responses from the ATUS respondent files and geographic information from the CPS files.</p>
+</div>
+<div id="cleaning" class="section level3">
+<h3>Cleaning: </br></h3>
 </p>
+<p>We started with the Activity Summary files. Our first step was to pivot from wide to long format, as the approximately 400 activity codes each had their own column. The activity codes (the letter “t” followed by 6 digits) were not very informative, so we also recoded them to be more informative of the activity (ex. t010101 was recoded as “Sleeping”). We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions given by ATUS. We would like to note that some activities could have fallen under more than one category (ex. Some may view sports to fall under leisure and some may view it to fall under exercise or both). Other cleaning steps included renaming variable names to be more informative (ex. TELFS renamed to labor_force_status). We appended 2019 and 2020 datasets and merged the different datasets were using the ID (TUCASEID) variable.</p>
 </div>
 </div>
 <div id="exploratory-analysis" class="section level1">

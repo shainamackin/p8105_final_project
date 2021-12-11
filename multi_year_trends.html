@@ -11,7 +11,7 @@
 
 
 
-<title>index.knit</title>
+<title>Multi-year trends</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
 <script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
@@ -33,7 +33,6 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
-<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -221,9 +220,6 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
-<style type="text/css">
-.code-folding-btn { margin-bottom: 4px; }
-</style>
 
 
 
@@ -340,7 +336,10 @@ div.tocify {
       <a href="exploratory_analyses.html">COVID-19 exploratory analysis</a>
     </li>
     <li>
-      <a href="group_differences.html">Group differences</a>
+      <a href="group_differences.html">Differences by age and sex</a>
+    </li>
+    <li>
+      <a href="multi_year_trends.html">Trends from 2009-2019</a>
     </li>
   </ul>
 </li>
@@ -378,91 +377,15 @@ div.tocify {
 
 <div id="header">
 
-<div class="btn-group pull-right float-right">
-<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
-<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
-<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
-<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
-</ul>
-</div>
 
 
-
+<h1 class="title toc-ignore">Multi-year trends</h1>
 
 </div>
 
 
-<div id="only-time-will-tell" class="section level1">
-<h1><strong>Only Time Will Tell:</strong></h1>
-<p></p>
-<p><strong>An investigation into American time use trends pre- and post- onset of COVID-19</strong></p>
-<p><img src="https://upload.wikimedia.org/wikipedia/commons/f/f4/Analog_clock_animation.gif" /></p>
-<p>
- 
-</p>
-<p align="center">
-</div>
-<div id="the-project" class="section level1">
-<h1>The Project</h1>
-COVID-19 has drastically impacted the ways in which we spend our time. From March to May, 2020 – during the onset of the pandemic in the United States – initiation of stay-at-home orders, lockdown measures, and social distancing norms rapidly and severely altered daily activities. From time spent with others to time spent in our homes, we were interested in exploring pandemic impacts on time use and analyzing how they may differ based on social and demographic characteristics across the United States.
-</p>
-Our analysis is largely exploratory, visualizing distribution of activities across states, units of time, and demographics. We have also run regression analyses to investigate the significance of the associations between demographic variables of interest and time use outcomes.<br />
-
-<p>
- 
-</p>
-</div>
-<div id="the-website" class="section level1">
-<h1>The Website</h1>
-This project uses publicly available data from the U.S. Bureau of Labor Statistics’ <a href="https://www.bls.gov/tus/datafiles-2020.htm">American Time Use Survey (ATUS)</a> to investigate time use trends across the U.S. between 2019 and 2020.
-<p>
- 
-</p>
-<div id="exploratory-analyses" class="section level4">
-<h4>Exploratory Analyses</h4>
-•
-</p>
-•
-</p>
-</div>
-<div id="statistical-analyses" class="section level4">
-<h4>Statistical Analyses</h4>
-•
-</p>
-•
-</p>
-</div>
-<div id="map-dashboard" class="section level4">
-<h4>Map Dashboard</h4>
-•
-</p>
-</div>
-<div id="project-report" class="section level4">
-<h4>Project Report</h4>
-•
-</p>
-</div>
-</div>
-<div id="the-team" class="section level1">
-<h1>The Team</h1>
-</p>
-<div id="dee-wang-dtw2127" class="section level4">
-<h4>Dee Wang (dtw2127)</h4>
-</p>
-</div>
-<div id="sandya-ganesh-sg3891" class="section level4">
-<h4>Sandya Ganesh (sg3891)</h4>
-</p>
-</div>
-<div id="shaina-mackin-smm2350" class="section level4">
-<h4>Shaina Mackin (smm2350)</h4>
-</p>
-</div>
-<div id="xin-fang-xf2226" class="section level4">
-<h4>Xin Fang (xf2226)</h4>
-</p>
-</div>
-</div>
+<p>We were also curious to see if there were any trends in time spent on different categories and plotted average time spent on activities from 2009 to 2019. However, we did not see any obvious trends from 2009 - 2019.</p>
+<p><img src="multi_year_trends_files/figure-html/unnamed-chunk-1-1.png" width="768" /></p>
 
 
 
@@ -499,11 +422,6 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
-<script>
-$(document).ready(function () {
-  window.initializeCodeFolding("hide" === "show");
-});
-</script>
 
 <script>
 $(document).ready(function ()  {

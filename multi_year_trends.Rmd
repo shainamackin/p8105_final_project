@@ -1,0 +1,54 @@
+---
+title: "Multi-year trends"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    theme: cosmo
+    source_code: embed 
+---
+
+```{r setup, message = FALSE, echo = FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+options(scipen = 50)
+library(ggplot2)
+
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis",
+  digits = 3
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d 
+knitr::opts_chunk$set(
+  fig.height = 6,
+  fig.width = 8,
+  message = F,
+  warning = F 
+  )
+
+
+
+```
+
+We were also curious to see if there were any trends in time spent on different categories and plotted average time spent on activities from 2009 to 2019. However, we did not see any obvious trends from 2009 - 2019. 
+
+```{r message = FALSE, echo = FALSE}
+
+annual_data = read_csv("data/annual_activity.csv") 
+
+annual_data %>% 
+  mutate(Year = factor(Year)) %>% 
+  group_by(Activity, Year) %>% 
+  ggplot(aes(x = Year, y = Estimate, color = Activity)) + 
+  geom_line(aes(group = Activity)) + 
+  theme(legend.position = "right") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+
+```
+
+
