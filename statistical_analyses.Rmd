@@ -22,7 +22,18 @@ knitr::opts_chunk$set(echo = TRUE)
 Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
 <p/>
 <p/>
-## Models
+## Univariate Analysis: Demographics Table
+
+First, we will explore the demographics of the respondents included in our dataset.
+```{r}
+cps_summary = 
+  read_csv("./data/summary_household_category.csv")
+
+table1(~ race + age + sex + labor_force_status + region|year, data = cps_summary)
+
+```
+
+##Models
 
 First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
 
