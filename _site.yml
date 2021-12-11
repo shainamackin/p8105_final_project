@@ -1,5 +1,5 @@
 name: "Dee Wang, Sandya Ganesh, Shaina Mackin, Xin Fang"
-output_dir: "www"
+output_dir: "."
 navbar:
   title: "Only Time Will Tell"
   right:
@@ -15,7 +15,7 @@ navbar:
             href: multi_year_trends.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html
-    - text: "Interactive map"
+    - text: "Interactive Map"
       href: https://xinfang.shinyapps.io/p8105_final_project/
     - text: "Project Report"
       href: project_report.html
