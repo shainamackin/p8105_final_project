@@ -112,7 +112,10 @@ merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = 
 
 category_time_month_2020 = merged_actsum_cps_resp_2020 %>% 
   drop_na() %>% 
-  filter(category %in% c("caring_duties", "education", "household", "leisure", "sleep", "telephone", "work")) %>% #drop certain categories 
+  filter(category %in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating_drinking", 
+                         "personal_care", "caring_duties")) %>% 
   group_by(month, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
             sum_weight = sum(weight)) %>% 
@@ -123,15 +126,12 @@ category_time_month_2020 = merged_actsum_cps_resp_2020 %>%
   mutate(month = match(month, month.name)) %>%
    mutate(
      category = replace(category, category == "caring_duties", "caring duties"),
-     #category = replace(category, category == "eating_drinking", "eating/drinking"),
-     #category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
-     #category = replace(category, category == "personal_care", "personal care"),
-     #category = replace(category, category == "professional_services", "professional services"),
-     #category = replace(category, category == "religious_spiritual", "religious/spiritual")
+     category = replace(category, category == "eating_drinking", "eating/drinking"),
+     category = replace(category, category == "personal_care", "personal care"),
      ) %>%
   arrange(month) 
 
-monthly_2020_plotly = category_time_month_2020 %>%
+monthly_2020_plotly_hours = category_time_month_2020 %>%
   mutate(text_label = str_c("Activity: ", category, "\nAverage hours: ", average_hours, "\nMonth: ", month)) %>%
   plot_ly(
     x = ~month, y = ~average_hours, type = "scatter", mode = "line",
@@ -140,10 +140,46 @@ monthly_2020_plotly = category_time_month_2020 %>%
         annotations = list(x = 2.5, y = 3, text = "month 4 missing"), 
         xaxis = list(type = "category", title = 'Month'), 
         yaxis = list(title = 'Average Hours'))
+
+`%not_in%` <- purrr::negate(`%in%`)
+
+category_time_month_2020 = merged_actsum_cps_resp_2020 %>% 
+  drop_na() %>% 
+  filter(category %not_in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating_drinking", 
+                         "personal_care", "caring_duties")) %>% 
+  group_by(month, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %>% 
+  subset(select = -c(sum_product,sum_weight)) %>% 
+  mutate(
+    month = as.factor(month)) %>%
+  mutate(month = match(month, month.name)) %>%
+   mutate(
+     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
+     category = replace(category, category == "professional_services", "professional services"),
+     category = replace(category, category == "religious_spiritual", "religious/spiritual")
+     ) %>%
+  arrange(month) 
+
+
+monthly_2020_plotly_minutes = category_time_month_2020 %>%
+  mutate(text_label = str_c("Activity: ", category, "\nAverage minutes: ", average_minutes, "\nMonth: ", month)) %>%
+  plot_ly(
+    x = ~month, y = ~average_minutes, type = "scatter", mode = "line",
+    color = ~category, text = ~text_label, alpha = 0.9) %>%
+ layout(title = 'Average time spent on activities across the U.S. in 2020', 
+        annotations = list(x = 2.5, y = 10, text = "month 4 missing"), 
+        xaxis = list(type = "category", title = 'Month'), 
+        yaxis = list(title = 'Average Minutes'))
+
 ```
 
 ```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
-monthly_2020_plotly
+monthly_2020_plotly_hours
+monthly_2020_plotly_minutes
 ```
 
 There is a notable increase in daily hours spent on leisure activities between March and May 2020, though it seems to fluctuate throughout the rest of the year. There is also an increase in time spent on household activities between March and May 2020. Time spent on education took a significant dip during this same time period, potentially due to school shutdowns. It remained low from May until September, which makes sense considering the traditional US school year/summer break timings.
@@ -175,8 +211,8 @@ We can see that average daily minutes spent socializing dropped from 35 minutes 
 How did daily time spent on socializing vary depending on age? 
 
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
-library(gganimate)
-library(gifski)
+#library(gganimate)
+#library(gifski)
 
 social_age_plot <- socializing %>% 
     mutate(year = factor(year)) %>% 
@@ -186,15 +222,15 @@ social_age_plot <- socializing %>%
   mutate(average_minutes = round(sum_product*60/sum_weight, 2)) %>% 
   ggplot(aes(x = age, y = average_minutes, color = year)) + 
   geom_point(alpha = .5) + 
-  geom_line() + 
+  geom_smooth() + 
   labs(
     title = "Average minutes spent on socializing based on age", 
     x = "Age", 
     y = "Average minutes"
-  ) +
-  transition_reveal(age)
+  ) #+
+  #transition_reveal(age)
 
-animate(social_age_plot, renderer = gifski_renderer())
+#animate(social_age_plot, renderer = gifski_renderer())
 
 ```
 

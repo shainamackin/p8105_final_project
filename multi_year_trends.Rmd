@@ -13,6 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 options(scipen = 50)
 library(ggplot2)
+library(plotly)
 
 
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
@@ -34,20 +35,27 @@ knitr::opts_chunk$set(
 
 ```
 
-We were also curious to see if there were any trends in time spent on different categories and plotted average time spent on activities from 2009 to 2019. However, we did not see any obvious trends from 2009 - 2019. 
+We were also curious to see if there were any trends in time spent on different categories and plotted average time spent on activities from 2009 to 2019. While we don't see any obvious trends, the average time we spend on sleep seems to have been slightly increasing. 
 
 ```{r message = FALSE, echo = FALSE}
 
 annual_data = read_csv("data/annual_activity.csv") 
 
-annual_data %>% 
-  mutate(Year = factor(Year)) %>% 
-  group_by(Activity, Year) %>% 
-  ggplot(aes(x = Year, y = Estimate, color = Activity)) + 
-  geom_line(aes(group = Activity)) + 
-  theme(legend.position = "right") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+annual_data_plotly = annual_data %>% 
+  mutate(text_label = str_c("Activity: ", Activity, "\nEstimate: ", Estimate, "\nYear: ", Year)) %>%
+  plot_ly(
+    x = ~Year, y = ~Estimate, type = "scatter", mode = "line",
+    color = ~Activity, text = ~text_label, alpha = 0.9) %>%
+ layout(title = 'Average time spent on activities across the U.S. from 2009-2019', 
+        xaxis = list(type = "category", title = 'Year'), 
+        yaxis = list(title = 'Average Hours'))
+
 
 ```
+
+```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
+annual_data_plotly
+```
+
 
 

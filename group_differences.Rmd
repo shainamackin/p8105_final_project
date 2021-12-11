@@ -1,7 +1,5 @@
 ---
-title: "group_differences"
-author: "Dee Wang"
-date: "10/12/2021"
+title: "Differences by age and sex"
 output: html_document
 ---
 
@@ -29,18 +27,25 @@ knitr::opts_chunk$set(
 
 ```
 
-We were curious to see how time spent on activities differed depending on age and sex. The plot below shows how time use varies depending on age. 
+We were curious to see how time spent on activities differed depending on age and sex using data from 2019 and 2020. The plot below shows how time use varies depending on age.  
 
 ```{r message = FALSE, echo = FALSE}
-summary_household_category = read_csv("data/summary_household_category.csv")
+summary_household_category = read_csv("data/summary_household_category.csv") %>% 
+     mutate(
+     category = replace(category, category == "caring_duties", "caring duties"),
+     category = replace(category, category == "eating_drinking", "eating/drinking"),
+     category = replace(category, category == "personal_care", "personal care"),
+     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
+     category = replace(category, category == "professional_services", "professional services"),
+     category = replace(category, category == "religious_spiritual", "religious/spiritual"))
 
 `%not_in%` <- purrr::negate(`%in%`)
 
 plot1 = summary_household_category %>% 
    filter(category %in% c("sleep", "leisure", 
                          "work", "household", 
-                         "traveling", "eating_drinking", 
-                         "personal_care", "caring_duties")) %>% 
+                         "traveling", "eating/drinking", 
+                         "personal care", "caring duties")) %>% 
   drop_na() %>% 
   group_by(age, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
@@ -50,13 +55,14 @@ plot1 = summary_household_category %>%
   ggplot(aes(x = age, y = average_hours)) +
     #geom_point(aes(color = category, alpha = .3)) +
     geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = "Average hours") +
     facet_wrap(~category, scales = "free", ncol = 2)
 
 plot2 = summary_household_category %>% 
    filter(category %not_in% c("sleep", "leisure", 
                          "work", "household", 
-                         "traveling", "eating_drinking", 
-                         "personal_care", "caring_duties")) %>% 
+                         "traveling", "eating/drinking", 
+                         "personal care", "caring duties")) %>% 
   drop_na() %>% 
   group_by(age, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
@@ -66,6 +72,7 @@ plot2 = summary_household_category %>%
   ggplot(aes(x = age, y = average_minutes)) +
     #geom_point(aes(color = category, alpha = .3)) +
     geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = "Average minutes") +
     facet_wrap(~category, scales = "free", ncol = 2)
 
 gridExtra::grid.arrange(plot1, plot2, ncol = 2)
@@ -81,8 +88,8 @@ plot1 = summary_household_category %>%
   drop_na() %>% 
   filter(category %in% c("sleep", "leisure", 
                          "work", "household", 
-                         "traveling", "eating_drinking", 
-                         "personal_care", "caring_duties")) %>% 
+                         "traveling", "eating/drinking", 
+                         "personal care", "caring duties")) %>% 
   group_by(sex, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
             sum_weight = sum(weight)) %>% 
@@ -90,14 +97,15 @@ plot1 = summary_household_category %>%
   select(-sum_product, -sum_weight) %>% 
   ggplot(aes(x = sex, y = average_hours, fill = sex)) +
     geom_bar(stat = "identity", position = "dodge", width = 0.5, show.legend = FALSE) +
+    labs(y = "Average hours") +
     facet_wrap(~category, scales = "free", ncol = 2)
 
 plot2 = summary_household_category %>% 
   drop_na() %>% 
   filter(category %not_in% c("sleep", "leisure", 
                          "work", "household", 
-                         "traveling", "eating_drinking", 
-                         "personal_care", "caring_duties")) %>% 
+                         "traveling", "eating/drinking", 
+                         "personal care", "caring duties")) %>% 
   group_by(sex, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
             sum_weight = sum(weight)) %>% 
@@ -105,11 +113,12 @@ plot2 = summary_household_category %>%
   select(-sum_product, -sum_weight) %>% 
   ggplot(aes(x = sex, y = average_minutes, fill = sex)) +
     geom_bar(stat = "identity", position = "dodge", width = 0.5, show.legend = FALSE) +
+  labs(y = "Average minutes") +
     facet_wrap(~category, scales = "free", ncol = 2) 
 
 gridExtra::grid.arrange(plot1, plot2, ncol = 2)
 
 ```
 
-Again, note that the y axis for the first two columns is in hours, and in minutes for the last two columns. Some activities that females spend more time on include caring duties, household activities, personal care, education, religious and spiritual activities and shopping. Males on the other hand spend more time working and exercising as well as engaging in governmental and civic obligations. The average number of minutes females spend on these activities is close to 0. 
+Again, note that the y axis for the first two columns is in hours, and in minutes for the last two columns. Some activities that females spend more time on include caring duties, household activities, personal care, education, religious and spiritual activities and shopping. Males on the other hand spend more time working and exercising as well as engaging in governmental and civic obligations. The average number of minutes females spend on governmental and civic obligations is close to 0. 
 
