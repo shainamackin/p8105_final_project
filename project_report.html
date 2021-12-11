@@ -13,8 +13,8 @@
 
 <title>Project Report</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
-<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -419,6 +419,16 @@ Data for this project comes from the U.S. Bureau of Labor Statistics’ American
 <h3>Cleaning: </br></h3>
 </p>
 <p>We started with the Activity Summary files. Our first step was to pivot from wide to long format, as the approximately 400 activity codes each had their own column. We also selected key demographic variables and renamed them to be more informative.</p>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages --------------------------------------- tidyverse 1.3.1 --</code></pre>
+<pre><code>## v ggplot2 3.3.5     v purrr   0.3.4
+## v tibble  3.1.4     v dplyr   1.0.7
+## v tidyr   1.1.3     v stringr 1.4.0
+## v readr   2.0.1     v forcats 0.5.1</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------ tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(ggplot2)</code></pre>
 <pre class="r"><code>activity_summary_2019 = read.table(&quot;data/atussum_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
 activity_summary_2020 = read.table(&quot;data/atussum_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
 
@@ -1474,16 +1484,9 @@ gridExtra::grid.arrange(plot1, plot2, ncol = 2)</code></pre>
 <div id="multi-year-trends" class="section level3">
 <h3>Multi-year trends</h3>
 <p>We also plotted average time spent on different categories of activities from 2009 to 2019, using data available on the ATUS website.</p>
-<pre class="r"><code>annual_data = read_csv(&quot;data/annual_activity.csv&quot;) </code></pre>
-<pre><code>## Rows: 55 Columns: 4</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr (1): Activity
-## dbl (3): Year, Estimate, SE</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>annual_data_plotly = annual_data %&gt;% 
+<pre class="r"><code>annual_data = read_csv(&quot;data/annual_activity.csv&quot;) 
+
+annual_data_plotly = annual_data %&gt;% 
   mutate(text_label = str_c(&quot;Activity: &quot;, Activity, &quot;\nEstimate: &quot;, Estimate, &quot;\nYear: &quot;, Year)) %&gt;%
   plot_ly(
     x = ~Year, y = ~Estimate, type = &quot;scatter&quot;, mode = &quot;line&quot;,
@@ -1505,7 +1508,13 @@ gridExtra::grid.arrange(plot1, plot2, ncol = 2)</code></pre>
 </div>
 <div id="discussion" class="section level1">
 <h1>Discussion</h1>
-<p>We found that employment is a strong predictor of time spent doing leisure activities, and that time spent on leisure activities did increase in 2020 after the nation-wide lockdown. These findings are in accordance with what we would expect. • What were your findings? </br> • Are they what you expect? </br> • What insights into the data can you make?</br></p>
+<p>We found that in 2020, Americans on average spent more time on leisure and household activities as compared to 2019, and spent less time on work and travel. With more individuals working from home during the pandemic, these findings make sense. We saw the same trends when comparing time spent on activities in March of 2020 versus May of 2020. We also saw large drops in average time spent on education from March (41 minutes) to May (15 minutes) across the individuals in our study. We also found that time spent socializing dropped from 35 minutes in 2019 to 30 minutes in 2020. When looking at how time spent socializing related to age, we saw that there were larger decreases in socializing among the older population, which would make sense given that older individuals are more vulnerable to COVID-19. It would be interesting to study how decreases in socializing has impacted older adults’ well-being.</p>
+<p>With our multi-paneled plots showing time spent on activities against age, we were able to see how the time we spent on various activities changes over our life course. There are certain activities like eating and drinking, household activities and religious and spiritual activities that we spend more and more time on as we get older. With other activities like work and leisure, there are peaks and dips at around the mid-life point (~40 years). There were also trends in time spent depending on sex. Some activities that females spend more time on include caring duties, household activities, personal care, education, religious and spiritual activities and shopping. Males on the other hand spend more time working and exercising as well as engaging in governmental and civic obligations.</p>
+<p>Looking at our multi-year 2009-2019 trend plot, we didn’t see any drastic changes in the amount of time we spend on different activities. There did appear to be an upward trend for time we spend sleeping and working, though these were subtle. We saw some interesting between-state differences in time spent on activities. For instance, average daily leisure time in Wyoming (8 hours) was around 1.5 hours higher than in West Virginia (state with second highest average daily leisure time) and 5 hours higher than leisure time spent in Vermont. It would be interesting to look closer at how time is spent on different categories within one state. Additionally, it could be informative to look at the demographic distributions of respondents in these states.</p>
+<p>We found that labor force status is a strong predictor of time spent on leisure activities. This finding is in accordance with what we would expect, since those who are retired have much more time to spend on leisure activities vs someone who is working. Additionally, we found that time spent on leisure activities did increase in 2020 when compared to 2019, which also validated our hypotheses around people spending more time on new hobbies and fun activities during the nation-wide lockdown. Additionally, other sociodemographic factors like age, race, and sex are significant predictors of time spent on leisure activities, but their interaction terms were found to be non significant. The RSME values indicate that the model with labor force is a better model fit when compared to the models with age, race, and sex. Some interesting next steps could be to look at labor force as a predictor alongside other sociodemographic variables such as income bracket, and also study other activities that time is spent on, such as sleep.</p>
+<p>#Limitations</p>
+<p>A lot of the work that we did was descriptive, and so it is unclear whether differences we identified in time spent on categories of activities was significantly different in 2020 as compared to 2019. As a next step, it would be interesting to use more statistical tests to identify if changes were significant. Additionally, the COVID-19 pandemic suspended data collection from mid-March 2020 to mid-May 2020. This means that the data we used for 2020 is not representative of the whole year, and estimates generated for 2020 are not as accurate as they are for other years.</p>
+<p>One caveat/limitation in the regression analyses is that we were not able to find an easy solution to using the statistically weighted data on an individual respondent level. The statistical weights were put in place to deal with differing response rates across people from different socio demographic backgrounds, and more responses during the weekends vs. weekdays, which would definitely affect time spent on leisure activities. Based on the literature and our hypotheses, the direction of the associations we found seem probable, and it is likely only the strength of the association would change slightly upon adding the statistical weights.</p>
 </div>
 
 

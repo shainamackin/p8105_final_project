@@ -46,6 +46,12 @@ Data for this project comes from the U.S. Bureau of Labor Statistics’ American
 
 We started with the Activity Summary files. Our first step was to pivot from wide to long format, as the approximately 400 activity codes each had their own column. We also selected key demographic variables and renamed them to be more informative.
 
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+
 ```{r eval = FALSE}
 activity_summary_2019 = read.table("data/atussum_2019.dat", header = TRUE, sep = ",")
 activity_summary_2020 = read.table("data/atussum_2020.dat", header = TRUE, sep = ",")
@@ -500,7 +506,7 @@ actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) 
 
 We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions given by ATUS. We would like to note that some activities could have fallen under more than one category (ex. Some may view sports to fall under leisure and some may view it to fall under exercise or both). 
 
-```{r}
+```{r eval = FALSE}
 actsum_combined_categorized = actsum_combined %>% 
   mutate(category = case_when(
     activity_codes %in% c("Sleeping", 
@@ -1138,7 +1144,7 @@ gridExtra::grid.arrange(plot1, plot2, ncol = 2)
 
 We also plotted average time spent on different categories of activities from 2009 to 2019, using data available on the ATUS website. 
 
-```{r}
+```{r eval = FALSE}
 annual_data = read_csv("data/annual_activity.csv") 
 
 annual_data_plotly = annual_data %>% 
