@@ -148,7 +148,7 @@ monthly_2020_plotly = category_time_month_2020 %>%
 monthly_2020_plotly
 ```
 
-There is a notable increase in daily hours spent on leisure activities between March and May 2020, though it seems to fluctuate throughout the rest of the year. There is also an increase in time spent on household activities between March and May 2020. Time spent on education took a significant dip during this same time period, and remained low from May until September, which makes sense considering the traditional US school year/summer break timings.
+There is a notable increase in daily hours spent on leisure activities between March and May 2020, though it seems to fluctuate throughout the rest of the year. There is also an increase in time spent on household activities between March and May 2020. Time spent on education took a significant dip during this same time period, potentially due to school shutdowns. It remained low from May until September, which makes sense considering the traditional US school year/summer break timings.
 
 We were also curious to see if time spent socializing changed from 2019 to 2020 due to social distancing measures. Below is a bar chart showing average daily minutes spent socializing in 2019 versus 2020. 
 
