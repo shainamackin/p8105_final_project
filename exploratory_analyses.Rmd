@@ -209,7 +209,7 @@ socializing %>%
 
 ```
 
-We can see that average daily minutes spent socializing dropped from 35 minutes in 2019 to 30 minutes in 2020. 
+We can see that average daily minutes spent socializing dropped from around 35 minutes in 2019 to 30 minutes in 2020. 
 
 How did daily time spent on socializing vary depending on age? 
 
