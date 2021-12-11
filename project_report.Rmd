@@ -36,14 +36,12 @@ The initial questions we had going into this project were:
 
 **4.** How does time spent with others differ pre- and post- onset of COVID-19, and how do sociodempgraphic factors affect this? 
 
-<<<<<<< HEAD
+
 As the project evolved, however, so too did our initial questions:
 
 + Namely, in relation to Initial Question 4, we discovered that obtaining an estimate of time spent with others would require cleaning and merging two additional large datasets. Instead, we decided to modify our initial question and instead use the activity codes around socializing and communicating with others to get a sense of how this had changed from pre- to post-pandemic, and how this varied by age. 
 + As an expansion upon our initially proposed regression analyses of sociodemographic variables, it occurred to us mid-analysis to also investigate the interaction effects of these sociodemographic variables.
-=======
 
->>>>>>> d81035a647d599e9b1410a82375fa967b82f9547
 </p>
 <p/>
 <p/>
