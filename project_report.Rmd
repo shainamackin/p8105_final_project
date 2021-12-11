@@ -13,13 +13,15 @@ output:
 </p>
 COVID-19 has drastically impacted the ways in which we spend our time. During the height of the pandemic, stay-at-home orders, lockdown measures, and social distancing norms prevented many Americans from going into workplaces and schools and from seeing friends and family, impacting the way we spend our days -- and making us hyper aware of that. The motivation for this project was originally to understand how COVID-19 affected time use. We set out to look at how time spent on activities such as paid and unpaid work, education, sleep, and leisure may have changed from pre- to post- pandemic. We believe that this is important to investigate as the way we spend our time impacts our general well-being.
 </p>
-
+<p/>
+<p/>
 
 # Related Work
 The work that inspired this project was done by the [Our World in Data group](https://ourworldindata.org/time-use). They looked at how  people all around the world spend their days. They point out that looking at how we spend our time -- particularly focusing on how much time we spend on things we enjoy, can be informative of general well-being. In countries where individuals work more, and spend less time on leisure activities, there are generally lower levels of happiness and life satisfaction.</br>
 
 A lot of individuals have used the specific data sets that we used for this project to do cool things! One example is a simulation built by a statistician at UCLA, who [simulated](https://flowingdata.com/2015/12/15/a-day-in-the-life-of-americans/) how 1000 Americans transition from one activity to another over the course of a day. We recommend you check it out.
-
+<p/>
+<p/>
 # Initial Questions
 
 The initial questions we had going into this project were:
@@ -35,7 +37,8 @@ We had initially planned to look at how sociodemographic factors affect time spe
 •  How did these questions evolve over the course of the project? </br>
 •  What new questions did you consider in the course of your analysis? </br>
 </p>
-
+<p/>
+<p/>
 # The Data
 </p>
 ### Source: <br/>
