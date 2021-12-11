@@ -20,7 +20,7 @@ scale_fill_discrete = scale_fill_viridis_d
 ```
 <p/>
 <p/>
-# __Only Time Will Tell:__ 
+# __Only Time Will Tell__ 
 <p/>
 __An investigation into American time use trends pre- and post- onset of COVID-19__
 
@@ -61,14 +61,19 @@ Project report includes:
 <p>&nbsp;</p>
 
 # The Team
-</p>
-Dee Wang 
-</p>
-Sandya Ganesh 
-</p>
-Shaina Mackin 
-</p>
-Xin Fang
+Our project team members are all 2022 MPH Candidates at Columbia University's Mailman School of Public Health:
+<p>&nbsp;</p>
+<img src="images/2.jpg" style="width:15%"> 
+[Dee Wang](https://www.linkedin.com/in/dee-wang-385b18113/) | Public Health Research Methods, Department of Population & Family Health
+<p>&nbsp;</p>
+<img src="images/4.jpg" style="width:15%"> 
+[Sandya Ganesh](https://www.linkedin.com/in/sandya-ganesh/) | Applied Biostatistics and Public Health Data Science, Department of Epidemiology
+<p>&nbsp;</p>
+<img src="images/3.jpg" style="width:15%"> 
+[Shaina Mackin](https://www.linkedin.com/in/shainamackin/) | Comparative Effectiveness and Outcomes Research, Department of Sociomedical Sciences
+<p>&nbsp;</p>
+<img src="images/1.jpg" style="width:15%"> 
+[Xin Fang](https://www.linkedin.com/in/xin-fang-66895b151/) | Applied Biostatistics and Public Health Data Science, Department of Epidemiology
 </p>
 
 
