@@ -13,7 +13,7 @@ navbar:
             href: group_differences.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html
-    - text: "Map Dashboard"
+    - text: "Interactive map"
       href: shiny_dashboard.html
     - text: "Project Report"
       href: project_report.html
