@@ -8,6 +8,7 @@ output:
     source_code: embed 
     code_folding: hide
 ---
+Collaborators: Dee Wang, Sandya Ganesh, Shaina Mackin, Xin Fang
 </br>
 
 # Project Motivation 
