@@ -1,6 +1,8 @@
 ---
 title: "Differences by age and sex"
 output: html_document
+code_folding: hide
+
 ---
 
 ```{r setup, message = FALSE, echo = FALSE}

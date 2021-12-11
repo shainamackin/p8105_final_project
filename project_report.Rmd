@@ -6,7 +6,9 @@ output:
     toc: true
     toc_float: true
     source_code: embed 
+    code_folding: hide
 ---
+Collaborators: Dee Wang, Sandya Ganesh, Shaina Mackin, Xin Fang
 </br>
 
 # Project Motivation 
@@ -50,6 +52,9 @@ Data for this project comes from the U.S. Bureau of Labor Statistics’ American
 We started with the Activity Summary files. Our first step was to pivot from wide to long format, as the approximately 400 activity codes each had their own column. We also selected key demographic variables and renamed them to be more informative.
 
 ```{r eval = FALSE}
+library(tidyverse)
+library(ggplot2)
+
 activity_summary_2019 = read.table("data/atussum_2019.dat", header = TRUE, sep = ",")
 activity_summary_2020 = read.table("data/atussum_2020.dat", header = TRUE, sep = ",")
 
@@ -503,7 +508,7 @@ actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) 
 
 We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions given by ATUS. We would like to note that some activities could have fallen under more than one category (ex. Some may view sports to fall under leisure and some may view it to fall under exercise or both). 
 
-```{r}
+```{r eval = FALSE}
 actsum_combined_categorized = actsum_combined %>% 
   mutate(category = case_when(
     activity_codes %in% c("Sleeping", 
@@ -1026,134 +1031,28 @@ summary_household_category$sex <-
 
 ### COVID-19 
 
-For each of our visualizations and summary tables, we had to calculate average hours/minutes spent on activities using weights. The weights were created by ATUS to account for the fact that respondents were more likely to participate on weekends vs weekdays, and for the fact that some demographics were more represented than others (for instance, women were more likely to respond than men). To calculate average daily hours/minutes spent on an activity, we multiplied total time spent on the activity by the weight, and then summed all these products together and divided this by the sum of the weights. See a sample of this code below. 
+For each of our visualizations and summary tables, we had to calculate average hours/minutes spent on activities using weights. The weights were created by ATUS to account for the fact that respondents were more likely to participate on weekends vs weekdays, and for the fact that some demographics were more represented than others (for instance, women were more likely to respond than men). To calculate average daily hours/minutes spent on an activity, we multiplied total time spent on the activity by the weight, and then summed all these products together and divided this by the sum of the weights. See the code for this calculation below. 
 
 ```{r eval = FALSE}
+
  summary_household_category %>% 
   drop_na() %>% 
   group_by(year, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
             sum_weight = sum(weight)) %>% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
-  subset(select = -c(sum_product,sum_weight)) %>% 
-  pivot_wider(names_from = "year", 
-              values_from = "average_hours") %>% 
-  mutate(percent_change = round((`2020` - `2019`)*100/`2019`, 1)) %>% 
-  arrange(desc(`2019`)) %>% 
-  knitr::kable()
+  mutate(average_hours = round(sum_product/sum_weight, 1)) 
 
 ```
 
 We also created a number of different plots. As mentioned in the Initial Questions section, instead of looking at time spent with others (which would require cleaning and merging new data sets we were unfamiliar with), we looked at time spent socializing and communicating with others in 2019 vs 2020, and looked at how this varied by age.
 
-```{r eval = FALSE}
-summary_household_category %>% 
-  drop_na() %>% 
-  group_by(year, category) %>% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %>% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
-  subset(select = -c(sum_product,sum_weight)) %>% 
-  mutate(year = as.factor(year)) %>% 
-  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
-  labs(
-    y = "Average Hours", 
-    x = "Categories", 
-    title = "Average hours spent in each category"
-  )
-
-socializing = read_csv("data/socializing.csv")
-
-socializing %>% 
-  mutate(year = as.factor(year)) %>% 
-  group_by(year, category) %>% 
-    summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %>% 
-  mutate(average_minutes = round((sum_product*60/sum_weight), 2)) %>% 
-  ggplot(aes(x = year, y = average_minutes, fill = year)) + 
-  geom_bar(stat = "identity", position = "stack", width = 0.5) + 
-  geom_text(aes(label = average_minutes, hjust = 0.5, vjust = 3)) + 
-  labs(
-    title = "Average minutes spent on socializing", 
-    x = "Year", 
-    y = "Average minutes"
-  )
-
-```
-
 ### Differences by age and sex 
 
-We created multi-paneled plots to show how time spent on activities differed depending on age and sex. Below is the code we used for the age plot. 
-
-```{r eval = FALSE}
-summary_household_category = read_csv("data/summary_household_category.csv") %>% 
-     mutate(
-     category = replace(category, category == "caring_duties", "caring duties"),
-     category = replace(category, category == "eating_drinking", "eating/drinking"),
-     category = replace(category, category == "personal_care", "personal care"),
-     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
-     category = replace(category, category == "professional_services", "professional services"),
-     category = replace(category, category == "religious_spiritual", "religious/spiritual"))
-
-`%not_in%` <- purrr::negate(`%in%`)
-
-plot1 = summary_household_category %>% 
-   filter(category %in% c("sleep", "leisure", 
-                         "work", "household", 
-                         "traveling", "eating/drinking", 
-                         "personal care", "caring duties")) %>% 
-  drop_na() %>% 
-  group_by(age, category) %>% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %>% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
-  select(-sum_product, -sum_weight) %>% 
-  ggplot(aes(x = age, y = average_hours)) +
-    #geom_point(aes(color = category, alpha = .3)) +
-    geom_smooth(aes(color = category), show.legend = FALSE) +
-    labs(y = "Average hours") +
-    facet_wrap(~category, scales = "free", ncol = 2)
-
-plot2 = summary_household_category %>% 
-   filter(category %not_in% c("sleep", "leisure", 
-                         "work", "household", 
-                         "traveling", "eating/drinking", 
-                         "personal care", "caring duties")) %>% 
-  drop_na() %>% 
-  group_by(age, category) %>% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %>% 
-  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %>% 
-  select(-sum_product, -sum_weight) %>% 
-  ggplot(aes(x = age, y = average_minutes)) +
-    #geom_point(aes(color = category, alpha = .3)) +
-    geom_smooth(aes(color = category), show.legend = FALSE) +
-    labs(y = "Average minutes") +
-    facet_wrap(~category, scales = "free", ncol = 2)
-
-gridExtra::grid.arrange(plot1, plot2, ncol = 2)
-
-```
+We created multi-paneled plots to show how time spent on activities differed depending on age and sex.
 
 ### Multi-year trends
 
 We also plotted average time spent on different categories of activities from 2009 to 2019, using data available on the ATUS website. 
-
-```{r}
-annual_data = read_csv("data/annual_activity.csv") 
-
-annual_data_plotly = annual_data %>% 
-  mutate(text_label = str_c("Activity: ", Activity, "\nEstimate: ", Estimate, "\nYear: ", Year)) %>%
-  plot_ly(
-    x = ~Year, y = ~Estimate, type = "scatter", mode = "line",
-    color = ~Activity, text = ~text_label, alpha = 0.9) %>%
- layout(title = 'Average time spent on activities across the U.S. from 2009-2019', 
-        xaxis = list(type = "category", title = 'Year'), 
-        yaxis = list(title = 'Average Hours'))
-
-```
 
 # Statistical Analysis
 
@@ -1185,7 +1084,7 @@ Looking at our multi-year 2009-2019 trend plot, we didn’t see any drastic chan
  
 We found that labor force status is a strong predictor of time spent on leisure activities. This finding is in accordance with what we would expect, since those who are retired have much more time to spend on leisure activities vs someone who is working. Additionally, we found that time spent on leisure activities did increase in 2020 when compared to 2019, which also validated our hypotheses around people spending more time on new hobbies and fun activities during the nation-wide lockdown. Additionally, other sociodemographic factors like age, race, and sex are significant predictors of time spent on leisure activities, but their interaction terms were found to be non significant. The RSME values indicate that the model with labor force is a better model fit when compared to the models with age, race, and sex. Some interesting next steps could be to look at labor force as a predictor alongside other sociodemographic variables such as income bracket, and also study other activities that time is spent on, such as sleep.
  
-#Limitations
+# Limitations
 
 A lot of the work that we did was descriptive, and so it is unclear whether differences we identified in time spent on categories of activities was significantly different in 2020 as compared to 2019. As a next step, it would be interesting to use more statistical tests to identify if changes were significant.  Additionally, the COVID-19 pandemic suspended data collection from mid-March 2020 to mid-May 2020. This means that the data we used for 2020 is not representative of the whole year, and estimates generated for 2020 are not as accurate as they are for other years. 
  
