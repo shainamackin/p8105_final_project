@@ -450,7 +450,7 @@ model_year %&gt;%
 </tr>
 </tbody>
 </table>
-<p>There is a significant difference between 2019 and 2020 in terms of leisure time spent (p-value &lt;0.05). We expect that leisure time spent in 2020 (post-pandemic) is 0.237 hours longer per day than leisure time spent in 2019, on average. This aligns with our hypothesis that after the pandemic, people started spending additional time on leisure activities.</p>
+<p>There is a significant difference between 2019 and 2020 in terms of leisure time spent (p-value &lt;0.05). We expect that leisure time spent in 2020 (post-pandemic) is 0.2 hours longer per day than leisure time spent in 2019, on average. This aligns with our hypothesis that after the pandemic, people started spending additional time on leisure activities.</p>
 <p>Next, we want to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.</p>
 <p><strong>(Model 1)</strong>: Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.</p>
 <p><strong>(Model 2)</strong>: Demographic characteristics: race, age, and sex. Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.</p>
@@ -571,7 +571,7 @@ model2 %&gt;%
 </tr>
 </tbody>
 </table>
-<p>The 3 main effect predictors in Model 2 are all significant (p-value &lt; 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age.</p>
+<p>The 3 main effect predictors in Model 2 are all significant (p-value &lt; 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.06 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.8 hours more on leisure activities per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age.</p>
 <pre class="r"><code>model3 = 
   lm(
     category_sum_hour ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
@@ -804,7 +804,7 @@ There are some outliers that will be noted and can be addressed in future analys
     title = &quot;Leisure Time Spent: Regression Models and RSME values&quot;
   )</code></pre>
 <p><img src="statistical_analyses_files/figure-html/rsme_plot-1.png" width="672" /></p>
-<p>From the violin plot, we can see that model 1, the model with Employment Status as the predictor, has the lowest RMSE average, which means it is the best model of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar model 2 and model 3 plots.</p>
+<p>From the violin plot, we can see that model 1, the model with Employment Status as the predictor, has the lowest RMSE average, which means it is the best model fit of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar model 2 and model 3 plots.</p>
 </div>
 </div>
 
