@@ -19,14 +19,14 @@ options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Regression
+# Regression
 
 Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities, using the statistically weighted data that compensates for aspects of the sampling and data collection process such as differences in response rates across demographics. There we cannot interpret the associations assuming hours spent is the outcome, and we will instead focus on the direction of the association.
 
-#### Models
+## Models
 First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
 
-```{r}
+```{r year_model, message=FALSE, show_col_types = FALSE}
 cps_summary_leisure = 
   read_csv("./data/summary_household_category.csv") %>% 
   filter(category == "leisure")
@@ -57,9 +57,7 @@ Next, we want to fit a few models that we hypothesize may predict time spent on 
 
 **(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions. This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.
 
-```{r}
-ggplot(data = cps_summary_leisure, aes(x=age, y=category_sum_hour)) + geom_point()
-
+```{r model1}
 model1 = 
   lm(category_sum_hour ~ labor_force_status, data = cps_summary_leisure)
 
@@ -70,12 +68,11 @@ model1 %>%
   knitr::kable(digits = 3)
 ```
 
-I don't see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear.
 
 From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average. Additionally, those who are retired are expected to spend 1.5 more hours per day on leisure activities per day in comparison to those who are employed but absent from work. 
 
 
-```{r}
+```{r model2and3}
 model2 = 
   lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
 
@@ -123,10 +120,10 @@ The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Sp
 
 However in the model with the interaction terms (Model 3), race is no longer significant, and none of the interaction terms are significant (p-value > 0.05).
 
-#### Diagnostics
+## Diagnostics
 
 Before we proceed, it is also important to look at residuals and fitted values in our models 
-```{r}
+```{r residuals_plots}
 cps_summary_leisure %>% 
   modelr::add_residuals(model1) %>% modelr::add_predictions(model1) %>% 
   ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
@@ -151,10 +148,10 @@ cps_summary_leisure %>%
 
 There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
 
-#### Cross Validation
+## Cross Validation
 
 In order to do the cross validation, we will first create the crossv_mc tibble with the train and test data
-```{r}
+```{r crossmv_mc}
 cv_df = crossv_mc(cps_summary_leisure, 100) %>% 
   mutate(
     train = map(train, as_tibble),
@@ -163,7 +160,7 @@ cv_df = crossv_mc(cps_summary_leisure, 100) %>%
 ```
 
 Next, we will fit the models and get the root mean squared errors
-```{r}
+```{r fit}
 fitted_df = cv_df %>%
   mutate(
     model1 = map(train, 

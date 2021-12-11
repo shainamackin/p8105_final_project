@@ -389,24 +389,17 @@ library(mgcv)
 
 options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)</code></pre>
-<div id="regression" class="section level2">
-<h2>Regression</h2>
+<div id="regression" class="section level1">
+<h1>Regression</h1>
 <p>Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities, using the statistically weighted data that compensates for aspects of the sampling and data collection process such as differences in response rates across demographics. There we cannot interpret the associations assuming hours spent is the outcome, and we will instead focus on the direction of the association.</p>
-<div id="models" class="section level4">
-<h4>Models</h4>
+<div id="models" class="section level2">
+<h2>Models</h2>
 <p>First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.</p>
 <pre class="r"><code>cps_summary_leisure = 
   read_csv(&quot;./data/summary_household_category.csv&quot;) %&gt;% 
-  filter(category == &quot;leisure&quot;)</code></pre>
-<pre><code>## Rows: 309689 Columns: 19</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr  (8): race, labor_force_status, sex, category, region, division, state, ...
-## dbl (11): TUCASEID, weight, age, day, year, TULINENO, metro_area, county, ca...</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>cps_summary_leisure$year =
+  filter(category == &quot;leisure&quot;)
+
+cps_summary_leisure$year =
   as_factor(case_when(
     cps_summary_leisure$year == 2019 ~ &quot;Pre-Pandemic 2019&quot;,
     cps_summary_leisure$year == 2020 ~ &quot;Post-Pandemic 2020&quot;,
@@ -445,8 +438,6 @@ model_year %&gt;%
 <p><strong>(Model 1)</strong>: Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.</p>
 <p><strong>(Model 2)</strong>: Demographic characteristics: race, age, and sex. Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.</p>
 <p><strong>(Model 3)</strong>: Demographic characteristics: race, age, and sex, and their interactions. This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.</p>
-<pre class="r"><code>ggplot(data = cps_summary_leisure, aes(x=age, y=category_sum_hour)) + geom_point()</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
 <pre class="r"><code>model1 = 
   lm(category_sum_hour ~ labor_force_status, data = cps_summary_leisure)
 
@@ -491,7 +482,6 @@ model1 %&gt;%
 </tr>
 </tbody>
 </table>
-<p>I don’t see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear.</p>
 <p>From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average. Additionally, those who are retired are expected to spend 1.5 more hours per day on leisure activities per day in comparison to those who are employed but absent from work.</p>
 <pre class="r"><code>model2 = 
   lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
@@ -717,8 +707,8 @@ model3 %&gt;%
 <p>The 3 main effect predictors in Model 2 are all significant (p-value &lt; 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age.</p>
 <p>However in the model with the interaction terms (Model 3), race is no longer significant, and none of the interaction terms are significant (p-value &gt; 0.05).</p>
 </div>
-<div id="diagnostics" class="section level4">
-<h4>Diagnostics</h4>
+<div id="diagnostics" class="section level2">
+<h2>Diagnostics</h2>
 <p>Before we proceed, it is also important to look at residuals and fitted values in our models</p>
 <pre class="r"><code>cps_summary_leisure %&gt;% 
   modelr::add_residuals(model1) %&gt;% modelr::add_predictions(model1) %&gt;% 
@@ -726,25 +716,25 @@ model3 %&gt;%
   labs(x = &quot;Predicted Leisure Time Spent (hr)&quot;,
        y = &quot;Residuals&quot;,
        title = &quot;Model 1: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/residuals_plots-1.png" width="672" /></p>
 <pre class="r"><code>cps_summary_leisure %&gt;% 
   modelr::add_residuals(model2) %&gt;% modelr::add_predictions(model2) %&gt;% 
   ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
   labs(x = &quot;Predicted Leisure Time Spent (hr)&quot;,
        y = &quot;Residuals&quot;,
        title = &quot;Model 2: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-2.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/residuals_plots-2.png" width="672" /></p>
 <pre class="r"><code>cps_summary_leisure %&gt;% 
   modelr::add_residuals(model3) %&gt;% modelr::add_predictions(model3) %&gt;% 
   ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
   labs(x = &quot;Predicted Leisure Time Spent (hr)&quot;,
        y = &quot;Residuals&quot;,
        title = &quot;Model 3: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
-<p><img src="statistical_analyses_files/figure-html/unnamed-chunk-4-3.png" width="672" /></p>
+<p><img src="statistical_analyses_files/figure-html/residuals_plots-3.png" width="672" /></p>
 <p>There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.</p>
 </div>
-<div id="cross-validation" class="section level4">
-<h4>Cross Validation</h4>
+<div id="cross-validation" class="section level2">
+<h2>Cross Validation</h2>
 <p>In order to do the cross validation, we will first create the crossv_mc tibble with the train and test data</p>
 <pre class="r"><code>cv_df = crossv_mc(cps_summary_leisure, 100) %&gt;% 
   mutate(
