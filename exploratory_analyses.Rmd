@@ -41,7 +41,8 @@ summary_household_category <- summary_household_category %>% mutate(
      category = replace(category, category == "professional_services", "professional services"),
      category = replace(category, category == "religious_spiritual", "religious/spiritual"))
 ```
-
+<p/>
+<p/>
 ## How has time-use been impacted by COVID-19? 
 
 Has the way we spend time on different categories changed due to the pandemic? See the table below to see average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 

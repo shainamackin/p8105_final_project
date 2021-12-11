@@ -16,11 +16,13 @@ library(mgcv)
 options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
+<p/>
+<p/>
 # Regression
 
 Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
-
+<p/>
+<p/>
 ## Models
 
 First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
@@ -122,7 +124,8 @@ model3 %>%
 ```
 
 Upon including the interaction terms, race is no longer significant, and none of the interaction terms are significant (p-value > 0.05).
-
+<p/>
+<p/>
 ## Diagnostics
 
 Before we proceed, it is also important to look at residuals and fitted values in our models 
@@ -150,7 +153,8 @@ cps_summary_leisure %>%
 ```
 
 There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
-
+<p/>
+<p/>
 ## Cross Validation
 
 In order to do the cross validation, we will first create the crossv_mc tibble with the train and test data
