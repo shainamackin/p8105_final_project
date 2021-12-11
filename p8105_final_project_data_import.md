@@ -3,6 +3,10 @@ P8105 Final Project
 
 ``` r
 library(tidyverse)
+library(dplyr)
+library(modelr)
+library(mgcv)
+
 options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)
 ```
@@ -1055,43 +1059,6 @@ print(category_time)
     ## 15 gov_civic_obligations    0.8    0.4          -50  
     ## 16 telephone                0.8    1.1           37.5
 
-There was increased time spent on caring duties, household activities,
-leisure activities, professional services and on the telephone. Notably,
-there were decreases in time spent on educational activities, exercise,
-government and civic obligations, religious/spiritual activities,
-shopping and traveling.
-
-To visualize some of these changes, let’s create a grouped bar chart
-comparing time spent on different categories of activities in 2019 and
-2020.
-
-``` r
-category_time_long = summary_household_category %>% 
-  drop_na() %>% 
-  filter(category_sum_min > 0) %>% 
-  group_by(year, category) %>% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %>% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
-  select(-sum_product, -sum_weight) %>% 
-  mutate(year = factor(year))
-```
-
-    ## `summarise()` has grouped output by 'year'. You can override using the `.groups` argument.
-
-``` r
-category_time_long %>% 
-  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
-  geom_bar(stat = "identity", position = "dodge") + 
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-```
-
-![](p8105_final_project_data_import_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
-
-``` r
-#note that the stacked bar chart wasn't very informative, so it hasn't been included. 
-```
-
 ## Demographic table
 
 ``` r
@@ -1110,6 +1077,11 @@ table(summary_household_category$race)
 ``` r
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
+    summary_household_category$race %in% c(4, 7) ~ "Asian",
+    summary_household_category$race %in% c(1) ~ "White", 
+    summary_household_category$race %in% c(2, 6) ~ "Black",
+    summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
+    TRUE ~ "unknown",
     summary_household_category$race %in% c(1) ~ "White",
     summary_household_category$race %in% c(2) ~ "Black", 
     summary_household_category$race %in% c(3) ~ "American Indian",
@@ -1117,7 +1089,6 @@ summary_household_category$race <- # Need to review race categorization
     summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
     TRUE ~ "2+ races"
   ))
-
 
 summary_household_category$labor_force_status <-
   as_factor(case_when(
@@ -1140,10 +1111,10 @@ unique_household <- summary_household_category %>%
   group_by(TUCASEID) %>% 
   filter(row_number() == 1) 
 
-table1(~ race + age + sex + labor_force_status + state|year, data = unique_household)
+table1(~ race + age + sex + labor_force_status + region|year, data = unique_household)
 ```
 
-    ## Warning in table1.formula(~race + age + sex + labor_force_status + state | :
+    ## Warning in table1.formula(~race + age + sex + labor_force_status + region | :
     ## Terms to the right of '|' in formula 'x' define table columns and are expected
     ## to be factors with meaningful labels.
 
@@ -1165,9 +1136,9 @@ table1(~ race + age + sex + labor_force_status + state|year, data = unique_house
 </tr>
 <tr>
 <td class='rowlabel'>Black</td>
-<td>1242 (13.2%)</td>
-<td>1061 (12.1%)</td>
-<td>2303 (12.6%)</td>
+<td>1273 (13.5%)</td>
+<td>1099 (12.5%)</td>
+<td>2372 (13.0%)</td>
 </tr>
 <tr>
 <td class='rowlabel'>White</td>
@@ -1177,21 +1148,15 @@ table1(~ race + age + sex + labor_force_status + state|year, data = unique_house
 </tr>
 <tr>
 <td class='rowlabel'>Asian</td>
-<td>402 (4.3%)</td>
-<td>431 (4.9%)</td>
-<td>833 (4.6%)</td>
+<td>458 (4.9%)</td>
+<td>473 (5.4%)</td>
+<td>931 (5.1%)</td>
 </tr>
 <tr>
-<td class='rowlabel'>American Indian</td>
-<td>69 (0.7%)</td>
-<td>76 (0.9%)</td>
-<td>145 (0.8%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>2+ races</td>
-<td>123 (1.3%)</td>
-<td>126 (1.4%)</td>
-<td>249 (1.4%)</td>
+<td class='rowlabel'>unknown</td>
+<td>105 (1.1%)</td>
+<td>122 (1.4%)</td>
+<td>227 (1.2%)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Hawaiian/Pacific Islander</td>
@@ -1272,316 +1237,34 @@ table1(~ race + age + sex + labor_force_status + state|year, data = unique_house
 <td class='lastrow'>102 (0.6%)</td>
 </tr>
 <tr>
-<td class='rowlabel firstrow'>state</td>
+<td class='rowlabel firstrow'>region</td>
 <td class='firstrow'></td>
 <td class='firstrow'></td>
 <td class='firstrow'></td>
 </tr>
 <tr>
-<td class='rowlabel'>AK</td>
-<td>14 (0.1%)</td>
-<td>18 (0.2%)</td>
-<td>32 (0.2%)</td>
+<td class='rowlabel'>Midwest</td>
+<td>1799 (19.1%)</td>
+<td>1673 (19.1%)</td>
+<td>3472 (19.1%)</td>
 </tr>
 <tr>
-<td class='rowlabel'>AL</td>
-<td>144 (1.5%)</td>
-<td>143 (1.6%)</td>
-<td>287 (1.6%)</td>
+<td class='rowlabel'>Northeast</td>
+<td>1277 (13.5%)</td>
+<td>1188 (13.5%)</td>
+<td>2465 (13.5%)</td>
 </tr>
 <tr>
-<td class='rowlabel'>AR</td>
-<td>102 (1.1%)</td>
-<td>79 (0.9%)</td>
-<td>181 (1.0%)</td>
+<td class='rowlabel'>South</td>
+<td>2953 (31.3%)</td>
+<td>2652 (30.2%)</td>
+<td>5605 (30.8%)</td>
 </tr>
 <tr>
-<td class='rowlabel'>AZ</td>
-<td>165 (1.7%)</td>
-<td>174 (2.0%)</td>
-<td>339 (1.9%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>CA</td>
-<td>687 (7.3%)</td>
-<td>662 (7.5%)</td>
-<td>1349 (7.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>CO</td>
-<td>132 (1.4%)</td>
-<td>105 (1.2%)</td>
-<td>237 (1.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>CT</td>
-<td>98 (1.0%)</td>
-<td>94 (1.1%)</td>
-<td>192 (1.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>DC</td>
-<td>20 (0.2%)</td>
-<td>18 (0.2%)</td>
-<td>38 (0.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>DE</td>
-<td>27 (0.3%)</td>
-<td>24 (0.3%)</td>
-<td>51 (0.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>FL</td>
-<td>402 (4.3%)</td>
-<td>384 (4.4%)</td>
-<td>786 (4.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>GA</td>
-<td>245 (2.6%)</td>
-<td>192 (2.2%)</td>
-<td>437 (2.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>HI</td>
-<td>21 (0.2%)</td>
-<td>22 (0.3%)</td>
-<td>43 (0.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>IA</td>
-<td>123 (1.3%)</td>
-<td>115 (1.3%)</td>
-<td>238 (1.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>ID</td>
-<td>48 (0.5%)</td>
-<td>62 (0.7%)</td>
-<td>110 (0.6%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>IL</td>
-<td>299 (3.2%)</td>
-<td>251 (2.9%)</td>
-<td>550 (3.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>IN</td>
-<td>198 (2.1%)</td>
-<td>170 (1.9%)</td>
-<td>368 (2.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>KS</td>
-<td>67 (0.7%)</td>
-<td>82 (0.9%)</td>
-<td>149 (0.8%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>KY</td>
-<td>143 (1.5%)</td>
-<td>126 (1.4%)</td>
-<td>269 (1.5%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>LA</td>
-<td>116 (1.2%)</td>
-<td>98 (1.1%)</td>
-<td>214 (1.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>MA</td>
-<td>199 (2.1%)</td>
-<td>192 (2.2%)</td>
-<td>391 (2.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>MD</td>
-<td>125 (1.3%)</td>
-<td>130 (1.5%)</td>
-<td>255 (1.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>ME</td>
-<td>38 (0.4%)</td>
-<td>33 (0.4%)</td>
-<td>71 (0.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>MI</td>
-<td>281 (3.0%)</td>
-<td>238 (2.7%)</td>
-<td>519 (2.8%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>MN</td>
-<td>144 (1.5%)</td>
-<td>153 (1.7%)</td>
-<td>297 (1.6%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>MO</td>
-<td>144 (1.5%)</td>
-<td>160 (1.8%)</td>
-<td>304 (1.7%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>MS</td>
-<td>83 (0.9%)</td>
-<td>67 (0.8%)</td>
-<td>150 (0.8%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>MT</td>
-<td>25 (0.3%)</td>
-<td>23 (0.3%)</td>
-<td>48 (0.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>NC</td>
-<td>231 (2.4%)</td>
-<td>209 (2.4%)</td>
-<td>440 (2.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>ND</td>
-<td>24 (0.3%)</td>
-<td>26 (0.3%)</td>
-<td>50 (0.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>NE</td>
-<td>61 (0.6%)</td>
-<td>64 (0.7%)</td>
-<td>125 (0.7%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>NH</td>
-<td>40 (0.4%)</td>
-<td>34 (0.4%)</td>
-<td>74 (0.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>NJ</td>
-<td>195 (2.1%)</td>
-<td>163 (1.9%)</td>
-<td>358 (2.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>NM</td>
-<td>58 (0.6%)</td>
-<td>66 (0.8%)</td>
-<td>124 (0.7%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>NV</td>
-<td>73 (0.8%)</td>
-<td>72 (0.8%)</td>
-<td>145 (0.8%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>NY</td>
-<td>378 (4.0%)</td>
-<td>362 (4.1%)</td>
-<td>740 (4.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>OH</td>
-<td>286 (3.0%)</td>
-<td>254 (2.9%)</td>
-<td>540 (3.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>OK</td>
-<td>122 (1.3%)</td>
-<td>93 (1.1%)</td>
-<td>215 (1.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>OR</td>
-<td>121 (1.3%)</td>
-<td>139 (1.6%)</td>
-<td>260 (1.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>PA</td>
-<td>289 (3.1%)</td>
-<td>271 (3.1%)</td>
-<td>560 (3.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>RI</td>
-<td>20 (0.2%)</td>
-<td>25 (0.3%)</td>
-<td>45 (0.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>SC</td>
-<td>146 (1.5%)</td>
-<td>125 (1.4%)</td>
-<td>271 (1.5%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>SD</td>
-<td>17 (0.2%)</td>
-<td>31 (0.4%)</td>
-<td>48 (0.3%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>TN</td>
-<td>182 (1.9%)</td>
-<td>187 (2.1%)</td>
-<td>369 (2.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>TX</td>
-<td>575 (6.1%)</td>
-<td>524 (6.0%)</td>
-<td>1099 (6.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>UT</td>
-<td>96 (1.0%)</td>
-<td>95 (1.1%)</td>
-<td>191 (1.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>VA</td>
-<td>225 (2.4%)</td>
-<td>212 (2.4%)</td>
-<td>437 (2.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>VT</td>
-<td>20 (0.2%)</td>
-<td>14 (0.2%)</td>
-<td>34 (0.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>WA</td>
-<td>211 (2.2%)</td>
-<td>180 (2.0%)</td>
-<td>391 (2.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>WI</td>
-<td>155 (1.6%)</td>
-<td>129 (1.5%)</td>
-<td>284 (1.6%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>WV</td>
-<td>65 (0.7%)</td>
-<td>41 (0.5%)</td>
-<td>106 (0.6%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>WY</td>
-<td>16 (0.2%)</td>
-<td>21 (0.2%)</td>
-<td>37 (0.2%)</td>
+<td class='rowlabel'>West</td>
+<td>1667 (17.7%)</td>
+<td>1639 (18.7%)</td>
+<td>3306 (18.1%)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Missing</td>
@@ -1592,335 +1275,3 @@ table1(~ race + age + sex + labor_force_status + state|year, data = unique_house
 </tbody>
 </table>
 </div>
-
-Let’s see what the average number of hours spent on leisure activities
-is by state.
-
-``` r
-leisure_data_state =
-  cps_summary_merged %>% 
-  filter(category == "leisure") %>% 
-  mutate(time_weight_product = total_minutes*weight) %>%  
-  group_by(state, year) %>% 
-  summarize(avg_leisure_time = sum(time_weight_product)/weight, 
-            n = n()
-            )
-```
-
-    ## `summarise()` has grouped output by 'state', 'year'. You can override using the `.groups` argument.
-
-``` r
-leisure_data_state = summary_household_category %>% 
-  filter(category == "leisure") %>% 
-  group_by(state,year) %>% 
-  summarise(avg_leisure_time = sum(category_sum_hour*weight)/sum(weight))
-```
-
-    ## `summarise()` has grouped output by 'state'. You can override using the `.groups` argument.
-
-``` r
-leisure_data_state1 = summary_household_category %>% 
-  filter(category == "leisure") %>%
-  group_by(state,year) %>% 
-  summarise(n = n(),sum(category_sum_hour)/n)
-```
-
-    ## `summarise()` has grouped output by 'state'. You can override using the `.groups` argument.
-
-``` r
-  ##sum(category_sum_hour)/n
-  ##sum(category_sum_hour*weight)/sum(weight)
-```
-
-Map the average number of hours spent on leisure activities is by state.
-
-``` r
-library(usmap)
-library(ggplot2)
-
-plot_usmap(data = leisure_data_state, values = "avg_leisure_time", color = "red") + 
-  scale_fill_viridis_b(name = "Average leisure time", label = scales::comma, direction = -1) + 
-  theme(legend.position = "right") +
-  facet_wrap(~ year)
-```
-
-![](p8105_final_project_data_import_files/figure-gfm/unnamed-chunk-10-1.png)<!-- -->
-
-## Plotly
-
-``` r
-library(plotly)
-#fig <- plotly::plot_geo(leisure_data_state, locationmode = 'USA-states')
-# fig <- fig %>% add_trace(
-#    z = ~total.exports, text = ~hover, locations = ~code,
-#    color = ~total.exports, colors = 'Purples'
-#  )
-# fig <- fig %>% colorbar(title = "xx")
-# fig <- fig %>% layout(
-#    title = 'xx',
-#    geo = g
-#  )
-
-#fig
-```
-
-## Regression
-
-Next we will conduct some linear regression analyses to understand what
-factors predict time spent on leisure activities, using the
-statistically weighted data that compensates for aspects of the sampling
-and data collection process such as differences in response rates across
-demographics. There we cannot interpret the associations assuming hours
-spent is the outcome, and we will instead focus on the direction of the
-association.
-
-#### Models
-
-First, we wanted to explore whether there are differences in time spent
-on leisure activities in 2019 vs. 2020, as we have hypothesized that in
-2020, after the pandemic hit and the US went into lockdown, people spent
-more at home doing fun activities and picking up new hobbies.
-
-``` r
-cps_summary_leisure = summary_household_category %>% 
-  filter(category == "leisure")
-
-model_year = lm(category_sum_hour_weight ~ year, data = cps_summary_leisure)
-model_year %>% 
-  broom::tidy() %>% 
-  select(term, estimate, p.value) %>% 
-  knitr::kable(digits = 3)
-```
-
-| term        |     estimate | p.value |
-|:------------|-------------:|--------:|
-| (Intercept) | -371650035.0 |   0.835 |
-| year        |     207812.1 |   0.814 |
-
-However, we can see from the table above that the differences between
-the 2 years is not significant, with a p-value &gt; 0.05, so there is
-not a significant difference in time spent on leisure activities between
-the 2 years.
-
-Next, we want to fit a couple of models that we hypothesize may predict
-time spent on leisure activities, as well 1 model fitted using backwards
-selection.
-
-(1): Labor force status. We believe that one of the strongest predictors
-of time spent on leisure activities is whether someone is currently
-employed or not. The categories of labor force status are retired
-(reference group), employed at work, employed but absent from work,
-unemployed and looking, and unemployed on layoff.
-
-``` r
-model1 = 
-  lm(category_sum_hour_weight ~ labor_force_status, data = cps_summary_leisure)
-
-model1 %>% 
-  broom::tidy() %>% 
-  select(term, estimate, p.value) %>% 
-  mutate(term = str_replace(term, "^labor_force_status", "Employment Status: ")) %>% 
-  knitr::kable(digits = 3)
-```
-
-| term                                    |    estimate | p.value |
-|:----------------------------------------|------------:|--------:|
-| (Intercept)                             |  59324603.2 |   0.000 |
-| Employment Status: Employed-At work     | -20444508.1 |   0.000 |
-| Employment Status: Unemployed-Looking   |  14851571.3 |   0.000 |
-| Employment Status: Employed-Absent      |  -8234973.8 |   0.001 |
-| Employment Status: Unemployed-On layoff |    614305.5 |   0.916 |
-
-From the table above, we can see that employment status is infact a
-strong predictor of time spent on leisure activities. Specifically, we
-see a positive association between unemployment categories and time
-spent on leisure activities, and a negative association between
-employment categories and time spent on leisure activities. This
-indicates that those who are unemployed are likely to spend more time on
-leisure activities, while those are unemployed are likely to spend less
-time on leisure activities.
-
-2.  Demographic characteristics: race, age, and sex
-3.  Demographic characteristics: race, age, and sex, and their
-    interactions
-
-``` r
-model2 = 
-  lm(category_sum_hour_weight ~ age + race + sex, data = cps_summary_leisure)
-
-model2 %>% 
-  broom::tidy() %>% 
-  select(term, estimate, p.value) %>%
-  mutate(
-    term = str_replace(term, "^race", "Race: "),
-    term = str_replace(term, "sexMale", "Sex: Male"),
-    term = str_replace(term, "age", "Age")
-    ) %>% 
-  knitr::kable(digits = 3)
-```
-
-| term                            |    estimate | p.value |
-|:--------------------------------|------------:|--------:|
-| (Intercept)                     |  60131181.6 |   0.000 |
-| Age                             |   -221700.5 |   0.000 |
-| Race: White                     |  -6157299.7 |   0.000 |
-| Race: Asian                     | -16080201.2 |   0.000 |
-| Race: American Indian           |  -7440116.9 |   0.142 |
-| Race: 2+ races                  |  -6923581.6 |   0.080 |
-| Race: Hawaiian/Pacific Islander |   4030245.1 |   0.694 |
-| Sex: Male                       |  11030546.5 |   0.000 |
-
-``` r
-model3 = 
-  lm(
-    category_sum_hour_weight ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
-    data = cps_summary_leisure)
-
-model3 %>% 
-  broom::tidy() %>% 
-  select(term, estimate, p.value) %>%
-  mutate(
-    term = str_replace(term, "^race", "Race: "),
-    term = str_replace(term, "sexMale", "Sex: Male"),
-    term = str_replace(term, "age", "Age")
-    ) %>% 
-  knitr::kable(digits = 3)
-```
-
-| term                                        |     estimate | p.value |
-|:--------------------------------------------|-------------:|--------:|
-| (Intercept)                                 |  47664291.36 |   0.000 |
-| Age                                         |    -65530.24 |   0.473 |
-| Race: White                                 |   3146959.57 |   0.569 |
-| Race: Asian                                 |   -999211.10 |   0.919 |
-| Race: American Indian                       |   -341188.84 |   0.987 |
-| Race: 2+ races                              |   7698257.47 |   0.599 |
-| Race: Hawaiian/Pacific Islander             | -31464815.11 |   0.474 |
-| Sex: Male                                   |  36440104.25 |   0.000 |
-| Age:raceWhite                               |    -80533.88 |   0.412 |
-| Age:raceAsian                               |   -236156.92 |   0.243 |
-| Age:raceAmerican Indian                     |   -150042.34 |   0.707 |
-| Age:race2+ races                            |   -179634.67 |   0.541 |
-| Age:raceHawaiian/Pacific Islander           |    942665.39 |   0.402 |
-| Age:Sex: Male                               |   -287353.05 |   0.047 |
-| Race: White:Sex: Male                       | -19620396.17 |   0.021 |
-| Race: Asian:Sex: Male                       |   4642686.92 |   0.748 |
-| Race: American Indian:Sex: Male             | -53878605.99 |   0.079 |
-| Race: 2+ races:Sex: Male                    |   -958281.45 |   0.964 |
-| Race: Hawaiian/Pacific Islander:Sex: Male   | -46298742.09 |   0.470 |
-| Age:raceWhite:Sex: Male                     |    140927.94 |   0.361 |
-| Age:raceAsian:Sex: Male                     |   -407014.14 |   0.181 |
-| Age:raceAmerican Indian:Sex: Male           |   1078200.75 |   0.066 |
-| Age:race2+ races:Sex: Male                  |   -327520.24 |   0.454 |
-| Age:raceHawaiian/Pacific Islander:Sex: Male |   1043331.84 |   0.499 |
-
-The 3 main effect predictors in Model 2 are all significant (p-value
-&lt; 0.05), however, in the model with the interaction terms (Model 3),
-there are several predictors that are nonsignificant.
-
-#### Diagnostics
-
-Before we proceed, it is also important to look at residuals and fitted
-values in our models
-
-``` r
-cps_summary_leisure %>% 
-  modelr::add_residuals(model1) %>% 
-  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
-```
-
-![](p8105_final_project_data_import_files/figure-gfm/unnamed-chunk-15-1.png)<!-- -->
-
-``` r
-cps_summary_leisure %>% 
-  modelr::add_residuals(model2) %>% 
-  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
-```
-
-![](p8105_final_project_data_import_files/figure-gfm/unnamed-chunk-15-2.png)<!-- -->
-
-``` r
-cps_summary_leisure %>% 
-  modelr::add_residuals(model3) %>% 
-  ggplot(aes(x = category_sum_hour_weight, y = resid)) + geom_point()
-```
-
-![](p8105_final_project_data_import_files/figure-gfm/unnamed-chunk-15-3.png)<!-- -->
-
-We see a few outliers that will be noted and can be addressed in future
-analyses. Additionally, we would expect to see that the residuals are of
-random size across the outcome, and we can see that our residuals are
-extremely skewed, but for the purposes of this project, we will continue
-with our model comparisons.
-
-#### Cross Validation
-
-Merging respondent data with 2020 categorized actsum data:
-
-``` r
-actsum_cps_2020 = summary_household_category %>%
-  filter(year == 2020)
-
-resp_2020_tidied = resp_2020 %>% 
-  select(TUCASEID, TULINENO, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %>%
-  mutate(date = lubridate::ymd(TUDIARYDATE)) %>%
-  separate(date, c("year", "month", "date")) %>%
-  mutate(month = month.name[as.numeric(month)]) %>%
-  mutate(year = as.numeric(year)) %>%
-  mutate(TUDIARYDATE = str_replace(TUDIARYDATE, "2020", "")) %>%
-  filter(TUYEAR == 2020) %>%
-  select(-TUYEAR, -TUMONTH, -TULINENO) %>%
-  mutate(
-    tudiaryday = factor(TUDIARYDAY, levels = c(1,2,3,4,5,6,7), labels = c("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"))) %>%
-  arrange(TUCASEID, month, date, year, TUDIARYDATE, tudiaryday)
-
-merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c("TUCASEID")) %>% janitor::clean_names()
-```
-
-Ploting trends over time:
-
-``` r
-library(plotly)
-
-category_time_month_2020 = merged_actsum_cps_resp_2020 %>% 
-  drop_na() %>% 
-  filter(category_sum_min > 0) %>% 
-  group_by(month, category) %>% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %>% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
-  select(-sum_product, -sum_weight) %>% 
-  mutate(
-    month = as.factor(month)) %>%
-  mutate(month = match(month, month.name)) %>%
-   mutate(
-     category = replace(category, category == "caring_duties", "caring duties"),
-     category = replace(category, category == "eating_drinking", "eating/drinking"),
-     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
-     category = replace(category, category == "personal_care", "personal care"),
-     category = replace(category, category == "professional_services", "professional services"),
-     category = replace(category, category == "religious_spiritual", "religious/spiritual")) %>%
-  arrange(month) 
-```
-
-    ## `summarise()` has grouped output by 'month'. You can override using the `.groups` argument.
-
-``` r
-monthly_2020_plotly = category_time_month_2020 %>%
-  mutate(text_label = str_c("Activity: ", category, "\nAverage hours: ", average_hours, "\nMonth: ", month)) %>%
-  plot_ly(
-    x = ~month, y = ~average_hours, type = "scatter", mode = "line",
-    color = ~category, text = ~text_label, alpha = 0.9) %>%
- layout(title = 'Average time spent on activities across the U.S. in 2020', xaxis = list(type = "category", title = 'Month'), yaxis = list(title = 'Average Hours'))
-
-monthly_2020_plotly
-```
-
-    ## Warning in RColorBrewer::brewer.pal(N, "Set2"): n too large, allowed maximum for palette Set2 is 8
-    ## Returning the palette you asked for with that many colors
-
-    ## Warning in RColorBrewer::brewer.pal(N, "Set2"): n too large, allowed maximum for palette Set2 is 8
-    ## Returning the palette you asked for with that many colors
-
-<div id="htmlwidget-3ba217eb3488e9108b2a" style="width:672px;height:480px;" class="plotly html-widget"></div>
-<script type="application/json" data-for="htmlwidget-3ba217eb3488e9108b2a">{"x":{"visdat":{"2b074bae018f":["function () ","plotlyVisDat"]},"cur_data":"2b074bae018f","attrs":{"2b074bae018f":{"x":{},"y":{},"mode":"line","text":{},"color":{},"alpha":0.9,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Average time spent on activities across the U.S. in 2020","xaxis":{"domain":[0,1],"automargin":true,"type":"category","title":"Month"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Average Hours"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1.6,1.8,1.7,2.6,2,2.1,2.2,2,2.5,2,1.9],"mode":"line","text":["Activity: caring duties<br />Average hours: 1.6<br />Month: 1","Activity: caring duties<br />Average hours: 1.8<br />Month: 2","Activity: caring duties<br />Average hours: 1.7<br />Month: 3","Activity: caring duties<br />Average hours: 2.6<br />Month: 5","Activity: caring duties<br />Average hours: 2<br />Month: 6","Activity: caring duties<br />Average hours: 2.1<br />Month: 7","Activity: caring duties<br />Average hours: 2.2<br />Month: 8","Activity: caring duties<br />Average hours: 2<br />Month: 9","Activity: caring duties<br />Average hours: 2.5<br />Month: 10","Activity: caring duties<br />Average hours: 2<br />Month: 11","Activity: caring duties<br />Average hours: 1.9<br />Month: 12"],"type":"scatter","name":"caring duties","marker":{"color":"rgba(102,194,165,0.9)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,0.9)"},"error_y":{"color":"rgba(102,194,165,0.9)"},"error_x":{"color":"rgba(102,194,165,0.9)"},"line":{"color":"rgba(102,194,165,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1,1.1,1.2,1.1,1.2,1.2,1.2,1.1,1.1,1.1,1.1],"mode":"line","text":["Activity: eating/drinking<br />Average hours: 1<br />Month: 1","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 2","Activity: eating/drinking<br />Average hours: 1.2<br />Month: 3","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 5","Activity: eating/drinking<br />Average hours: 1.2<br />Month: 6","Activity: eating/drinking<br />Average hours: 1.2<br />Month: 7","Activity: eating/drinking<br />Average hours: 1.2<br />Month: 8","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 9","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 10","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 11","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 12"],"type":"scatter","name":"eating/drinking","marker":{"color":"rgba(189,173,133,0.9)","line":{"color":"rgba(189,173,133,1)"}},"textfont":{"color":"rgba(189,173,133,0.9)"},"error_y":{"color":"rgba(189,173,133,0.9)"},"error_x":{"color":"rgba(189,173,133,0.9)"},"line":{"color":"rgba(189,173,133,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[4,6.3,6.6,4,3.6,2.5,2.9,6.7,6.4,5.1,4.9],"mode":"line","text":["Activity: education<br />Average hours: 4<br />Month: 1","Activity: education<br />Average hours: 6.3<br />Month: 2","Activity: education<br />Average hours: 6.6<br />Month: 3","Activity: education<br />Average hours: 4<br />Month: 5","Activity: education<br />Average hours: 3.6<br />Month: 6","Activity: education<br />Average hours: 2.5<br />Month: 7","Activity: education<br />Average hours: 2.9<br />Month: 8","Activity: education<br />Average hours: 6.7<br />Month: 9","Activity: education<br />Average hours: 6.4<br />Month: 10","Activity: education<br />Average hours: 5.1<br />Month: 11","Activity: education<br />Average hours: 4.9<br />Month: 12"],"type":"scatter","name":"education","marker":{"color":"rgba(245,146,102,0.9)","line":{"color":"rgba(245,146,102,1)"}},"textfont":{"color":"rgba(245,146,102,0.9)"},"error_y":{"color":"rgba(245,146,102,0.9)"},"error_x":{"color":"rgba(245,146,102,0.9)"},"line":{"color":"rgba(245,146,102,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1.4,1.4,1.4,1.4,1.6,1.8,1.7,1.5,1.5,1.9,1.1],"mode":"line","text":["Activity: exercise<br />Average hours: 1.4<br />Month: 1","Activity: exercise<br />Average hours: 1.4<br />Month: 2","Activity: exercise<br />Average hours: 1.4<br />Month: 3","Activity: exercise<br />Average hours: 1.4<br />Month: 5","Activity: exercise<br />Average hours: 1.6<br />Month: 6","Activity: exercise<br />Average hours: 1.8<br />Month: 7","Activity: exercise<br />Average hours: 1.7<br />Month: 8","Activity: exercise<br />Average hours: 1.5<br />Month: 9","Activity: exercise<br />Average hours: 1.5<br />Month: 10","Activity: exercise<br />Average hours: 1.9<br />Month: 11","Activity: exercise<br />Average hours: 1.1<br />Month: 12"],"type":"scatter","name":"exercise","marker":{"color":"rgba(217,150,141,0.9)","line":{"color":"rgba(217,150,141,1)"}},"textfont":{"color":"rgba(217,150,141,0.9)"},"error_y":{"color":"rgba(217,150,141,0.9)"},"error_x":{"color":"rgba(217,150,141,0.9)"},"line":{"color":"rgba(217,150,141,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,8,9,10,11],"y":[0.1,0.2,0.7,0.6,0.7,0.4,0.2],"mode":"line","text":["Activity: gov/civic obligations<br />Average hours: 0.1<br />Month: 1","Activity: gov/civic obligations<br />Average hours: 0.2<br />Month: 2","Activity: gov/civic obligations<br />Average hours: 0.7<br />Month: 3","Activity: gov/civic obligations<br />Average hours: 0.6<br />Month: 8","Activity: gov/civic obligations<br />Average hours: 0.7<br />Month: 9","Activity: gov/civic obligations<br />Average hours: 0.4<br />Month: 10","Activity: gov/civic obligations<br />Average hours: 0.2<br />Month: 11"],"type":"scatter","name":"gov/civic obligations","marker":{"color":"rgba(162,158,189,0.9)","line":{"color":"rgba(162,158,189,1)"}},"textfont":{"color":"rgba(162,158,189,0.9)"},"error_y":{"color":"rgba(162,158,189,0.9)"},"error_x":{"color":"rgba(162,158,189,0.9)"},"line":{"color":"rgba(162,158,189,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[2.1,2.2,2.3,2.8,2.7,2.8,2.8,2.4,2.5,2.6,2.6],"mode":"line","text":["Activity: household<br />Average hours: 2.1<br />Month: 1","Activity: household<br />Average hours: 2.2<br />Month: 2","Activity: household<br />Average hours: 2.3<br />Month: 3","Activity: household<br />Average hours: 2.8<br />Month: 5","Activity: household<br />Average hours: 2.7<br />Month: 6","Activity: household<br />Average hours: 2.8<br />Month: 7","Activity: household<br />Average hours: 2.8<br />Month: 8","Activity: household<br />Average hours: 2.4<br />Month: 9","Activity: household<br />Average hours: 2.5<br />Month: 10","Activity: household<br />Average hours: 2.6<br />Month: 11","Activity: household<br />Average hours: 2.6<br />Month: 12"],"type":"scatter","name":"household","marker":{"color":"rgba(175,154,200,0.9)","line":{"color":"rgba(175,154,200,1)"}},"textfont":{"color":"rgba(175,154,200,0.9)"},"error_y":{"color":"rgba(175,154,200,0.9)"},"error_x":{"color":"rgba(175,154,200,0.9)"},"line":{"color":"rgba(175,154,200,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[5.3,4.8,5,5.8,5.5,5.3,5.7,5.1,5.5,5.4,5.9],"mode":"line","text":["Activity: leisure<br />Average hours: 5.3<br />Month: 1","Activity: leisure<br />Average hours: 4.8<br />Month: 2","Activity: leisure<br />Average hours: 5<br />Month: 3","Activity: leisure<br />Average hours: 5.8<br />Month: 5","Activity: leisure<br />Average hours: 5.5<br />Month: 6","Activity: leisure<br />Average hours: 5.3<br />Month: 7","Activity: leisure<br />Average hours: 5.7<br />Month: 8","Activity: leisure<br />Average hours: 5.1<br />Month: 9","Activity: leisure<br />Average hours: 5.5<br />Month: 10","Activity: leisure<br />Average hours: 5.4<br />Month: 11","Activity: leisure<br />Average hours: 5.9<br />Month: 12"],"type":"scatter","name":"leisure","marker":{"color":"rgba(215,144,197,0.9)","line":{"color":"rgba(215,144,197,1)"}},"textfont":{"color":"rgba(215,144,197,0.9)"},"error_y":{"color":"rgba(215,144,197,0.9)"},"error_x":{"color":"rgba(215,144,197,0.9)"},"line":{"color":"rgba(215,144,197,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[0.9,1,0.9,0.8,0.9,0.8,1,1,0.9,0.9,0.9],"mode":"line","text":["Activity: personal care<br />Average hours: 0.9<br />Month: 1","Activity: personal care<br />Average hours: 1<br />Month: 2","Activity: personal care<br />Average hours: 0.9<br />Month: 3","Activity: personal care<br />Average hours: 0.8<br />Month: 5","Activity: personal care<br />Average hours: 0.9<br />Month: 6","Activity: personal care<br />Average hours: 0.8<br />Month: 7","Activity: personal care<br />Average hours: 1<br />Month: 8","Activity: personal care<br />Average hours: 1<br />Month: 9","Activity: personal care<br />Average hours: 0.9<br />Month: 10","Activity: personal care<br />Average hours: 0.9<br />Month: 11","Activity: personal care<br />Average hours: 0.9<br />Month: 12"],"type":"scatter","name":"personal care","marker":{"color":"rgba(219,162,168,0.9)","line":{"color":"rgba(219,162,168,1)"}},"textfont":{"color":"rgba(219,162,168,0.9)"},"error_y":{"color":"rgba(219,162,168,0.9)"},"error_x":{"color":"rgba(219,162,168,0.9)"},"line":{"color":"rgba(219,162,168,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1.5,1.4,0.8,0.7,1.6,1.2,1.1,1.1,1.2,1.5,1.4],"mode":"line","text":["Activity: professional services<br />Average hours: 1.5<br />Month: 1","Activity: professional services<br />Average hours: 1.4<br />Month: 2","Activity: professional services<br />Average hours: 0.8<br />Month: 3","Activity: professional services<br />Average hours: 0.7<br />Month: 5","Activity: professional services<br />Average hours: 1.6<br />Month: 6","Activity: professional services<br />Average hours: 1.2<br />Month: 7","Activity: professional services<br />Average hours: 1.1<br />Month: 8","Activity: professional services<br />Average hours: 1.1<br />Month: 9","Activity: professional services<br />Average hours: 1.2<br />Month: 10","Activity: professional services<br />Average hours: 1.5<br />Month: 11","Activity: professional services<br />Average hours: 1.4<br />Month: 12"],"type":"scatter","name":"professional services","marker":{"color":"rgba(189,198,118,0.9)","line":{"color":"rgba(189,198,118,1)"}},"textfont":{"color":"rgba(189,198,118,0.9)"},"error_y":{"color":"rgba(189,198,118,0.9)"},"error_x":{"color":"rgba(189,198,118,0.9)"},"line":{"color":"rgba(189,198,118,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1.5,1.3,1.3,1.6,1.5,1.2,1.5,1.3,1.2,1.5,1],"mode":"line","text":["Activity: religious/spiritual<br />Average hours: 1.5<br />Month: 1","Activity: religious/spiritual<br />Average hours: 1.3<br />Month: 2","Activity: religious/spiritual<br />Average hours: 1.3<br />Month: 3","Activity: religious/spiritual<br />Average hours: 1.6<br />Month: 5","Activity: religious/spiritual<br />Average hours: 1.5<br />Month: 6","Activity: religious/spiritual<br />Average hours: 1.2<br />Month: 7","Activity: religious/spiritual<br />Average hours: 1.5<br />Month: 8","Activity: religious/spiritual<br />Average hours: 1.3<br />Month: 9","Activity: religious/spiritual<br />Average hours: 1.2<br />Month: 10","Activity: religious/spiritual<br />Average hours: 1.5<br />Month: 11","Activity: religious/spiritual<br />Average hours: 1<br />Month: 12"],"type":"scatter","name":"religious/spiritual","marker":{"color":"rgba(186,217,78,0.9)","line":{"color":"rgba(186,217,78,1)"}},"textfont":{"color":"rgba(186,217,78,0.9)"},"error_y":{"color":"rgba(186,217,78,0.9)"},"error_x":{"color":"rgba(186,217,78,0.9)"},"line":{"color":"rgba(186,217,78,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[0.8,0.9,0.9,0.9,0.7,0.8,0.9,0.8,0.8,0.9,0.8],"mode":"line","text":["Activity: shopping<br />Average hours: 0.8<br />Month: 1","Activity: shopping<br />Average hours: 0.9<br />Month: 2","Activity: shopping<br />Average hours: 0.9<br />Month: 3","Activity: shopping<br />Average hours: 0.9<br />Month: 5","Activity: shopping<br />Average hours: 0.7<br />Month: 6","Activity: shopping<br />Average hours: 0.8<br />Month: 7","Activity: shopping<br />Average hours: 0.9<br />Month: 8","Activity: shopping<br />Average hours: 0.8<br />Month: 9","Activity: shopping<br />Average hours: 0.8<br />Month: 10","Activity: shopping<br />Average hours: 0.9<br />Month: 11","Activity: shopping<br />Average hours: 0.8<br />Month: 12"],"type":"scatter","name":"shopping","marker":{"color":"rgba(227,217,62,0.9)","line":{"color":"rgba(227,217,62,1)"}},"textfont":{"color":"rgba(227,217,62,0.9)"},"error_y":{"color":"rgba(227,217,62,0.9)"},"error_x":{"color":"rgba(227,217,62,0.9)"},"line":{"color":"rgba(227,217,62,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[9.1,9.1,9,9.1,9.2,9,9,9.1,9.1,9.2,9.3],"mode":"line","text":["Activity: sleep<br />Average hours: 9.1<br />Month: 1","Activity: sleep<br />Average hours: 9.1<br />Month: 2","Activity: sleep<br />Average hours: 9<br />Month: 3","Activity: sleep<br />Average hours: 9.1<br />Month: 5","Activity: sleep<br />Average hours: 9.2<br />Month: 6","Activity: sleep<br />Average hours: 9<br />Month: 7","Activity: sleep<br />Average hours: 9<br />Month: 8","Activity: sleep<br />Average hours: 9.1<br />Month: 9","Activity: sleep<br />Average hours: 9.1<br />Month: 10","Activity: sleep<br />Average hours: 9.2<br />Month: 11","Activity: sleep<br />Average hours: 9.3<br />Month: 12"],"type":"scatter","name":"sleep","marker":{"color":"rgba(252,214,66,0.9)","line":{"color":"rgba(252,214,66,1)"}},"textfont":{"color":"rgba(252,214,66,0.9)"},"error_y":{"color":"rgba(252,214,66,0.9)"},"error_x":{"color":"rgba(252,214,66,0.9)"},"line":{"color":"rgba(252,214,66,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[0.8,0.7,1.1,1.1,1,1.3,1.1,1,1.2,1.4,1.2],"mode":"line","text":["Activity: telephone<br />Average hours: 0.8<br />Month: 1","Activity: telephone<br />Average hours: 0.7<br />Month: 2","Activity: telephone<br />Average hours: 1.1<br />Month: 3","Activity: telephone<br />Average hours: 1.1<br />Month: 5","Activity: telephone<br />Average hours: 1<br />Month: 6","Activity: telephone<br />Average hours: 1.3<br />Month: 7","Activity: telephone<br />Average hours: 1.1<br />Month: 8","Activity: telephone<br />Average hours: 1<br />Month: 9","Activity: telephone<br />Average hours: 1.2<br />Month: 10","Activity: telephone<br />Average hours: 1.4<br />Month: 11","Activity: telephone<br />Average hours: 1.2<br />Month: 12"],"type":"scatter","name":"telephone","marker":{"color":"rgba(241,204,114,0.9)","line":{"color":"rgba(241,204,114,1)"}},"textfont":{"color":"rgba(241,204,114,0.9)"},"error_y":{"color":"rgba(241,204,114,0.9)"},"error_x":{"color":"rgba(241,204,114,0.9)"},"line":{"color":"rgba(241,204,114,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1.2,1.4,1.2,1,1.1,1.3,1.3,1.2,1.2,1.1,1.2],"mode":"line","text":["Activity: traveling<br />Average hours: 1.2<br />Month: 1","Activity: traveling<br />Average hours: 1.4<br />Month: 2","Activity: traveling<br />Average hours: 1.2<br />Month: 3","Activity: traveling<br />Average hours: 1<br />Month: 5","Activity: traveling<br />Average hours: 1.1<br />Month: 6","Activity: traveling<br />Average hours: 1.3<br />Month: 7","Activity: traveling<br />Average hours: 1.3<br />Month: 8","Activity: traveling<br />Average hours: 1.2<br />Month: 9","Activity: traveling<br />Average hours: 1.2<br />Month: 10","Activity: traveling<br />Average hours: 1.1<br />Month: 11","Activity: traveling<br />Average hours: 1.2<br />Month: 12"],"type":"scatter","name":"traveling","marker":{"color":"rgba(226,195,150,0.9)","line":{"color":"rgba(226,195,150,1)"}},"textfont":{"color":"rgba(226,195,150,0.9)"},"error_y":{"color":"rgba(226,195,150,0.9)"},"error_x":{"color":"rgba(226,195,150,0.9)"},"line":{"color":"rgba(226,195,150,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[2.1,1.2,2.3,1.2,1.9,2,2,3,2.6,2.2,2],"mode":"line","text":["Activity: volunteer<br />Average hours: 2.1<br />Month: 1","Activity: volunteer<br />Average hours: 1.2<br />Month: 2","Activity: volunteer<br />Average hours: 2.3<br />Month: 3","Activity: volunteer<br />Average hours: 1.2<br />Month: 5","Activity: volunteer<br />Average hours: 1.9<br />Month: 6","Activity: volunteer<br />Average hours: 2<br />Month: 7","Activity: volunteer<br />Average hours: 2<br />Month: 8","Activity: volunteer<br />Average hours: 3<br />Month: 9","Activity: volunteer<br />Average hours: 2.6<br />Month: 10","Activity: volunteer<br />Average hours: 2.2<br />Month: 11","Activity: volunteer<br />Average hours: 2<br />Month: 12"],"type":"scatter","name":"volunteer","marker":{"color":"rgba(204,187,165,0.9)","line":{"color":"rgba(204,187,165,1)"}},"textfont":{"color":"rgba(204,187,165,0.9)"},"error_y":{"color":"rgba(204,187,165,0.9)"},"error_x":{"color":"rgba(204,187,165,0.9)"},"line":{"color":"rgba(204,187,165,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[7.9,7.9,7.2,7.3,7.4,7.4,7.7,7.4,8,7.4,7.6],"mode":"line","text":["Activity: work<br />Average hours: 7.9<br />Month: 1","Activity: work<br />Average hours: 7.9<br />Month: 2","Activity: work<br />Average hours: 7.2<br />Month: 3","Activity: work<br />Average hours: 7.3<br />Month: 5","Activity: work<br />Average hours: 7.4<br />Month: 6","Activity: work<br />Average hours: 7.4<br />Month: 7","Activity: work<br />Average hours: 7.7<br />Month: 8","Activity: work<br />Average hours: 7.4<br />Month: 9","Activity: work<br />Average hours: 8<br />Month: 10","Activity: work<br />Average hours: 7.4<br />Month: 11","Activity: work<br />Average hours: 7.6<br />Month: 12"],"type":"scatter","name":"work","marker":{"color":"rgba(179,179,179,0.9)","line":{"color":"rgba(179,179,179,1)"}},"textfont":{"color":"rgba(179,179,179,0.9)"},"error_y":{"color":"rgba(179,179,179,0.9)"},"error_x":{"color":"rgba(179,179,179,0.9)"},"line":{"color":"rgba(179,179,179,0.9)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
