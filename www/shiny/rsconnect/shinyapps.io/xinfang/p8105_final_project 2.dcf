@@ -1,0 +1,15 @@
+name: p8105_final_project
+title: p8105_final_project
+username:
+account: xinfang
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 5309871
+bundleId: 5359305
+url: https://xinfang.shinyapps.io/p8105_final_project/
+when: 1639222018.68329
+lastSyncTime: 1639222018.68331
+asMultiple: FALSE
+asStatic: FALSE
+additionalFiles: shiny_dashboard.Rmd|summary_household_category.csv
+ignoredFiles: _site.yml|.RDataTmp|.RDataTmp1|about.html|atus/app.R|exploratory_analyses.Rmd|group_differences.Rmd|index.Rmd|multi_year_trends.Rmd|p8105_final_project_data_import.Rmd|p8105_final_project.Rmd|project_report.Rmd|server.R|shiny/shiny_dashboard.Rmd|shiny/summary_household_category.csv|statistical_analyses.Rmd|data|site_libs|www
