@@ -127,7 +127,7 @@ renderPlotly({
     ) %>%
     layout(
       xaxis = list(title = "State"),
-      yaxis = list(title = "Number of hours spent on the category in each day")
+      yaxis = list(title = "Hours spent per day")
     )
 })
 ```
@@ -170,7 +170,7 @@ renderPlotly({
     ) %>%
     layout(
       xaxis = list(title = "Region"),
-      yaxis = list(title = "Number of hours spent on the category in each day")
+      yaxis = list(title = "Hours spent per day")
     )
 })
 ```
