@@ -26,7 +26,11 @@ navbar:
     - icon: fa-github fa-lg
       href: http://github.com/shainamackin/p8105_final_project
     - icon: fa-database fa-lg
+<<<<<<< HEAD
       href: https://www.bls.gov/tus/data
+=======
+      href: https://www.bls.gov/tus/#data
+>>>>>>> d723bea4bf3493024e5738f23bf6243662299190
 output:
   html_document:
     theme: lumen
