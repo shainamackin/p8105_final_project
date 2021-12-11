@@ -49,7 +49,7 @@ Exploratory analyses include:
 </p>
 + Multi-year time use trends from 2009-2019  
 
-Statistical analyses include linear regressions on the following:
+Statistical analyses include linear regressions on time use with the following:
 </p>
 + Labor force status 
 </p>
