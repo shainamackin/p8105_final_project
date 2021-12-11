@@ -13,8 +13,8 @@
 
 <title>Statistical Analyses</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
-<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -384,9 +384,13 @@ div.tocify {
 </div>
 
 
+<p/>
+<p/>
 <div id="regression" class="section level1">
 <h1>Regression</h1>
-<p>Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).</p>
+Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
+<p/>
+<p/>
 <div id="models" class="section level2">
 <h2>Models</h2>
 <p>First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.</p>
@@ -639,12 +643,16 @@ div.tocify {
 </tr>
 </tbody>
 </table>
-<p>Upon including the interaction terms, race is no longer significant, and none of the interaction terms are significant (p-value &gt; 0.05).</p>
+Upon including the interaction terms, race is no longer significant, and none of the interaction terms are significant (p-value &gt; 0.05).
+<p/>
+<p/>
 </div>
 <div id="diagnostics" class="section level2">
 <h2>Diagnostics</h2>
 <p>Before we proceed, it is also important to look at residuals and fitted values in our models <img src="statistical_analyses_files/figure-html/residuals_plots-1.png" width="672" /><img src="statistical_analyses_files/figure-html/residuals_plots-2.png" width="672" /><img src="statistical_analyses_files/figure-html/residuals_plots-3.png" width="672" /></p>
-<p>There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.</p>
+There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
+<p/>
+<p/>
 </div>
 <div id="cross-validation" class="section level2">
 <h2>Cross Validation</h2>
