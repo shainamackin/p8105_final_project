@@ -1,8 +1,7 @@
 ---
 title: "Shiny Dashboard"
 output: 
-    flexdashboard::flex_dashboard:
-      orientation: columns
+    flexdashboard::flex_dashboard
       vertical_layout: fill
 runtime: shiny
 params:
