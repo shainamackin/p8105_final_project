@@ -1,5 +1,5 @@
 name: "Dee Wang, Sandya Ganesh, Shaina Mackin, Xin Fang"
-output_dir: "www"
+output_dir: "."
 navbar:
   title: "Only Time Will Tell"
   right:
