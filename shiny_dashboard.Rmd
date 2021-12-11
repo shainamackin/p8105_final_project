@@ -25,6 +25,7 @@ shiny_state_map_df = summary_household_category %>%
      category = replace(category, category == "personal_care", "personal care"),
      category = replace(category, category == "professional_services", "professional services"),
      category = replace(category, category == "religious_spiritual", "religious/spiritual")) %>%
+  filter(category != "N/A") %>%
   summarise(avg_time = sum(category_sum_hour*weight)/sum(weight))
 ```
 
