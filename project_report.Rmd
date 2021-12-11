@@ -39,7 +39,7 @@ We had initially planned to look at how sociodemographic factors affect time spe
 # The Data
 </p>
 ### Source: <br/>
-Data for this project comes from the U.S. Bureau of Labor Statistics’ American Time Use Survey (ATUS), publicly available [here](https://www.bls.gov/tus/datafiles-2020.htm). </p> Key variables from the Activity Summary files included activity codes, total time spent on the activity, and demographic variables. We pulled dates of responses from the ATUS respondent files and geographic information from the CPS files.
+Data for this project comes from the U.S. Bureau of Labor Statistics’ American Time Use Survey (ATUS), publicly available [here](https://www.bls.gov/tus/datafiles-2020.htm). </p> Key variables from the Activity Summary files included activity codes, total time spent on the activity, and demographic variables. We pulled dates of responses from the ATUS respondent files and geographic information from the CPS files. The ATUS website also contained annual estimates of time spent on different activity categories from 2009-2019 which we were able to use for our multi-year trend plot. 
 
 ### Cleaning: </br>
 </p>
@@ -1020,11 +1020,137 @@ summary_household_category$sex <-
 ```
 
 # Exploratory Analysis
-•  Visualizations </br>
-•  Summaries </br>
-•  Exploratory statistical analyses </br>
-•  Justify the steps you took, and show any major changes to your ideas </br>
-</p>
+
+### COVID-19 
+
+For each of our visualizations and summary tables, we had to calculate average hours/minutes spent on activities using weights. The weights were created by ATUS to account for the fact that respondents were more likely to participate on weekends vs weekdays, and for the fact that some demographics were more represented than others (for instance, women were more likely to respond than men). To calculate average daily hours/minutes spent on an activity, we multiplied total time spent on the activity by the weight, and then summed all these products together and divided this by the sum of the weights. See a sample of this code below. 
+
+```{r eval = FALSE}
+ summary_household_category %>% 
+  drop_na() %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  subset(select = -c(sum_product,sum_weight)) %>% 
+  pivot_wider(names_from = "year", 
+              values_from = "average_hours") %>% 
+  mutate(percent_change = round((`2020` - `2019`)*100/`2019`, 1)) %>% 
+  arrange(desc(`2019`)) %>% 
+  knitr::kable()
+
+```
+
+We also created a number of different plots. As mentioned in the Initial Questions section, instead of looking at time spent with others (which would require cleaning and merging new data sets we were unfamiliar with), we looked at time spent socializing and communicating with others in 2019 vs 2020, and looked at how this varied by age.
+
+```{r eval = FALSE}
+summary_household_category %>% 
+  drop_na() %>% 
+  group_by(year, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  subset(select = -c(sum_product,sum_weight)) %>% 
+  mutate(year = as.factor(year)) %>% 
+  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
+  geom_bar(stat = "identity", position = "dodge") + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  labs(
+    y = "Average Hours", 
+    x = "Categories", 
+    title = "Average hours spent in each category"
+  )
+
+socializing = read_csv("data/socializing.csv")
+
+socializing %>% 
+  mutate(year = as.factor(year)) %>% 
+  group_by(year, category) %>% 
+    summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_minutes = round((sum_product*60/sum_weight), 2)) %>% 
+  ggplot(aes(x = year, y = average_minutes, fill = year)) + 
+  geom_bar(stat = "identity", position = "stack", width = 0.5) + 
+  geom_text(aes(label = average_minutes, hjust = 0.5, vjust = 3)) + 
+  labs(
+    title = "Average minutes spent on socializing", 
+    x = "Year", 
+    y = "Average minutes"
+  )
+
+```
+
+### Differences by age and sex 
+
+We created multi-paneled plots to show how time spent on activities differed depending on age and sex. Below is the code we used for the age plot. 
+
+```{r eval = FALSE}
+summary_household_category = read_csv("data/summary_household_category.csv") %>% 
+     mutate(
+     category = replace(category, category == "caring_duties", "caring duties"),
+     category = replace(category, category == "eating_drinking", "eating/drinking"),
+     category = replace(category, category == "personal_care", "personal care"),
+     category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
+     category = replace(category, category == "professional_services", "professional services"),
+     category = replace(category, category == "religious_spiritual", "religious/spiritual"))
+
+`%not_in%` <- purrr::negate(`%in%`)
+
+plot1 = summary_household_category %>% 
+   filter(category %in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating/drinking", 
+                         "personal care", "caring duties")) %>% 
+  drop_na() %>% 
+  group_by(age, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  ggplot(aes(x = age, y = average_hours)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = "Average hours") +
+    facet_wrap(~category, scales = "free", ncol = 2)
+
+plot2 = summary_household_category %>% 
+   filter(category %not_in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating/drinking", 
+                         "personal care", "caring duties")) %>% 
+  drop_na() %>% 
+  group_by(age, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  ggplot(aes(x = age, y = average_minutes)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = "Average minutes") +
+    facet_wrap(~category, scales = "free", ncol = 2)
+
+gridExtra::grid.arrange(plot1, plot2, ncol = 2)
+
+```
+
+### Multi-year trends
+
+We also plotted average time spent on different categories of activities from 2009 to 2019, using data available on the ATUS website. 
+
+```{r}
+annual_data = read_csv("data/annual_activity.csv") 
+
+annual_data_plotly = annual_data %>% 
+  mutate(text_label = str_c("Activity: ", Activity, "\nEstimate: ", Estimate, "\nYear: ", Year)) %>%
+  plot_ly(
+    x = ~Year, y = ~Estimate, type = "scatter", mode = "line",
+    color = ~Activity, text = ~text_label, alpha = 0.9) %>%
+ layout(title = 'Average time spent on activities across the U.S. from 2009-2019', 
+        xaxis = list(type = "category", title = 'Year'), 
+        yaxis = list(title = 'Average Hours'))
+
+```
 
 # Statistical Analysis
 
@@ -1051,3 +1177,5 @@ We found that employment is a strong predictor of time spent doing leisure activ
 •  What were your findings? </br>
 •  Are they what you expect? </br>
 •  What insights into the data can you make?</br>
+
+
