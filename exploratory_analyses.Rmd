@@ -96,14 +96,14 @@ actsum_cps_2020 = summary_household_category %>%
 resp_2020 = read.table("data/atusresp_2020.dat", header = TRUE, sep = ",")
 
 resp_2020_tidied = resp_2020 %>% 
-  select(TUCASEID, TULINENO, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %>%
+  dplyr::select(TUCASEID, TULINENO, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %>%
   mutate(date = lubridate::ymd(TUDIARYDATE)) %>%
   separate(date, c("year", "month", "date")) %>%
   mutate(month = month.name[as.numeric(month)]) %>%
   mutate(year = as.numeric(year)) %>%
   mutate(TUDIARYDATE = str_replace(TUDIARYDATE, "2020", "")) %>%
   filter(TUYEAR == 2020) %>%
-  select(-TUYEAR, -TUMONTH, -TULINENO) %>%
+  dplyr::select(-TUYEAR, -TUMONTH, -TULINENO) %>%
   mutate(
     tudiaryday = factor(TUDIARYDAY, levels = c(1,2,3,4,5,6,7), labels = c("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"))) %>%
   arrange(TUCASEID, month, date, year, TUDIARYDATE, tudiaryday)
@@ -117,7 +117,7 @@ category_time_month_2020 = merged_actsum_cps_resp_2020 %>%
   summarize(sum_product = sum(category_sum_hour_weight), 
             sum_weight = sum(weight)) %>% 
   mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
-  select(-sum_product, -sum_weight) %>% 
+  subset(select = -c(sum_product,sum_weight)) %>% 
   mutate(
     month = as.factor(month)) %>%
   mutate(month = match(month, month.name)) %>%
@@ -185,7 +185,7 @@ social_age_plot <- socializing %>%
   mutate(average_minutes = round(sum_product*60/sum_weight, 2)) %>% 
   ggplot(aes(x = age, y = average_minutes, color = year)) + 
   geom_point(alpha = .5) + 
-  geom_smooth() + 
+  geom_line() + 
   labs(
     title = "Average minutes spent on socializing based on age", 
     x = "Age", 
