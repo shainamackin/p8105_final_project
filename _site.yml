@@ -17,12 +17,14 @@ navbar:
       href: shiny_dashboard.html
     - text: "Project Report"
       href: project_report.html
+    - icon: fa-youtube
+      href: https://www.youtube.com/watch?v=5oObMqzIwXU
     - icon: fa-envelope fa-lg
       href: mailto:<shainamackin@gmail.com>
     - icon: fa-github fa-lg
       href: http://github.com/shainamackin/p8105_final_project
     - icon: fa-database fa-lg
-      href: https://www.bls.gov/tus/data.htm
+      href: https://www.bls.gov/tus/data.html
 output:
   html_document:
-    theme: cosmo
+    theme: lumen
