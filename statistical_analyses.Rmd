@@ -24,6 +24,7 @@ knitr::opts_chunk$set(echo = TRUE)
 Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities, using the statistically weighted data that compensates for aspects of the sampling and data collection process such as differences in response rates across demographics. There we cannot interpret the associations assuming hours spent is the outcome, and we will instead focus on the direction of the association.
 
 ## Models
+
 First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
 
 ```{r year_model, message=FALSE, show_col_types = FALSE}
@@ -51,11 +52,14 @@ There is a significant difference between 2019 and 2020 in terms of leisure time
 
 Next, we want to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.
 
-**(Model 1)**: Labor force status. We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.
+**(Model 1)**: Labor force status. 
+We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.
 
-**(Model 2)**: Demographic characteristics: race, age, and sex. Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.
+**(Model 2)**: Demographic characteristics: race, age, and sex. 
+Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.
 
-**(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions. This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.
+**(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions. 
+This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.
 
 ```{r model1}
 model1 = 
