@@ -6,7 +6,7 @@ output:
     toc_float: true
 ---
 
-```{r setup, message = FALSE}
+```{r setup, message = FALSE, warning = FALSE, echo = FALSE}
 library(tidyverse)
 library(dplyr)
 library(modelr)
@@ -18,13 +18,13 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Regression
 
-Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities, using the statistically weighted data that compensates for aspects of the sampling and data collection process such as differences in response rates across demographics. There we cannot interpret the associations assuming hours spent is the outcome, and we will instead focus on the direction of the association.
+Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
 
 ## Models
 
 First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
 
-```{r year_model, message=FALSE, show_col_types = FALSE}
+```{r year_model, message=FALSE, show_col_types = FALSE, warning = FALSE, echo = FALSE}
 cps_summary_leisure = 
   read_csv("./data/summary_household_category.csv") %>% 
   filter(category == "leisure")
@@ -58,7 +58,7 @@ Race, age, and sex, are three common demographic variables that we would expend 
 **(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions. 
 This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.
 
-```{r model1}
+```{r model1, message = FALSE, warning = FALSE, echo = FALSE}
 model1 = 
   lm(category_sum_hour ~ labor_force_status, data = cps_summary_leisure)
 
@@ -66,14 +66,13 @@ model1 %>%
   broom::tidy() %>% 
   select(term, estimate, p.value) %>% 
   mutate(term = str_replace(term, "^labor_force_status", "Employment Status: ")) %>% 
-  knitr::kable(digits = 3)
+  knitr::kable(digits = 3, caption = "Model 1 Parameter Estimates")
 ```
-
 
 From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average. Additionally, those who are retired are expected to spend 1.5 more hours per day on leisure activities per day in comparison to those who are employed but absent from work. 
 
 
-```{r model2and3}
+```{r model2, message = FALSE, warning = FALSE, echo = FALSE}
 model2 = 
   lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
 
@@ -85,13 +84,18 @@ model2 %>%
     term = str_replace(term, "sexMale", "Sex: Male"),
     term = str_replace(term, "age", "Age")
     ) %>% 
-  knitr::kable(digits = 3)
+  knitr::kable(digits = 3, caption = "Model 2 Parameter Estimates")
 
+```
+
+The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
+
+
+```{r model3, message = FALSE, warning = FALSE, echo = FALSE}
 model3 = 
   lm(
     category_sum_hour ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
     data = cps_summary_leisure)
-
 
 model3 %>% 
   broom::tidy() %>% 
@@ -113,18 +117,15 @@ model3 %>%
     term = str_replace(term, "Age * Race:White:Sex: Male", "Age * Race:White * Sex:Male"),
     term = str_replace(term, "Age * Race:Hawaiian/Pacific Islander:Sex: Male", "Age * Race:Hawaiian/Pacific Islander * Sex:Male"),
     ) %>% 
-  knitr::kable(digits = 3)
-
+  knitr::kable(digits = 3, caption = "Model 3 Parameter Estimates")
 ```
 
-The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
-
-However in the model with the interaction terms (Model 3), race is no longer significant, and none of the interaction terms are significant (p-value > 0.05).
+Upon including the interaction terms, race is no longer significant, and none of the interaction terms are significant (p-value > 0.05).
 
 ## Diagnostics
 
 Before we proceed, it is also important to look at residuals and fitted values in our models 
-```{r residuals_plots}
+```{r residuals_plots, message = FALSE, warning = FALSE, echo = FALSE}
 cps_summary_leisure %>% 
   modelr::add_residuals(model1) %>% modelr::add_predictions(model1) %>% 
   ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
@@ -152,7 +153,7 @@ There are some outliers that will be noted and can be addressed in future analys
 ## Cross Validation
 
 In order to do the cross validation, we will first create the crossv_mc tibble with the train and test data
-```{r crossmv_mc}
+```{r crossmv_mc, message = FALSE, warning = FALSE, echo = FALSE}
 cv_df = crossv_mc(cps_summary_leisure, 100) %>% 
   mutate(
     train = map(train, as_tibble),
@@ -161,7 +162,7 @@ cv_df = crossv_mc(cps_summary_leisure, 100) %>%
 ```
 
 Next, we will fit the models and get the root mean squared errors
-```{r fit}
+```{r fit, message = FALSE, warning = FALSE, echo = FALSE}
 fitted_df = cv_df %>%
   mutate(
     model1 = map(train, 
@@ -182,7 +183,7 @@ fitted_df = cv_df %>%
 ```
 
 Finally, we will plot the distribution of RMSE values to compare each candidate model
-```{r rsme_plot}
+```{r rsme_plot, message = FALSE, warning = FALSE, echo = FALSE}
 fitted_df %>%
   select(starts_with("rmse")) %>% 
   pivot_longer(
