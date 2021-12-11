@@ -407,7 +407,12 @@ library(mgcv)
 
 options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)</code></pre>
+<<<<<<< HEAD
+<p/>
+<p/>
+=======
 >>>>>>> 0c6807d42a7a3200d8aef3a01c785cde2eb51b14
+>>>>>>> 95bd0ba72ba05051943b909199e068ae1754fc81
 <div id="regression" class="section level1">
 <h1>Regression</h1>
 Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
@@ -505,6 +510,12 @@ model1 %&gt;%
 </tbody>
 </table>
 <p>From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average. Additionally, those who are retired are expected to spend 1.5 more hours per day on leisure activities per day in comparison to those who are employed but absent from work.</p>
+<p>For the 2nd and 3rd model, we did a quick check to make sure that age could be used as a continuous variable by plotting age against time spent on leisure activities. From the plot below, we don’t see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear.</p>
+<pre class="r"><code>ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
+  labs(x = &quot;Age (yrs)&quot;,
+       y = &quot;Time Spent on Leisure Activities (hrs/day)&quot;,
+       title = &quot;Relationship between Age and Leisure Time&quot;)</code></pre>
+<p><img src="statistical_analyses_files/figure-html/model2-1.png" width="672" /></p>
 <pre class="r"><code>model2 = 
   lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
 
@@ -762,8 +773,14 @@ There are some outliers that will be noted and can be addressed in future analys
        y = &quot;Residuals&quot;,
        title = &quot;Model 3: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
 <p><img src="statistical_analyses_files/figure-html/residuals_plots-3.png" width="672" /></p>
+<<<<<<< HEAD
+There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
+<p/>
+<p/>
+=======
 <p>There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.</p>
 >>>>>>> 0c6807d42a7a3200d8aef3a01c785cde2eb51b14
+>>>>>>> 95bd0ba72ba05051943b909199e068ae1754fc81
 </div>
 <div id="cross-validation" class="section level2">
 <h2>Cross Validation</h2>
