@@ -4,7 +4,7 @@ output:
   html_document:
     toc: true
     toc_float: true
-    source_code: embed 
+
 ---
 
 ```{r setup, message = FALSE, echo = FALSE}

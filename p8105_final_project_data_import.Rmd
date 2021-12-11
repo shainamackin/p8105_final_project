@@ -4,7 +4,6 @@ output: github_document
 editor_options: 
   chunk_output_type: inline
 always_allow_html: true
-source_code: embed
 ---
 
 ```{r setup, message = FALSE}
