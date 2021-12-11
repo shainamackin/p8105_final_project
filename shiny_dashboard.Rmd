@@ -2,8 +2,7 @@
 title: "Shiny Dashboard"
 output: 
     flexdashboard::flex_dashboard:
-    vertical_layout: fill
-source_code: embed
+      vertical_layout: fill
 runtime: shiny
 ---
 
