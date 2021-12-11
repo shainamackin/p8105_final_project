@@ -13,8 +13,8 @@
 
 <title>Statistical Analyses</title>
 
-<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -396,23 +396,14 @@ div.tocify {
 </div>
 
 
-<<<<<<< HEAD
-<p/>
-<p/>
-=======
 <pre class="r"><code>library(tidyverse)
-library(dplyr)
 library(modelr)
 library(mgcv)
 
 options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)</code></pre>
-<<<<<<< HEAD
 <p/>
 <p/>
-=======
->>>>>>> 0c6807d42a7a3200d8aef3a01c785cde2eb51b14
->>>>>>> 95bd0ba72ba05051943b909199e068ae1754fc81
 <div id="regression" class="section level1">
 <h1>Regression</h1>
 Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
@@ -745,12 +736,6 @@ Upon including the interaction terms, race is no longer significant, and none of
 </div>
 <div id="diagnostics" class="section level2">
 <h2>Diagnostics</h2>
-<<<<<<< HEAD
-<p>Before we proceed, it is also important to look at residuals and fitted values in our models <img src="statistical_analyses_files/figure-html/residuals_plots-1.png" width="672" /><img src="statistical_analyses_files/figure-html/residuals_plots-2.png" width="672" /><img src="statistical_analyses_files/figure-html/residuals_plots-3.png" width="672" /></p>
-There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
-<p/>
-<p/>
-=======
 <p>Before we proceed, it is also important to look at residuals and fitted values in our models</p>
 <pre class="r"><code>cps_summary_leisure %&gt;% 
   modelr::add_residuals(model1) %&gt;% modelr::add_predictions(model1) %&gt;% 
@@ -773,14 +758,9 @@ There are some outliers that will be noted and can be addressed in future analys
        y = &quot;Residuals&quot;,
        title = &quot;Model 3: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
 <p><img src="statistical_analyses_files/figure-html/residuals_plots-3.png" width="672" /></p>
-<<<<<<< HEAD
 There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.
 <p/>
 <p/>
-=======
-<p>There are some outliers that will be noted and can be addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.</p>
->>>>>>> 0c6807d42a7a3200d8aef3a01c785cde2eb51b14
->>>>>>> 95bd0ba72ba05051943b909199e068ae1754fc81
 </div>
 <div id="cross-validation" class="section level2">
 <h2>Cross Validation</h2>

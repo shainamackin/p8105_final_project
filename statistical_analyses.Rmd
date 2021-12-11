@@ -9,7 +9,6 @@ output:
 
 ```{r setup, message = FALSE, warning = FALSE}
 library(tidyverse)
-library(dplyr)
 library(modelr)
 library(mgcv)
 
