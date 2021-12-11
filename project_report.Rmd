@@ -56,15 +56,15 @@ We started with the Activity Summary files. Our first step was to pivot from wid
 
 # Statistical Analysis
 
-We studied how various sociodemographic and other factors affected time spent on leisure activities. As the outcome was hours/day spent on leisure activities, we conducted linear regression. First, we looked at whether the predictor variables should be categorical or continuous. After plotting age against time spent on leisure activities, we saw a relatively linear association and no need for categorization. Race, originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation. We did not need to adjust the sex and employment status categorization. 
+We studied how various sociodemographic and other factors affected time spent on leisure activities. As the outcome was hours/day spent on leisure activities, we conducted linear regression analyses. First, we looked at whether the predictor variables should be categorical or continuous. After plotting age against time spent on leisure activities, we saw a relatively linear association and no need for categorization. Race originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation. We did not need to adjust the sex and employment status categorization. 
 
-We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that during the pandemic in 2020, people spent more on leisure activities, and found a significant difference. Leisure time spent in 2020 (post-pandemic) is  expected to be 0.237 hours longer per day than leisure time spent in 2019 on average.
+We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we hypothesized that during the pandemic in 2020, people spent more on leisure activities, and found a significant difference. Leisure time spent in 2020 (post-pandemic) is  expected to be 0.237 hours longer per day than leisure time spent in 2019 on average.
 
 
 Next, we created several linear regression models to test our various hypotheses around sociodemographic characteristics, and compared the fitted models in terms of their RSME values:
 
 **(Model 1)**: Labor force status
-Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average (p-value<0.05)
+Those who are employed and at work are expected to spend 2.9 fewer hours per day on leisure activities per day in comparison to those who are retired, on average (p-value<0.05)
 
 **(Model 2)**: Demographic characteristics: race, age, and sex. 
 The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
@@ -75,6 +75,7 @@ When interaction terms are added, race is no longer significant, and none of the
 We found that Model 1 resulted in the lowest RSME values, which indicates that it is the best model, while Model 2 and Model 3 were similar in terms of RSME values.
 
 # Discussion
+We found that employment is a strong predictor of time spent doing leisure activities, and that time spent on leisure activities did increase in 2020 after the nation-wide lockdown. These findings are in accordance with what we would expect. 
 •  What were your findings? </br>
 •  Are they what you expect? </br>
 •  What insights into the data can you make?</br>
