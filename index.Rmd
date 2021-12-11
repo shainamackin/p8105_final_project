@@ -1,6 +1,10 @@
 ---
 title: "Home"
+<<<<<<< HEAD
 output: 
+=======
+output:
+>>>>>>> ed2a1a3c0722af8c2046b45776a3b30170f28fa3
   html_document:
     code_folding: hide
     toc: true
