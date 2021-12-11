@@ -211,10 +211,7 @@ We can see that average daily minutes spent socializing dropped from 35 minutes 
 How did daily time spent on socializing vary depending on age? 
 
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
-#library(gganimate)
-#library(gifski)
-
-social_age_plot <- socializing %>% 
+socializing %>% 
     mutate(year = factor(year)) %>% 
   group_by(year, category, age) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
@@ -227,10 +224,7 @@ social_age_plot <- socializing %>%
     title = "Average minutes spent on socializing based on age", 
     x = "Age", 
     y = "Average minutes"
-  ) #+
-  #transition_reveal(age)
-
-#animate(social_age_plot, renderer = gifski_renderer())
+  ) 
 
 ```
 
