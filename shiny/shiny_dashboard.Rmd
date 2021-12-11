@@ -9,7 +9,6 @@ params:
   output_format: flexdashboard::flex_dashboard
 resource_files:
 - shiny_dashboard.Rmd
-- shiny_dashboard.Rmd
 - summary_household_category.csv
 ---
 
