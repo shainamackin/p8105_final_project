@@ -7,28 +7,40 @@ output: html_document
 
 ```{r setup, message = FALSE, echo = FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+options(scipen = 50)
+library(ggplot2)
+library(plotly)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis",
+  digits = 3
+)
+scale_colour_discrete = scale_colour_viridis_d
+scale_fill_discrete = scale_fill_viridis_d 
+knitr::opts_chunk$set(
+  fig.height = 6,
+  fig.width = 8,
+  message = F,
+  warning = F 
+  )
 
 ```
 
-We were curious to see how time spent on activities differed depending on different demographic characteristics. The plot below shows how time use varies depending on age. 
+We were curious to see how time spent on activities differed depending on age and sex. The plot below shows how time use varies depending on age. 
 
 ```{r message = FALSE, echo = FALSE}
 summary_household_category = read_csv("data/summary_household_category.csv")
 
-summary_household_category %>% 
-  #filter(category %in% c("sleep", "leisure", "work", "household", "traveling", "eating_drinking")) %>% 
-  drop_na() %>% 
-  group_by(age, category) %>% 
-  summarize(sum_product = sum(category_sum_hour_weight), 
-            sum_weight = sum(weight)) %>% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
-  select(-sum_product, -sum_weight) %>% 
-  ggplot(aes(x = age, y = average_hours)) +
-    #geom_point(aes(color = category, alpha = .3)) +
-    geom_smooth(aes(color = category)) +
-    facet_wrap(~category, scales = "free")
+`%not_in%` <- purrr::negate(`%in%`)
 
-summary_household_category %>% 
+plot1 = summary_household_category %>% 
+   filter(category %in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating_drinking", 
+                         "personal_care", "caring_duties")) %>% 
   drop_na() %>% 
   group_by(age, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
@@ -37,8 +49,67 @@ summary_household_category %>%
   select(-sum_product, -sum_weight) %>% 
   ggplot(aes(x = age, y = average_hours)) +
     #geom_point(aes(color = category, alpha = .3)) +
-    geom_smooth(aes(color = category)) +
-    facet_wrap(~category, scales = "free")
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    facet_wrap(~category, scales = "free", ncol = 2)
+
+plot2 = summary_household_category %>% 
+   filter(category %not_in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating_drinking", 
+                         "personal_care", "caring_duties")) %>% 
+  drop_na() %>% 
+  group_by(age, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  ggplot(aes(x = age, y = average_minutes)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    facet_wrap(~category, scales = "free", ncol = 2)
+
+gridExtra::grid.arrange(plot1, plot2, ncol = 2)
 
 ```
+
+Note that the y axis for the first two columns is in hours, and in minutes for the last two columns. Activity categories that we consistently spend more time on as we get older include eating and drinking, household activities, professional services, religious and spiritual activities and volunteering. The leisure and work curves are approximately inverse -- we are working the most number of hours at age 40 and have the least amount of time for leisure at this time. After the age of 40, the time we spend working gradually decreases and the time we spend on leisure gradually increases. 
+
+We also looked at how time spent on categories of activities differed based on sex. 
+
+```{r message = FALSE, echo = FALSE}
+plot1 = summary_household_category %>% 
+  drop_na() %>% 
+  filter(category %in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating_drinking", 
+                         "personal_care", "caring_duties")) %>% 
+  group_by(sex, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  ggplot(aes(x = sex, y = average_hours, fill = sex)) +
+    geom_bar(stat = "identity", position = "dodge", width = 0.5, show.legend = FALSE) +
+    facet_wrap(~category, scales = "free", ncol = 2)
+
+plot2 = summary_household_category %>% 
+  drop_na() %>% 
+  filter(category %not_in% c("sleep", "leisure", 
+                         "work", "household", 
+                         "traveling", "eating_drinking", 
+                         "personal_care", "caring_duties")) %>% 
+  group_by(sex, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  ggplot(aes(x = sex, y = average_minutes, fill = sex)) +
+    geom_bar(stat = "identity", position = "dodge", width = 0.5, show.legend = FALSE) +
+    facet_wrap(~category, scales = "free", ncol = 2) 
+
+gridExtra::grid.arrange(plot1, plot2, ncol = 2)
+
+```
+
+Again, note that the y axis for the first two columns is in hours, and in minutes for the last two columns. Some activities that females spend more time on include caring duties, household activities, personal care, education, religious and spiritual activities and shopping. Males on the other hand spend more time working and exercising as well as engaging in governmental and civic obligations. The average number of minutes females spend on these activities is close to 0. 
 
