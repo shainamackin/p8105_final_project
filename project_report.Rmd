@@ -36,8 +36,7 @@ The initial questions we had going into this project were:
 
 We had initially planned to look at how sociodemographic factors affect time spent with others, however, obtaining an estimate of time spent with others would require cleaning and merging two new datasets. Instead, we decided to use the activity codes around socializing and communicating with others to get a sense of how this had changed from pre- to post-pandemic, and how this varied by age. As we conducted the regression analyses, we also had the idea to additionally look at the interaction of various sociodemographic variables, to see if there are any interaction effects for time spent on leisure activities.
 
-•  How did these questions evolve over the course of the project? </br>
-•  What new questions did you consider in the course of your analysis? </br>
+
 </p>
 <p/>
 <p/>
@@ -1058,16 +1057,16 @@ We also plotted average time spent on different categories of activities from 20
 
 We studied how various sociodemographic and other factors affected time spent on leisure activities. As the outcome was hours/day spent on leisure activities, we conducted linear regression analyses. First, we looked at whether the predictor variables should be categorical or continuous. After plotting age against time spent on leisure activities, we saw a relatively linear association and no need for categorization. Race originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation. We did not need to adjust the sex and employment status categorization. 
 
-We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we hypothesized that during the pandemic in 2020, people spent more on leisure activities, and found a significant difference. Leisure time spent in 2020 (post-pandemic) is  expected to be 0.237 hours longer per day than leisure time spent in 2019 on average.
+We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we hypothesized that during the pandemic in 2020, people spent more on leisure activities, and found a significant difference. Leisure time spent in 2020 (post-pandemic) is  expected to be approximately 0.2 hours (or 12 minutes) longer per day than leisure time spent in 2019 on average.
 
 
 Next, we created several linear regression models to test our various hypotheses around sociodemographic characteristics, and compared the fitted models in terms of their RSME values:
 
 **(Model 1)**: Labor force status
-Those who are employed and at work are expected to spend 2.9 fewer hours per day on leisure activities per day in comparison to those who are retired, on average (p-value<0.05)
+Those who are employed and at work are expected to spend 2.9 fewer hours per day on leisure activities per day in comparison to those who are retired, on average (p-value < 0.05)
 
 **(Model 2)**: Demographic characteristics: race, age, and sex. 
-The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
+The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 3.6 minutes or 0.06 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 47 minutes or approximately 0.8 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.0 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
 
 **(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions. 
 When interaction terms are added, race is no longer significant, and none of the interaction terms are significant (p-value > 0.05).
