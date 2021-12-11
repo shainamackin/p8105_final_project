@@ -5,7 +5,9 @@ account: covidtimes
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 5309552
-bundleId: 5359003
+bundleId: 5359142
 url: https://covidtimes.shinyapps.io/p8105_final_project/
-when: 1639213213.47394
-lastSyncTime: 1639213213.47395
+when: 1639217341.84531
+lastSyncTime: 1639217341.84534
+asMultiple: FALSE
+asStatic: FALSE

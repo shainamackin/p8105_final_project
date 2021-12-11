@@ -16,7 +16,7 @@ navbar:
     - text: "Statistical Analyses"
       href: statistical_analyses.html
     - text: "Interactive map"
-      href: shiny_dashboard.html
+      href: https://xinfang.shinyapps.io/p8105_final_project/
     - text: "Project Report"
       href: project_report.html
     - icon: fa-youtube
