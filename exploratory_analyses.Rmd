@@ -89,7 +89,7 @@ summary_household_category %>%
 
 Some notable changes from 2019 to 2020 include increases in time spent on leisure and household activities and decreases in time spent on work and travel. 
 
-We were also curious to see if time spent on activities varied from month to month during 2020. The interactive plot below displays average daily hours spent per month on different categories of activities. Note that month 4 (April) is missing observations due to a pause in data collection because of the pandemic. You can click on the activity categories legend on the right-hand side of the plot to see trends for different activity categories.  
+We were also curious to see if time spent on activities varied from month to month during 2020. The interactive plot below displays average daily hours spent per month on different categories of activities. Note that month 4 (April) is missing observations due to a pause in data collection because of the pandemic. To see trends for different activity categories, click on the activity categories legend on the right-hand side of the plot.
 
 ```{r month_code, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
 actsum_cps_2020 = summary_household_category %>%
@@ -147,9 +147,10 @@ monthly_2020_plotly = category_time_month_2020 %>%
 ```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
 monthly_2020_plotly
 ```
-There was a jump in daily hours spent on household activities and leisure activities between March and May 2020. On the flip side, there was a decrease in daily hours spent on education.  
 
-It would be interesting to see if time spent socializing has changed from 2019 to 2020 due to social distancing measures. Below is a bar chart showing average daily minutes spent socializing in 2019 versus 2020. 
+There is a notable increase in daily hours spent on leisure activities between March and May 2020, though it seems to fluctuate throughout the rest of the year. There is also an increase in time spent on household activities between March and May 2020. Time spent on education took a significant dip during this same time period, and remained low from May until September, which makes sense considering the traditional US school year/summer break timings.
+
+We were also curious to see if time spent socializing changed from 2019 to 2020 due to social distancing measures. Below is a bar chart showing average daily minutes spent socializing in 2019 versus 2020. 
 
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
 socializing = read_csv("data/socializing.csv")
@@ -171,7 +172,7 @@ socializing %>%
 
 ```
 
-Average daily minutes spent socializing dropped from 35 minutes in 2019 to 30 minutes in 2020. 
+We can see that average daily minutes spent socializing dropped from 35 minutes in 2019 to 30 minutes in 2020. 
 
 How did daily time spent on socializing vary depending on age? 
 
