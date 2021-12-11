@@ -103,13 +103,9 @@ renderPlotly({
              filter(
                year == input[["year_choice"]],
                category == input[["category_choice"]]) %>% 
-  arrange(desc(avg_time)) %>% 
-  mutate(
-    state = factor(state),
-    state = fct_reorder(state, avg_time)
-  )  %>% 
+  arrange(desc(avg_time)) %>%
    plot_ly(
-      x = ~state,
+      x = ~forcats::fct_reorder(state, avg_time, .desc = TRUE),
       y = ~avg_time, 
       color = ~state,
       type = "bar", colors = "viridis") %>% 
@@ -137,13 +133,8 @@ renderPlotly({
              filter(
                year == input[["year_choice"]],
                category == input[["category_choice"]]) %>% 
-  arrange(desc(avg_time)) %>% 
-  mutate(
-    region = factor(region),
-    region = fct_reorder(region, avg_time)
-  )  %>% 
    plot_ly(
-      x = ~region,
+      x = ~forcats::fct_reorder(region, avg_time, .desc = TRUE),
       y = ~avg_time, 
       color = ~region,
       type = "bar", colors = "viridis") %>% 
