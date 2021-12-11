@@ -12,7 +12,33 @@ knitr::opts_chunk$set(echo = TRUE)
 
 We were curious to see how time spent on activities differed depending on different demographic characteristics. The plot below shows how time use varies depending on age. 
 
-```{r}
+```{r message = FALSE, echo = FALSE}
+summary_household_category = read_csv("data/summary_household_category.csv")
+
+summary_household_category %>% 
+  #filter(category %in% c("sleep", "leisure", "work", "household", "traveling", "eating_drinking")) %>% 
+  drop_na() %>% 
+  group_by(age, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  ggplot(aes(x = age, y = average_hours)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category)) +
+    facet_wrap(~category, scales = "free")
+
+summary_household_category %>% 
+  drop_na() %>% 
+  group_by(age, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  ggplot(aes(x = age, y = average_hours)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category)) +
+    facet_wrap(~category, scales = "free")
 
 ```
 
