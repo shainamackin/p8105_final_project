@@ -13,6 +13,21 @@ output:
 library(tidyverse)
 options(scipen = 50)
 library(ggplot2)
+library(plotly)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+scale_colour_discrete = scale_color_viridis_d
+scale_fill_discrete = scale_fill_viridis_d
+
 ```
 
 ```{r data, message = FALSE, warning = FALSE, echo = FALSE}
@@ -41,7 +56,7 @@ Has the way we spend time on different categories changed due to the pandemic? S
 
 ```
 
-Visualize this with the bar plot shown below. 
+We can visualize this with the bar plot shown below. 
 
 ```{r message = FALSE, warning = FALSE, echo = FALSE}
 summary_household_category %>% 
@@ -59,3 +74,101 @@ summary_household_category %>%
 ```
 
 Some notable changes from 2019 to 2020 include increases in time spent on leisure and household activities and decreases in time spent on work and travel. 
+
+We were also curious to see if time spent on activities varied from month to month during 2020. The interactive plot below displays average daily hours spent per month on different categories of activities. Note that month 4 (April) is missing observations due to a pause in data collection because of the pandemic. You can click on the activity categories legend on the right-hand side of the plot to see trends for different activity categories.  
+
+```{r month_code, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+actsum_cps_2020 = summary_household_category %>%
+  filter(year == 2020)
+
+resp_2020 = read.table("data/atusresp_2020.dat", header = TRUE, sep = ",")
+
+resp_2020_tidied = resp_2020 %>% 
+  select(TUCASEID, TULINENO, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %>%
+  mutate(date = lubridate::ymd(TUDIARYDATE)) %>%
+  separate(date, c("year", "month", "date")) %>%
+  mutate(month = month.name[as.numeric(month)]) %>%
+  mutate(year = as.numeric(year)) %>%
+  mutate(TUDIARYDATE = str_replace(TUDIARYDATE, "2020", "")) %>%
+  filter(TUYEAR == 2020) %>%
+  select(-TUYEAR, -TUMONTH, -TULINENO) %>%
+  mutate(
+    tudiaryday = factor(TUDIARYDAY, levels = c(1,2,3,4,5,6,7), labels = c("sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"))) %>%
+  arrange(TUCASEID, month, date, year, TUDIARYDATE, tudiaryday)
+
+merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c("TUCASEID")) %>% janitor::clean_names()
+
+category_time_month_2020 = merged_actsum_cps_resp_2020 %>% 
+  drop_na() %>% 
+  filter(category %in% c("caring_duties", "education", "household", "leisure", "sleep", "telephone", "work")) %>% #drop certain categories 
+  group_by(month, category) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %>% 
+  select(-sum_product, -sum_weight) %>% 
+  mutate(
+    month = as.factor(month)) %>%
+  mutate(month = match(month, month.name)) %>%
+   mutate(
+     category = replace(category, category == "caring_duties", "caring duties"),
+     #category = replace(category, category == "eating_drinking", "eating/drinking"),
+     #category = replace(category, category == "gov_civic_obligations", "gov/civic obligations"),
+     #category = replace(category, category == "personal_care", "personal care"),
+     #category = replace(category, category == "professional_services", "professional services"),
+     #category = replace(category, category == "religious_spiritual", "religious/spiritual")
+     ) %>%
+  arrange(month) 
+
+monthly_2020_plotly = category_time_month_2020 %>%
+  mutate(text_label = str_c("Activity: ", category, "\nAverage hours: ", average_hours, "\nMonth: ", month)) %>%
+  plot_ly(
+    x = ~month, y = ~average_hours, type = "scatter", mode = "line",
+    color = ~category, text = ~text_label, alpha = 0.9) %>%
+ layout(title = 'Average time spent on activities across the U.S. in 2020', 
+        annotations = list(x = 2.5, y = 3, text = "month 4 missing"), 
+        xaxis = list(type = "category", title = 'Month'), 
+        yaxis = list(title = 'Average Hours'))
+```
+
+```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
+monthly_2020_plotly
+```
+There was a jump in daily hours spent on household activities and leisure activities between March and May 2020. On the flip side, there was a decrease in daily hours spent on education.  
+
+It would be interesting to see if time spent socializing has changed from 2019 to 2020 due to social distancing measures. Below is a bar chart showing average daily minutes spent socializing in 2019 versus 2020. 
+
+```{r message = FALSE, warning = FALSE, echo = FALSE}
+socializing = read_csv("data/socializing.csv")
+
+socializing %>% 
+  mutate(year = as.factor(year)) %>% 
+  group_by(year, category) %>% 
+    summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_minutes = round((sum_product*60/sum_weight), 2)) %>% 
+  ggplot(aes(x = year, y = average_minutes, fill = year)) + 
+  geom_bar(stat = "identity", position = "stack", width = 0.5) + 
+  geom_text(aes(label = average_minutes, hjust = 0.5, vjust = 3))
+
+```
+
+Average daily minutes spent socializing dropped from 35 minutes in 2019 to 30 minutes in 2020. 
+
+How did daily time spent on socializing vary depending on age? 
+
+```{r message = FALSE, warning = FALSE, echo = FALSE}
+socializing %>% 
+    mutate(year = factor(year)) %>% 
+  group_by(year, category, age) %>% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %>% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 2)) %>% 
+  ggplot(aes(x = age, y = average_minutes, color = year)) + 
+  geom_point(alpha = .5) + 
+  geom_smooth()
+
+```
+
+Time spent socializing didn't appeared to remain quite consistent for those between the ages of 15 and 30. Decreases in time spent socializing becomes more prominent for older age groups. This is perhaps due to older adults being more cautious due to their high vulnerability to COVID-19.  
+
+

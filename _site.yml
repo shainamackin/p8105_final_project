@@ -6,7 +6,11 @@ navbar:
     - text: "Home"
       href: index.html
     - text: "Exploratory Analyses"
-      href: exploratory_analyses.html
+      menu: 
+          - text: "COVID-19 exploratory analysis"
+            href: exploratory_analyses.html
+          - text: "Group differences"
+            href: group_differences.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html
     - text: "Map Dashboard"
