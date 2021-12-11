@@ -15,7 +15,7 @@ navbar:
             href: multi_year_trends.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html
-    - text: "Interactive map"
+    - text: "Interactive Map"
       href: https://xinfang.shinyapps.io/p8105_final_project/
     - text: "Project Report"
       href: project_report.html
