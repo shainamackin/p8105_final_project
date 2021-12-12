@@ -27,7 +27,7 @@ Next we will conduct some linear regression analyses to understand what factors 
 
 First, we will explore the demographics of the respondents included in our database and distribution of the predictors. We will check to make sure that age can be used as a continuous variable by plotting age against time spent on leisure activities. From the plot below, we don't see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear relationship.
 
-```{r univariate}
+```{r demographic table, message=FALSE, show_col_types = FALSE, warning = FALSE}
 cps_summary = 
   read_csv("./data/summary_household_category.csv")
 
@@ -36,7 +36,11 @@ cps_summary_leisure = cps_summary %>%
 
 library(table1)
 table1(~ race + age + sex + labor_force_status + region|year, data = cps_summary)
+```
 
+Respondents' demographic characteristics stayed the same from 2019 to 2020. This means that the survey sample did not change significantly. It is reasonable to compare how time spent varied pre and post pandemic using ATUS data. 
+
+```{r univariate, message=FALSE, show_col_types = FALSE, warning = FALSE}
 ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
   labs(x = "Age (yrs)",
        y = "Time Spent on Leisure Activities (hrs/day)",

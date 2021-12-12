@@ -414,28 +414,13 @@ Next we will conduct some linear regression analyses to understand what factors 
 <h2>Univariate Analysis: Demographics Table</h2>
 <p>First, we will explore the demographics of the respondents included in our database and distribution of the predictors. We will check to make sure that age can be used as a continuous variable by plotting age against time spent on leisure activities. From the plot below, we don’t see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear relationship.</p>
 <pre class="r"><code>cps_summary = 
-  read_csv(&quot;./data/summary_household_category.csv&quot;)</code></pre>
-<pre><code>## Rows: 309689 Columns: 19</code></pre>
-<pre><code>## ── Column specification ────────────────────────────────────────────────────────
-## Delimiter: &quot;,&quot;
-## chr  (8): race, labor_force_status, sex, category, region, division, state, ...
-## dbl (11): TUCASEID, weight, age, day, year, TULINENO, metro_area, county, ca...</code></pre>
-<pre><code>## 
-## ℹ Use `spec()` to retrieve the full column specification for this data.
-## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
-<pre class="r"><code>cps_summary_leisure = cps_summary %&gt;% 
+  read_csv(&quot;./data/summary_household_category.csv&quot;)
+
+cps_summary_leisure = cps_summary %&gt;% 
   filter(category == &quot;leisure&quot;)
 
-library(table1)</code></pre>
-<pre><code>## 
-## Attaching package: &#39;table1&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:base&#39;:
-## 
-##     units, units&lt;-</code></pre>
-<pre class="r"><code>table1(~ race + age + sex + labor_force_status + region|year, data = cps_summary)</code></pre>
-<pre><code>## Warning in table1.formula(~race + age + sex + labor_force_status + region | :
-## Terms to the right of &#39;|&#39; in formula &#39;x&#39; define table columns and are expected
-## to be factors with meaningful labels.</code></pre>
+library(table1)
+table1(~ race + age + sex + labor_force_status + region|year, data = cps_summary)</code></pre>
 <div class="Rtable1"><table class="Rtable1">
 <thead>
 <tr>
@@ -599,6 +584,7 @@ library(table1)</code></pre>
 </tbody>
 </table>
 </div>
+<p>Respondents’ demographic characteristics stayed the same from 2019 to 2020. This means that the survey sample did not change significantly. It is reasonable to compare how time spent varied pre and post pandemic using ATUS data.</p>
 <pre class="r"><code>ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
   labs(x = &quot;Age (yrs)&quot;,
        y = &quot;Time Spent on Leisure Activities (hrs/day)&quot;,
