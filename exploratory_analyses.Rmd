@@ -5,10 +5,11 @@ output:
     toc: true
     toc_float: true
     code_folding: hide
-
+editor_options: 
+  chunk_output_type: inline
 ---
 
-```{r setup, message = FALSE, echo = FALSE}
+```{r setup, echo = FALSE, message = FALSE}
 library(tidyverse)
 options(scipen = 50)
 library(ggplot2)
@@ -33,7 +34,7 @@ knitr::opts_chunk$set(
 
 ```
 
-```{r data, message = FALSE, warning = FALSE, echo = FALSE}
+```{r data, message = FALSE, warning = FALSE}
 summary_household_category = read_csv("data/summary_household_category.csv")
 summary_household_category <- summary_household_category %>% mutate(
      category = replace(category, category == "caring_duties", "caring duties"),
@@ -50,7 +51,7 @@ summary_household_category <- summary_household_category %>% mutate(
 Has the way we spend time on different categories changed due to the pandemic? See the table below to see average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 
 
 
-```{r message = FALSE, warning = FALSE, echo = FALSE}
+```{r message = FALSE, warning = FALSE}
  summary_household_category %>% 
   drop_na() %>% 
   group_by(year, category) %>% 
@@ -68,7 +69,7 @@ Has the way we spend time on different categories changed due to the pandemic? S
 
 We can visualize this with the bar plot shown below. 
 
-```{r message = FALSE, warning = FALSE, echo = FALSE}
+```{r message = FALSE, warning = FALSE}
 summary_household_category %>% 
   drop_na() %>% 
   group_by(year, category) %>% 
@@ -92,7 +93,7 @@ Some notable changes from 2019 to 2020 include increases in time spent on leisur
 
 We were also curious to see if time spent on activities varied from month to month during 2020. The interactive plot below displays average daily hours spent per month on different categories of activities. Note that month 4 (April) is missing observations due to a pause in data collection because of the pandemic. To see trends for different activity categories, click on the activity categories legend on the right-hand side of the plot.
 
-```{r month_code, echo = FALSE, message = FALSE, include = FALSE, warning = FALSE}
+```{r month_code, message = FALSE, warning = FALSE}
 actsum_cps_2020 = summary_household_category %>%
   filter(year == 2020)
 
@@ -180,7 +181,7 @@ monthly_2020_plotly_minutes = category_time_month_2020 %>%
 
 ```
 
-```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
+```{r month_plot, message = FALSE, warning = FALSE}
 monthly_2020_plotly_hours
 monthly_2020_plotly_minutes
 ```
@@ -189,7 +190,7 @@ There is a notable increase in daily hours spent on leisure activities between M
 
 We were also curious to see if time spent socializing changed from 2019 to 2020 due to social distancing measures. Below is a bar chart showing average daily minutes spent socializing in 2019 versus 2020. 
 
-```{r message = FALSE, warning = FALSE, echo = FALSE}
+```{r message = FALSE, warning = FALSE}
 socializing = read_csv("data/socializing.csv")
 
 socializing %>% 
@@ -213,7 +214,7 @@ We can see that average daily minutes spent socializing dropped from around 35 m
 
 How did daily time spent on socializing vary depending on age? 
 
-```{r message = FALSE, warning = FALSE, echo = FALSE}
+```{r message = FALSE, warning = FALSE}
 socializing %>% 
     mutate(year = factor(year)) %>% 
   group_by(year, category, age) %>% 
