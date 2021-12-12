@@ -98,7 +98,7 @@ activity_summary_2019_long =
 
 We bound the 2019 and 2020 data sets. The activity codes (the letter "t" followed by 6 digits) were not very informative, so we also recoded them to be more informative of the activity (ex. t010101 was recoded as "Sleeping"). 
 
-```{r }
+```{r message = FALSE, warning = FALSE}
 actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) %>% 
   mutate(activity_codes = recode(activity_codes, 
                                  t010101 = "Sleeping", 
@@ -517,7 +517,8 @@ actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) 
 We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that some activities could be considered to fall under more than one category (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise or even both). In our case, we used the definitions provided by ATUS to categorize each activity under one category. 
 
 We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that activity categorization is subjective (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise), but for the purposes of this analysis we adhered to the operational definitions provided by ATUS. 
-```{r  }
+
+```{r message = FALSE, warning = FALSE }
 actsum_combined_categorized = actsum_combined %>% 
   mutate(category = case_when(
     activity_codes %in% c("Sleeping", 
@@ -931,7 +932,7 @@ activity_codes %in% c("Travel related to personal care",
 
 We then cleaned the CPS datasets that contained geographic and demographic information. We  selected variables of interest and then renamed them to be more useful, and also recoded variable values. 
 
-```{r  }
+```{r message = FALSE, warning = FALSE }
 cps_2019 = read.table("data/atuscps_2019.dat", header = TRUE, sep = ",")
 cps_2020 = read.table("data/atuscps_2020.dat", header = TRUE, sep = ",")
 
@@ -993,7 +994,7 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
 
 We then merged the CPS files with the Activity Summary files and created a summarized data set that contained total time spent on each activity category for each respondent. Lastly, we did some final re-coding of variables including race and labor force status. Race originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation.We used write_csv to save a csv version of this data set(summary_household_category) which was used for our analyses. 
 
-```{r  }
+```{r  message = FALSE, warning = FALSE}
 
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
 
@@ -1041,11 +1042,8 @@ write_csv(summary_household_category, "summary_household_category.csv")
 
 To produce our summary tables and visualizations, we calculated average hours/minutes spent on activities using weights. The weights were created by ATUS to account for the fact that respondents were more likely to participate on weekends vs weekdays, and for the fact that some demographics were more represented than others (for instance, women were more likely to respond than men). To calculate average daily hours/minutes spent on an activity, we multiplied total time spent on the activity by the weight, and then summed all these products together and divided this by the sum of the weights. See the code for this calculation below. 
 
-<<<<<<< HEAD
-```{r  }
-=======
-```{r summm, eval = FALSE}
->>>>>>> 52e9a01449d4c884a48e5fc0393ea8f448a4c7af
+```{r  message = FALSE, warning = FALSE}
+
 
  summary_household_category %>% 
   drop_na() %>%
@@ -1234,7 +1232,7 @@ socializing %>%
 
 We created multi-panel plots to show how time spent on activities differed depending on age and sex.
 
-```{r message = FALSE  }
+```{r message = FALSE, warning = FALSE }
 summary_household_category = read_csv("data/summary_household_category.csv") %>% 
      mutate(
      category = replace(category, category == "caring_duties", "caring duties"),
@@ -1284,7 +1282,7 @@ gridExtra::grid.arrange(plot1, plot2, ncol = 2)
 
 ```
 
-```{r message = FALSE  }
+```{r message = FALSE, warning = FALSE}
 plot1 = summary_household_category %>% 
   drop_na() %>% 
   filter(category %in% c("sleep", "leisure", 
@@ -1325,7 +1323,7 @@ gridExtra::grid.arrange(plot1, plot2, ncol = 2)
 
 We also plotted average time spent on different categories of activities from 2009 to 2019. 
 
-```{r message = FALSE  }
+```{r message = FALSE, warning = FALSE }
 
 annual_data = read_csv("data/annual_activity.csv") 
 

@@ -1041,7 +1041,7 @@ category_time =
 print(category_time)
 ```
 
-    ## # A tibble: 16 × 4
+    ## # A tibble: 16 x 4
     ##    category              `2019` `2020` percent_change
     ##    <chr>                  <dbl>  <dbl>          <dbl>
     ##  1 sleep                    8.9    9              1.1
@@ -1111,163 +1111,58 @@ table1(~ race + age + sex + labor_force_status + region|year, data = unique_hous
     ## Terms to the right of '|' in formula 'x' define table columns and are expected
     ## to be factors with meaningful labels.
 
-<div class="Rtable1"><table class="Rtable1">
-<thead>
-<tr>
-<th class='rowlabel firstrow lastrow'></th>
-<th class='firstrow lastrow'><span class='stratlabel'>2019<br><span class='stratn'>(N=9435)</span></span></th>
-<th class='firstrow lastrow'><span class='stratlabel'>2020<br><span class='stratn'>(N=8782)</span></span></th>
-<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=18217)</span></span></th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td class='rowlabel firstrow'>race</td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel'>Black</td>
-<td>1273 (13.5%)</td>
-<td>1099 (12.5%)</td>
-<td>2372 (13.0%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>White</td>
-<td>7580 (80.3%)</td>
-<td>7073 (80.5%)</td>
-<td>14653 (80.4%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>Asian</td>
-<td>458 (4.9%)</td>
-<td>473 (5.4%)</td>
-<td>931 (5.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>unknown</td>
-<td>105 (1.1%)</td>
-<td>122 (1.4%)</td>
-<td>227 (1.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>Hawaiian/Pacific Islander</td>
-<td class='lastrow'>19 (0.2%)</td>
-<td class='lastrow'>15 (0.2%)</td>
-<td class='lastrow'>34 (0.2%)</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>age</td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel'>Mean (SD)</td>
-<td>51.1 (18.2)</td>
-<td>51.2 (18.3)</td>
-<td>51.1 (18.2)</td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>Median [Min, Max]</td>
-<td class='lastrow'>51.0 [15.0, 85.0]</td>
-<td class='lastrow'>52.0 [15.0, 85.0]</td>
-<td class='lastrow'>52.0 [15.0, 85.0]</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>sex</td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel'>Female</td>
-<td>5124 (54.3%)</td>
-<td>4732 (53.9%)</td>
-<td>9856 (54.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>Male</td>
-<td class='lastrow'>4311 (45.7%)</td>
-<td class='lastrow'>4050 (46.1%)</td>
-<td class='lastrow'>8361 (45.9%)</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>labor_force_status</td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel'>Retired</td>
-<td>3448 (36.5%)</td>
-<td>3383 (38.5%)</td>
-<td>6831 (37.5%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>Employed-At work</td>
-<td>5449 (57.8%)</td>
-<td>4765 (54.3%)</td>
-<td>10214 (56.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>Unemployed-Looking</td>
-<td>242 (2.6%)</td>
-<td>264 (3.0%)</td>
-<td>506 (2.8%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>Employed-Absent</td>
-<td>274 (2.9%)</td>
-<td>290 (3.3%)</td>
-<td>564 (3.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>Unemployed-On layoff</td>
-<td class='lastrow'>22 (0.2%)</td>
-<td class='lastrow'>80 (0.9%)</td>
-<td class='lastrow'>102 (0.6%)</td>
-</tr>
-<tr>
-<td class='rowlabel firstrow'>region</td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-<td class='firstrow'></td>
-</tr>
-<tr>
-<td class='rowlabel'>Midwest</td>
-<td>1798 (19.1%)</td>
-<td>1673 (19.1%)</td>
-<td>3471 (19.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>Northeast</td>
-<td>1275 (13.5%)</td>
-<td>1184 (13.5%)</td>
-<td>2459 (13.5%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>South</td>
-<td>2953 (31.3%)</td>
-<td>2646 (30.1%)</td>
-<td>5599 (30.7%)</td>
-</tr>
-<tr>
-<td class='rowlabel'>West</td>
-<td>1665 (17.6%)</td>
-<td>1638 (18.7%)</td>
-<td>3303 (18.1%)</td>
-</tr>
-<tr>
-<td class='rowlabel lastrow'>Missing</td>
-<td class='lastrow'>1744 (18.5%)</td>
-<td class='lastrow'>1641 (18.7%)</td>
-<td class='lastrow'>3385 (18.6%)</td>
-</tr>
-</tbody>
-</table>
-</div>
+    ##                                             2019              2020
+    ## 1                                       (N=9435)          (N=8782)
+    ## 2                         race                                    
+    ## 3                        Black      1273 (13.5%)      1099 (12.5%)
+    ## 4                        White      7580 (80.3%)      7073 (80.5%)
+    ## 5                        Asian        458 (4.9%)        473 (5.4%)
+    ## 6                      unknown        105 (1.1%)        122 (1.4%)
+    ## 7    Hawaiian/Pacific Islander         19 (0.2%)         15 (0.2%)
+    ## 8                          age                                    
+    ## 9                    Mean (SD)       51.1 (18.2)       51.2 (18.3)
+    ## 10           Median [Min, Max] 51.0 [15.0, 85.0] 52.0 [15.0, 85.0]
+    ## 11                         sex                                    
+    ## 12                      Female      5124 (54.3%)      4732 (53.9%)
+    ## 13                        Male      4311 (45.7%)      4050 (46.1%)
+    ## 14          labor_force_status                                    
+    ## 15                     Retired      3448 (36.5%)      3383 (38.5%)
+    ## 16            Employed-At work      5449 (57.8%)      4765 (54.3%)
+    ## 17          Unemployed-Looking        242 (2.6%)        264 (3.0%)
+    ## 18             Employed-Absent        274 (2.9%)        290 (3.3%)
+    ## 19        Unemployed-On layoff         22 (0.2%)         80 (0.9%)
+    ## 20                      region                                    
+    ## 21                     Midwest      1798 (19.1%)      1673 (19.1%)
+    ## 22                   Northeast      1275 (13.5%)      1184 (13.5%)
+    ## 23                       South      2953 (31.3%)      2646 (30.1%)
+    ## 24                        West      1665 (17.6%)      1638 (18.7%)
+    ## 25                     Missing      1744 (18.5%)      1641 (18.7%)
+    ##              Overall
+    ## 1          (N=18217)
+    ## 2                   
+    ## 3       2372 (13.0%)
+    ## 4      14653 (80.4%)
+    ## 5         931 (5.1%)
+    ## 6         227 (1.2%)
+    ## 7          34 (0.2%)
+    ## 8                   
+    ## 9        51.1 (18.2)
+    ## 10 52.0 [15.0, 85.0]
+    ## 11                  
+    ## 12      9856 (54.1%)
+    ## 13      8361 (45.9%)
+    ## 14                  
+    ## 15      6831 (37.5%)
+    ## 16     10214 (56.1%)
+    ## 17        506 (2.8%)
+    ## 18        564 (3.1%)
+    ## 19        102 (0.6%)
+    ## 20                  
+    ## 21      3471 (19.1%)
+    ## 22      2459 (13.5%)
+    ## 23      5599 (30.7%)
+    ## 24      3303 (18.1%)
+    ## 25      3385 (18.6%)
 
 ``` r
 write_csv(summary_household_category, "summary_household_category.csv")
@@ -1294,7 +1189,7 @@ socializing %>%
 
     ## `summarise()` has grouped output by 'TUCASEID', 'weight'. You can override using the `.groups` argument.
 
-    ## # A tibble: 18,217 × 6
+    ## # A tibble: 18,217 x 6
     ## # Groups:   TUCASEID, weight [18,217]
     ##    TUCASEID    weight  year sum_time_weight sum_total_minutes average_hours
     ##       <dbl>     <dbl> <dbl>           <dbl>             <int>         <dbl>
@@ -1308,7 +1203,7 @@ socializing %>%
     ##  8  2.02e13  7640780.  2019              0                  0         0    
     ##  9  2.02e13  2865212.  2019              0                  0         0    
     ## 10  2.02e13 17748277.  2019              0                  0         0    
-    ## # … with 18,207 more rows
+    ## # ... with 18,207 more rows
 
 ``` r
 socializing = read_csv("./data/socializing.csv")
@@ -1316,11 +1211,11 @@ socializing = read_csv("./data/socializing.csv")
 
     ## Rows: 18217 Columns: 19
 
-    ## ── Column specification ────────────────────────────────────────────────────────
+    ## -- Column specification --------------------------------------------------------
     ## Delimiter: ","
     ## chr  (8): race, labor_force_status, sex, category, region, division, state, ...
     ## dbl (11): TUCASEID, weight, age, day, year, TULINENO, metro_area, county, ca...
 
     ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
+    ## i Use `spec()` to retrieve the full column specification for this data.
+    ## i Specify the column types or set `show_col_types = FALSE` to quiet this message.
