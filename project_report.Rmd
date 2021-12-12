@@ -1141,7 +1141,7 @@ model2 %>%
   knitr::kable(digits = 3, caption = "Model 2 Parameter Estimates")
 
 ```
-The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 3.6 minutes or 0.06 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 47 minutes or approximately 0.8 hours more on leisure activities per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.0 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
+The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 3.6 minutes or 0.06 hours more on leisure activities per day on average, adjusting for race and sex. 
 
 ```{r model3, message = FALSE, warning = FALSE}
 model3 = 
@@ -1250,7 +1250,7 @@ fitted_df %>%
   
 ```
 
-From the violin plot, we can see that Model 1, the model with employment status as the predictor, has the lowest RMSE average, which means it is the best model fit of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar Model 2 and Model 3 plots.
+Model 1, the model with employment status as the predictor, has the lowest RMSE average, which means it is the best model fit of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar Model 2 and Model 3 plots.
 
 # Discussion
  
