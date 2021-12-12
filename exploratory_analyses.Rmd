@@ -50,7 +50,6 @@ summary_household_category <- summary_household_category %>% mutate(
 
 Has the way we spend time on different categories changed due to the pandemic? See the table below for average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 
 
-
 ```{r message = FALSE, warning = FALSE}
  summary_household_category %>% 
   drop_na() %>% 
