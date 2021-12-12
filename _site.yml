@@ -7,11 +7,11 @@ navbar:
       href: index.html
     - text: "Exploratory Analyses"
       menu: 
-          - text: "COVID-19 exploratory analysis"
+          - text: "Time use: COVID-19"
             href: exploratory_analyses.html
-          - text: "Differences by age and sex"
+          - text: "Time use: age and sex"
             href: group_differences.html
-          - text: "Trends from 2009-2019"
+          - text: "Time use: across decade"
             href: multi_year_trends.html
     - text: "Statistical Analyses"
       href: statistical_analyses.html

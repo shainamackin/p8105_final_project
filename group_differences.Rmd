@@ -1,8 +1,12 @@
 ---
 title: "Differences by age and sex"
-output: html_document
-code_folding: hide
-
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+editor_options: 
+  chunk_output_type: inline
 ---
 
 ```{r setup, message = FALSE, echo = FALSE}
@@ -28,10 +32,14 @@ knitr::opts_chunk$set(
   )
 
 ```
+<p/>
+<p/>
+### Time use by age
 
-We were curious to see how time spent on activities differed depending on age and sex using data from 2019 and 2020. The plot below shows how time use varies depending on age.  
+We were curious to see how time spent on activities differed depending on age and sex using data from 2019 and 2020. The plot below shows how time use varies depending on age. 
 
-```{r message = FALSE, echo = FALSE}
+
+```{r message = FALSE}
 summary_household_category = read_csv("data/summary_household_category.csv") %>% 
      mutate(
      category = replace(category, category == "caring_duties", "caring duties"),
@@ -83,9 +91,11 @@ gridExtra::grid.arrange(plot1, plot2, ncol = 2)
 
 Note that the y axis for the first two columns is in hours, and in minutes for the last two columns. Activity categories that we consistently spend more time on as we get older include eating and drinking, household activities, professional services, religious and spiritual activities and volunteering. The leisure and work curves are approximately inverse -- we are working the most number of hours at age 40 and have the least amount of time for leisure at this time. After the age of 40, the time we spend working gradually decreases and the time we spend on leisure gradually increases. 
 
+### Time use by sex
+
 We also looked at how time spent on categories of activities differed based on sex. 
 
-```{r message = FALSE, echo = FALSE}
+```{r message = FALSE}
 plot1 = summary_household_category %>% 
   drop_na() %>% 
   filter(category %in% c("sleep", "leisure", 

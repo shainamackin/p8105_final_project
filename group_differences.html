@@ -13,8 +13,8 @@
 
 <title>Differences by age and sex</title>
 
-<script src="site_libs/header-attrs-2.11/header-attrs.js"></script>
-<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -29,7 +29,11 @@
        h6 {font-size: 12px;}
        code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
        pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.11.4/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
@@ -217,7 +221,73 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
 
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
 
 
 
@@ -227,6 +297,16 @@ $(document).ready(function () {
 
 
 <div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
 
 
 
@@ -301,6 +381,14 @@ $(document).ready(function () {
 
 <div id="header">
 
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
 
 
 <h1 class="title toc-ignore">Differences by age and sex</h1>
@@ -308,15 +396,104 @@ $(document).ready(function () {
 </div>
 
 
+<p/>
+<p/>
+<div id="time-use-by-age" class="section level3">
+<h3>Time use by age</h3>
 <p>We were curious to see how time spent on activities differed depending on age and sex using data from 2019 and 2020. The plot below shows how time use varies depending on age.</p>
+<pre class="r"><code>summary_household_category = read_csv(&quot;data/summary_household_category.csv&quot;) %&gt;% 
+     mutate(
+     category = replace(category, category == &quot;caring_duties&quot;, &quot;caring duties&quot;),
+     category = replace(category, category == &quot;eating_drinking&quot;, &quot;eating/drinking&quot;),
+     category = replace(category, category == &quot;personal_care&quot;, &quot;personal care&quot;),
+     category = replace(category, category == &quot;gov_civic_obligations&quot;, &quot;gov/civic obligations&quot;),
+     category = replace(category, category == &quot;professional_services&quot;, &quot;professional services&quot;),
+     category = replace(category, category == &quot;religious_spiritual&quot;, &quot;religious/spiritual&quot;))
+
+`%not_in%` &lt;- purrr::negate(`%in%`)
+
+plot1 = summary_household_category %&gt;% 
+   filter(category %in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(age, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = age, y = average_hours)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = &quot;Average hours&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2)
+
+plot2 = summary_household_category %&gt;% 
+   filter(category %not_in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(age, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = age, y = average_minutes)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = &quot;Average minutes&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2)
+
+gridExtra::grid.arrange(plot1, plot2, ncol = 2)</code></pre>
 <p><img src="group_differences_files/figure-html/unnamed-chunk-1-1.png" width="768" /></p>
 <p>Note that the y axis for the first two columns is in hours, and in minutes for the last two columns. Activity categories that we consistently spend more time on as we get older include eating and drinking, household activities, professional services, religious and spiritual activities and volunteering. The leisure and work curves are approximately inverse – we are working the most number of hours at age 40 and have the least amount of time for leisure at this time. After the age of 40, the time we spend working gradually decreases and the time we spend on leisure gradually increases.</p>
+</div>
+<div id="time-use-by-sex" class="section level3">
+<h3>Time use by sex</h3>
 <p>We also looked at how time spent on categories of activities differed based on sex.</p>
+<pre class="r"><code>plot1 = summary_household_category %&gt;% 
+  drop_na() %&gt;% 
+  filter(category %in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  group_by(sex, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = sex, y = average_hours, fill = sex)) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, width = 0.5, show.legend = FALSE) +
+    labs(y = &quot;Average hours&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2)
+
+plot2 = summary_household_category %&gt;% 
+  drop_na() %&gt;% 
+  filter(category %not_in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  group_by(sex, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = sex, y = average_minutes, fill = sex)) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, width = 0.5, show.legend = FALSE) +
+  labs(y = &quot;Average minutes&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2) 
+
+gridExtra::grid.arrange(plot1, plot2, ncol = 2)</code></pre>
 <p><img src="group_differences_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
 <p>Again, note that the y axis for the first two columns is in hours, and in minutes for the last two columns. Some activities that females spend more time on include caring duties, household activities, personal care, education, religious and spiritual activities and shopping. Males on the other hand spend more time working and exercising as well as engaging in governmental and civic obligations. The average number of minutes females spend on governmental and civic obligations is close to 0.</p>
+</div>
 
 
 
+</div>
+</div>
 
 </div>
 
@@ -348,7 +525,41 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
 
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

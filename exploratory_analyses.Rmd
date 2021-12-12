@@ -46,7 +46,7 @@ summary_household_category <- summary_household_category %>% mutate(
 ```
 <p/>
 <p/>
-## How has time-use been impacted by COVID-19? 
+## Impact of COVID-19 on time use
 
 Has the way we spend time on different categories changed due to the pandemic? See the table below to see average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 
 
@@ -67,6 +67,8 @@ Has the way we spend time on different categories changed due to the pandemic? S
 
 ```
 
+### Comparison of time use: 2019 vs 2020 
+<p/>
 We can visualize this with the bar plot shown below. 
 
 ```{r message = FALSE, warning = FALSE}
@@ -93,6 +95,7 @@ Some notable changes from 2019 to 2020 include increases in time spent on leisur
 
 We were also curious to see if time spent on activities varied from month to month during 2020. The interactive plot below displays average daily hours spent per month on different categories of activities. Note that month 4 (April) is missing observations due to a pause in data collection because of the pandemic. To see trends for different activity categories, click on the activity categories legend on the right-hand side of the plot.
 
+### Monthly trends: 2020
 ```{r month_code, message = FALSE, warning = FALSE}
 actsum_cps_2020 = summary_household_category %>%
   filter(year == 2020)
@@ -190,6 +193,7 @@ There is a notable increase in daily hours spent on leisure activities between M
 
 We were also curious to see if time spent socializing changed from 2019 to 2020 due to social distancing measures. Below is a bar chart showing average daily minutes spent socializing in 2019 versus 2020. 
 
+### Socializing: 2019 vs 2020
 ```{r message = FALSE, warning = FALSE}
 socializing = read_csv("data/socializing.csv")
 
