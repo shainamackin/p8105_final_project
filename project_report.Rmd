@@ -59,6 +59,8 @@ library(dplyr)
 library(ggplot2)
 library(modelr)
 library(mgcv)
+library(magrittr) 
+
 
 options(scipen = 50)
 knitr::opts_chunk$set(echo = TRUE)
