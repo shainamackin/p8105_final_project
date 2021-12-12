@@ -410,8 +410,8 @@ knitr::opts_chunk$set(echo = TRUE)</code></pre>
 Here, we will conduct linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
 <p/>
 <p/>
-<div id="univariate-analysis-demographics-table" class="section level3">
-<h3>Univariate Analysis: Demographics Table</h3>
+<div id="univariate-analysis" class="section level3">
+<h3>Univariate Analysis</h3>
 <p>First, we will explore the demographics of the respondents included in our database and distribution of the predictors. We will check to make sure that age can be used as a continuous variable by plotting age against time spent on leisure activities. From the plot below, we don’t see any clear distinctions indicating a need for categorization of age, so we will leave it as a continuous variable, as there appears to be monotonic and linear relationship.</p>
 <pre class="r"><code>cps_summary = 
   read_csv(&quot;./data/summary_household_category.csv&quot;)
