@@ -22,15 +22,33 @@ knitr::opts_chunk$set(echo = TRUE)
 Next we will conduct some linear regression analyses to understand what factors predict time spent on leisure activities (hours/day).
 <p/>
 <p/>
-## Models
 
-First, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
+## Univariate Analysis: Demographics Table
 
-```{r year_model, message=FALSE, show_col_types = FALSE, warning = FALSE}
-cps_summary_leisure = 
-  read_csv("./data/summary_household_category.csv") %>% 
+First, we will explore the demographics of the respondents included in our database and distribution of the predictors. We will check to make sure that age can be used as a continuous variable by plotting age against time spent on leisure activities. From the plot below, we don't see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear relationship.
+
+```{r univariate}
+cps_summary = 
+  read_csv("./data/summary_household_category.csv")
+
+cps_summary_leisure = cps_summary %>% 
   filter(category == "leisure")
 
+library(table1)
+table1(~ race + age + sex + labor_force_status + region|year, data = cps_summary)
+
+ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
+  labs(x = "Age (yrs)",
+       y = "Time Spent on Leisure Activities (hrs/day)",
+       title = "Relationship between Age and Leisure Time")
+
+```
+
+## Models
+
+Next, we wanted to explore whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we have hypothesized that in 2020, after the pandemic hit and the US went into lockdown, people spent more at home doing fun activities and picking up new hobbies.
+
+```{r year_model, message=FALSE, show_col_types = FALSE, warning = FALSE}
 cps_summary_leisure$year =
   as_factor(case_when(
     cps_summary_leisure$year == 2019 ~ "Pre-Pandemic 2019",
@@ -49,7 +67,7 @@ model_year %>%
 There is a significant difference between 2019 and 2020 in terms of leisure time spent (p-value <0.05). We expect that leisure time spent in 2020 (post-pandemic) is 0.2 hours longer per day than leisure time spent in 2019, on average. This aligns with our hypothesis that after the pandemic, people started spending additional time on leisure activities.
 
 
-Next, we want to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.
+Now, we would like to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.
 
 **(Model 1)**: Labor force status. 
 We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.
@@ -73,14 +91,7 @@ model1 %>%
 
 From the table above, we can see that in Model 1, employment status is a very strong predictor of time spent on leisure activities. Those who are employed and at work are expected to spend 1.4 fewer hours per day on leisure activities per day in comparison to those who are employed but absent from work, on average. Additionally, those who are retired are expected to spend 1.5 more hours per day on leisure activities per day in comparison to those who are employed but absent from work. 
 
-For the 2nd and 3rd model, we did a quick check to make sure that age could be used as a continuous variable by plotting age against time spent on leisure activities. From the plot below, we don't see any clear distinctions to group categories for age so we will leave it as a continuous variable, as there appears to be monotonic and linear.
-
 ```{r model2, message = FALSE, warning = FALSE}
-ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
-  labs(x = "Age (yrs)",
-       y = "Time Spent on Leisure Activities (hrs/day)",
-       title = "Relationship between Age and Leisure Time")
-
 model2 = 
   lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
 
