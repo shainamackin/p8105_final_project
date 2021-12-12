@@ -28,18 +28,17 @@ Many individuals have used the specific data sets that we used for this project 
 
 The initial questions we had going into this project were:
 
-**1.**  How do sociodemographic factors such as age, gender, and occupation affect time spent on work activities, leisure activities, and time spent with others? 
+**1.** How does time spent on various activities differ pre- and post-onset of the COVID-19 pandemic (2019 vs 2020)?
 
-**2.** How does time use on different activity categories differ pre- and post-pandemic (2019 vs 2020)?
+**2.** How do sociodemographic factors such as age, gender, and occupation affect time spent on leisure activities and time spent with others?
 
-**3.** How do time use trends differ by geography and across the span of a decade?
+**3.** How do time use trends differ across the span of a decade?
 
-**4.** How does time spent with others differ pre- and post- onset of COVID-19, and how do sociodempgraphic factors affect this? 
+**4.** How do time use trends differ by geography? 
 
-<<<<<<< HEAD
-As the project evolved, however, so too did our initial questions:
+As the project evolved, so too did our initial questions:
 
-+ Namely, in relation to Initial Question 4, we discovered that obtaining an estimate of time spent with others would require cleaning and merging two additional large datasets. Instead, we decided to modify our initial question and instead use the activity codes around socializing and communicating with others to get a sense of how this had changed from pre- to post-pandemic, and how this varied by age. 
++ Namely, in relation to time spent with others listed in Question 2, we discovered that obtaining an estimate of this would require cleaning and merging two additional large, messy datasets. Instead, we decided to modify our initial question and instead use the activity codes around socializing and communicating with others to get a sense of how this had changed pre- to post-onset of the pandemic, and how this varied by age. 
 + As an expansion upon our initially proposed regression analyses of sociodemographic variables, it occurred to us mid-analysis to also investigate the interaction effects of these sociodemographic variables.
 </p>
 <p/>
