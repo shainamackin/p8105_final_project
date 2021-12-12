@@ -46,7 +46,7 @@ As the project evolved, so too did our initial questions:
 # The Data
 </p>
 ### Source: <br/>
-Data for this project comes from the U.S. Bureau of Labor Statistics’ American Time Use Survey (ATUS), publicly available [here](https://www.bls.gov/tus/datafiles-2020.htm). </p> Key variables from the Activity Summary files included activity codes, total time spent on the activity, and demographic variables. We pulled dates of responses from the ATUS respondent files and geographic information from the CPS files. The ATUS website also contained annual estimates of time spent on different activity categories from 2009-2019 which we were able to use for our multi-year trend plot. 
+Data for this project comes from the U.S. Bureau of Labor Statistics’ American Time Use Survey (ATUS), publicly available [here](https://www.bls.gov/tus/datafiles-2020.htm). </p> Key variables from the Activity Summary files included activity codes, total time spent on the activity, and demographic characteristics. We pulled dates of responses from ATUS respondent files and geographic information from Current Population Survey (CPS) files. The ATUS website also contained annual estimates of time spent on different activity categories from 2009-2019 which we were able to use for our multi-year trend plot. 
 
 ### Cleaning: </br>
 </p>
@@ -87,7 +87,6 @@ activity_summary_2019_long =
          age = TEAGE, 
          sex = TESEX)
 ```
-
 
 We bound the 2019 and 2020 data sets. The activity codes (the letter "t" followed by 6 digits) were not very informative, so we also recoded them to be more informative of the activity (ex. t010101 was recoded as "Sleeping"). 
 
@@ -507,7 +506,7 @@ actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) 
 
 ```
 
-We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that some activities may have fallen under more than one category (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise or even both). 
+We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that activity categorization is subjective (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise), but for the purposes of this analysis we adhered to the operational definitions provided by ATUS. 
 
 ```{r eval = FALSE}
 actsum_combined_categorized = actsum_combined %>% 
@@ -980,8 +979,7 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
                             `3` = "not identified")) 
 ```
 
-We then merged the CPS files with the Activity Summary files. We then created a summarized data set that contained total time spent on each category of activity for each respondent, and did some final recoding of variables. 
-
+We then merged the CPS files with the Activity Summary files and created a summarized data set that contained total time spent on each activity category for each respondent. Lastly, we did some final re-coding of variables including race and labor force status. Race originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation.  
 ```{r eval = FALSE}
 
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
@@ -994,7 +992,7 @@ summary_household_category <- cps_summary_merged %>%
   filter(row_number() == 1) %>%
   select(-c("activity_codes","total_minutes"))
 
-summary_household_category$race <- # Need to review race categorization
+summary_household_category$race <- 
   as_factor(case_when(
     summary_household_category$race %in% c(4, 7) ~ "Asian",
     summary_household_category$race %in% c(1) ~ "White", 
@@ -1045,22 +1043,21 @@ For each of our visualizations and summary tables, we had to calculate average h
 
 ```
 
-We also created a number of different plots. As mentioned in the Initial Questions section, instead of looking at time spent with others (which would require cleaning and merging new data sets we were unfamiliar with), we looked at time spent socializing and communicating with others in 2019 vs 2020 and looked at how this varied by age.
+We created a number of different plots. As mentioned in the Initial Questions section, instead of looking at time spent with others as originally planned (which would require cleaning and merging additional data sets), we looked at time spent socializing and communicating with others in 2019 vs 2020 and how this varied by age.
 
 ### Differences by age and sex 
 
-We created multi-paneled plots to show how time spent on activities differed depending on age and sex.
+We created multi-panel plots to show how time spent on activities differed depending on age and sex.
 
 ### Multi-year trends
 
-We also plotted average time spent on different categories of activities from 2009 to 2019, using data available on the ATUS website. 
+We also plotted average time spent on different categories of activities from 2009 to 2019. 
 
 # Statistical Analysis
 
-We studied how various sociodemographic and other factors affected time spent on leisure activities. As the outcome was hours/day spent on leisure activities, we conducted linear regression analyses. First, we looked at whether the predictor variables should be categorical or continuous. After plotting age against time spent on leisure activities, we saw a relatively linear association and no need for categorization. Race originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation. We did not need to adjust the sex and employment status categorization. 
+We studied how various sociodemographic factors affected time spent on leisure activities. As the outcome of hours per day spent on leisure activities is continuous, we conducted linear regression analyses. First, we looked at whether the predictor variables should be categorical or continuous. After plotting age against time spent on leisure activities, we saw a relatively linear association and no need for categorization. We did not need to adjust the sex and employment status categorization. 
 
-We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we hypothesized that during the pandemic in 2020, people spent more on leisure activities, and found a significant difference. Leisure time spent in 2020 (post-pandemic) is  expected to be approximately 0.2 hours (or 12 minutes) longer per day than leisure time spent in 2019 on average.
-
+We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we hypothesized that during the pandemic in 2020 people spent more time on leisure activities, and found a significant difference. Leisure time spent in 2020 (post-pandemic) is expected to be approximately 0.2 hours (or 12 minutes) longer per day than leisure time spent in 2019, on average.
 
 Next, we created several linear regression models to test our various hypotheses around sociodemographic characteristics, and compared the fitted models in terms of their RSME values:
 
@@ -1068,11 +1065,9 @@ Next, we created several linear regression models to test our various hypotheses
 Those who are employed and at work are expected to spend 2.9 fewer hours per day on leisure activities per day in comparison to those who are retired, on average (p-value < 0.05)
 
 **(Model 2)**: Demographic characteristics: race, age, and sex. 
-<<<<<<< HEAD
 The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activities per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
-=======
-The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 3.6 minutes or 0.06 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 47 minutes or approximately 0.8 hours more on leisure activites per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.0 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
->>>>>>> d81035a647d599e9b1410a82375fa967b82f9547
+
+The 3 main effect predictors in Model 2 are all significant (p-value < 0.05). Specifically, for every 1 year increase in age, we expect people to spend 3.6 minutes or 0.06 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 47 minutes or approximately 0.8 hours more on leisure activities per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.0 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age. 
 
 **(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions. 
 When interaction terms are added, race is no longer significant, and none of the interaction terms are significant (p-value > 0.05).
@@ -1081,9 +1076,9 @@ We found that Model 1 resulted in the lowest RSME values, which indicates that i
 
 # Discussion
  
-We found that in 2020, Americans on average spent more time on leisure and household activities and less time on work and travel than they did in 2019. With more individuals working from home during the pandemic, these findings make sense. We saw the same trends when comparing time spent on activities in March of 2020 versus May of 2020. We also saw large drops in average time spent on education from March (41 minutes) to May (15 minutes) across the individuals in our study. Additionally, we found that time spent socializing dropped from  35 minutes in 2019 to 30 minutes in 2020.  When looking at how time spent socializing related to age, we saw that there were larger decreases in socializing among the older population, which would make sense given that older individuals are more vulnerable to COVID-19. It would be interesting to study how decreases in socializing have impacted older adults’ well-being. 
+We found that in 2020, Americans on average spent more time on leisure and household activities and less time on work and travel than they did in 2019. With more individuals working from home during the pandemic, these findings make logical sense. We saw the same trends when comparing time spent on activities in March of 2020 versus May of 2020. We also saw large drops in average time spent on education from March (41 minutes) to May (15 minutes) across the individuals in our study. Additionally, we found that time spent socializing dropped from  35 minutes in 2019 to 30 minutes in 2020. When looking at how time spent socializing related to age, we saw that there were greater decreases in socializing among the older population than the younger population, which makes sense given that older individuals are more vulnerable to COVID-19. It would be interesting to study how decreases in socializing have impacted older adults’ well-being. 
  
-With our multi-paneled plots showing time spent on activities against age, we were able to see how the time we spent on various activities changes over our life course. There are certain activities like eating and drinking, household activities and religious and spiritual activities that we spend more and more time on as we get older. With other activities like work and leisure, there are peaks and dips at around the mid-life point (~40 years). There were also trends in time spent depending on sex. Some activities that females spend more time on include caring duties, household activities, personal care, education, religious and spiritual activities and shopping. Males on the other hand spend more time working and exercising as well as engaging in governmental and civic obligations.
+With our multi-panel plots showing time spent on activities against age, we were able to see how the time we spent on various activities changes over our life course. There are certain activities like eating and drinking, household activities and religious and spiritual activities that we spend more and more time on as we get older. With other activities like work and leisure, there are peaks and dips at around the mid-life point (~40 years). There were also trends in time spent depending on sex. Some activities that females spend more time on include caring duties, household activities, personal care, education, religious and spiritual activities and shopping. Males on the other hand spend more time working and exercising as well as engaging in governmental and civic obligations.
  
 Looking at our multi-year 2009-2019 trend plot, we didn’t see any drastic changes in the amount of time we spend on different activities. There did appear to be an upward trend for time we spend sleeping and working, though these were subtle. We saw some interesting between-state differences in time spent on activities. For instance, average daily leisure time in Wyoming (8 hours) was around 1.5 hours higher than in West Virginia (state with second highest average daily leisure time) and 5 hours higher than leisure time spent in Vermont. It would be interesting to look closer at how time is spent on different categories within one state. Additionally, it could be informative to look at the demographic distributions of respondents in these states. 
  
