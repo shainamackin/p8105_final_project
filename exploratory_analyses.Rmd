@@ -48,7 +48,7 @@ summary_household_category <- summary_household_category %>% mutate(
 <p/>
 ## Impact of COVID-19 on time use
 
-Has the way we spend time on different categories changed due to the pandemic? See the table below to see average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 
+Has the way we spend time on different categories changed due to the pandemic? See the table below for average daily hours spent on categories of activities in 2019 versus 2020, and the percent change. 
 
 
 ```{r message = FALSE, warning = FALSE}
