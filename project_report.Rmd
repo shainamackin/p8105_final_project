@@ -508,7 +508,7 @@ actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) 
 
 ```
 
-We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that some activities may have fallen under more than one category (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise or even both). 
+We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that some activities could be considered to fall under more than one category (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise or even both). In our case, we used the definitions provided by ATUS to categorize each activity under one category. 
 
 ```{r eval = FALSE}
 actsum_combined_categorized = actsum_combined %>% 
@@ -925,6 +925,9 @@ activity_codes %in% c("Travel related to personal care",
 We then cleaned the CPS datasets that contained geographic and demographic information. We  selected variables of interest and then renamed them to be more useful, and also recoded variable values. 
 
 ```{r eval = FALSE}
+cps_2019 = read.table("data/atuscps_2019.dat", header = TRUE, sep = ",")
+cps_2020 = read.table("data/atuscps_2020.dat", header = TRUE, sep = ",")
+
 cps_2020_sub = cps_2020 %>% #select geographic variables
   select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
   mutate(year = 2020)
@@ -981,7 +984,7 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
                             `3` = "not identified")) 
 ```
 
-We then merged the CPS files with the Activity Summary files. We then created a summarized data set that contained total time spent on each category of activity for each respondent, and did some final recoding of variables. 
+We then merged the CPS files with the Activity Summary files. We then created a summarized data set that contained total time spent on each category of activity for each respondent, and did some final recoding of variables. We used write_csv to save a csv version of this data set(summary_household_category) which was used for our analyses.  
 
 ```{r eval = FALSE}
 
@@ -997,11 +1000,6 @@ summary_household_category <- cps_summary_merged %>%
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
-    summary_household_category$race %in% c(4, 7) ~ "Asian",
-    summary_household_category$race %in% c(1) ~ "White", 
-    summary_household_category$race %in% c(2, 6) ~ "Black",
-    summary_household_category$race %in% c(5) ~ "Hawaiian/Pacific Islander",
-    TRUE ~ "unknown",
     summary_household_category$race %in% c(1) ~ "White",
     summary_household_category$race %in% c(2) ~ "Black", 
     summary_household_category$race %in% c(3) ~ "American Indian",
@@ -1027,6 +1025,7 @@ summary_household_category$sex <-
     TRUE ~ "unknown"
   ))
 
+write_csv(summary_household_category, "summary_household_category.csv")
 ```
 
 # Exploratory Analysis

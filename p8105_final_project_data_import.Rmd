@@ -900,11 +900,13 @@ Let's read in and tidy the cps files that have the geographic information. First
 ```{r}
 cps_2020_sub = cps_2020 %>% #select geographic variables
   select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
-  mutate(year = 2020)
+  mutate(year = 2020) %>% 
+  filter(TULINENO == 1)
 
 cps_2019_sub = cps_2019 %>% #select geographic variables
   select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
-  mutate(year = 2019)
+  mutate(year = 2019) %>% 
+  filter(TULINENO == 1)
 
 #stack the 2019 and 2020 cps datasets
 
