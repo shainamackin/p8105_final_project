@@ -1061,7 +1061,7 @@ socializing %>%
   mutate(average_hours = (sum_time_weight/sum(weight))/60)  
 
 
-socializing = read_csv("socializing.csv")
+socializing = read_csv("./data/socializing.csv")
 
 ```
 

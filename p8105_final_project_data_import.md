@@ -944,11 +944,13 @@ values.
 ``` r
 cps_2020_sub = cps_2020 %>% #select geographic variables
   select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
-  mutate(year = 2020)
+  mutate(year = 2020) %>% 
+  filter(TULINENO == 1)
 
 cps_2019_sub = cps_2019 %>% #select geographic variables
   select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
-  mutate(year = 2019)
+  mutate(year = 2019) %>% 
+  filter(TULINENO == 1)
 
 #stack the 2019 and 2020 cps datasets
 
@@ -1042,14 +1044,14 @@ print(category_time)
     ## # A tibble: 16 × 4
     ##    category              `2019` `2020` percent_change
     ##    <chr>                  <dbl>  <dbl>          <dbl>
-    ##  1 sleep                    9      9.1            1.1
-    ##  2 work                     7.6    7.6            0  
-    ##  3 education                5.8    5.3           -8.6
-    ##  4 leisure                  5.1    5.4            5.9
+    ##  1 sleep                    8.9    9              1.1
+    ##  2 work                     7.5    7.5            0  
+    ##  3 education                5.4    5.2           -3.7
+    ##  4 leisure                  5      5.3            6  
     ##  5 household                2.3    2.5            8.7
     ##  6 volunteer                2.3    2            -13  
     ##  7 caring_duties            1.7    2             17.6
-    ##  8 exercise                 1.7    1.5          -11.8
+    ##  8 exercise                 1.6    1.5           -6.3
     ##  9 religious_spiritual      1.5    1.4           -6.7
     ## 10 traveling                1.4    1.2          -14.3
     ## 11 eating_drinking          1.1    1.1            0  
@@ -1065,16 +1067,7 @@ print(category_time)
 #race, age, sex, labor force status, and state 
 #First we need to recode race, sex, and labor force status
 library(table1)
-table(summary_household_category$race)
-```
 
-    ## 
-    ##      1      2      3      4      5      6      7      8      9     10     11 
-    ## 249101  39151   2465  14161    578   1173   1666    748     51    153     51 
-    ##     12     13     15     16     17     19     21     23 
-    ##     34     17     34    170     17     34     68     17
-
-``` r
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
     summary_household_category$race %in% c(4, 7) ~ "Asian",
@@ -1244,34 +1237,90 @@ table1(~ race + age + sex + labor_force_status + region|year, data = unique_hous
 </tr>
 <tr>
 <td class='rowlabel'>Midwest</td>
-<td>1799 (19.1%)</td>
+<td>1798 (19.1%)</td>
 <td>1673 (19.1%)</td>
-<td>3472 (19.1%)</td>
+<td>3471 (19.1%)</td>
 </tr>
 <tr>
 <td class='rowlabel'>Northeast</td>
-<td>1277 (13.5%)</td>
-<td>1188 (13.5%)</td>
-<td>2465 (13.5%)</td>
+<td>1275 (13.5%)</td>
+<td>1184 (13.5%)</td>
+<td>2459 (13.5%)</td>
 </tr>
 <tr>
 <td class='rowlabel'>South</td>
 <td>2953 (31.3%)</td>
-<td>2652 (30.2%)</td>
-<td>5605 (30.8%)</td>
+<td>2646 (30.1%)</td>
+<td>5599 (30.7%)</td>
 </tr>
 <tr>
 <td class='rowlabel'>West</td>
-<td>1667 (17.7%)</td>
-<td>1639 (18.7%)</td>
-<td>3306 (18.1%)</td>
+<td>1665 (17.6%)</td>
+<td>1638 (18.7%)</td>
+<td>3303 (18.1%)</td>
 </tr>
 <tr>
 <td class='rowlabel lastrow'>Missing</td>
-<td class='lastrow'>1739 (18.4%)</td>
-<td class='lastrow'>1630 (18.6%)</td>
-<td class='lastrow'>3369 (18.5%)</td>
+<td class='lastrow'>1744 (18.5%)</td>
+<td class='lastrow'>1641 (18.7%)</td>
+<td class='lastrow'>3385 (18.6%)</td>
 </tr>
 </tbody>
 </table>
 </div>
+
+``` r
+write_csv(summary_household_category, "summary_household_category.csv")
+```
+
+Create separate dataset filtered for socializing codes.
+
+``` r
+socializing = 
+  cps_summary_merged %>% 
+  filter(activity_codes %in% c("Socializing and communicating",
+"Socializing and communicating with others",
+"Attending/hosting social events, n.e.c.*",
+"Socializing, relaxing, and leisure, n.e.c.*",
+"Socializing, relaxing, and leisure as part of job")) %>% 
+  mutate(time_weight = weight*total_minutes) 
+
+socializing %>% 
+  group_by(TUCASEID, weight, year) %>% 
+  summarize(sum_time_weight = sum(time_weight), 
+            sum_total_minutes = sum(total_minutes)) %>% 
+  mutate(average_hours = (sum_time_weight/sum(weight))/60)  
+```
+
+    ## `summarise()` has grouped output by 'TUCASEID', 'weight'. You can override using the `.groups` argument.
+
+    ## # A tibble: 18,217 × 6
+    ## # Groups:   TUCASEID, weight [18,217]
+    ##    TUCASEID    weight  year sum_time_weight sum_total_minutes average_hours
+    ##       <dbl>     <dbl> <dbl>           <dbl>             <int>         <dbl>
+    ##  1  2.02e13  2286291.  2019              0                  0         0    
+    ##  2  2.02e13 53729031.  2019              0                  0         0    
+    ##  3  2.02e13 23789099.  2019              0                  0         0    
+    ##  4  2.02e13 22241500.  2019              0                  0         0    
+    ##  5  2.02e13  2599757.  2019       90991482.                35         0.583
+    ##  6  2.02e13 17223161.  2019      688926421.                40         0.667
+    ##  7  2.02e13  5515376.  2019              0                  0         0    
+    ##  8  2.02e13  7640780.  2019              0                  0         0    
+    ##  9  2.02e13  2865212.  2019              0                  0         0    
+    ## 10  2.02e13 17748277.  2019              0                  0         0    
+    ## # … with 18,207 more rows
+
+``` r
+socializing = read_csv("./data/socializing.csv")
+```
+
+    ## Rows: 18217 Columns: 19
+
+    ## ── Column specification ────────────────────────────────────────────────────────
+    ## Delimiter: ","
+    ## chr  (8): race, labor_force_status, sex, category, region, division, state, ...
+    ## dbl (11): TUCASEID, weight, age, day, year, TULINENO, metro_area, county, ca...
+
+    ## 
+    ## ℹ Use `spec()` to retrieve the full column specification for this data.
+    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.

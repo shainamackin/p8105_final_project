@@ -936,57 +936,59 @@ body {
 <p>Let’s read in and tidy the cps files that have the geographic information. First we’ll select the appropriate columns from cps and then rename the columns to be more useful. Then we’ll recode the column values.</p>
 <div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>cps_2020_sub <span class="ot">=</span> cps_2020 <span class="sc">%&gt;%</span> <span class="co">#select geographic variables</span></span>
 <span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(TUCASEID<span class="sc">:</span>GTCO, PRTAGE, PESEX) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2020</span>)</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>cps_2019_sub <span class="ot">=</span> cps_2019 <span class="sc">%&gt;%</span> <span class="co">#select geographic variables</span></span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(TUCASEID<span class="sc">:</span>GTCO, PRTAGE, PESEX) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2019</span>)</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="co">#stack the 2019 and 2020 cps datasets</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2020</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TULINENO <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>cps_2019_sub <span class="ot">=</span> cps_2019 <span class="sc">%&gt;%</span> <span class="co">#select geographic variables</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(TUCASEID<span class="sc">:</span>GTCO, PRTAGE, PESEX) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">year =</span> <span class="dv">2019</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(TULINENO <span class="sc">==</span> <span class="dv">1</span>)</span>
 <span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>cps_combined <span class="ot">=</span> <span class="fu">rbind</span>(cps_2019_sub, cps_2020_sub) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">division =</span> GEDIV, </span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">region =</span> GEREG, </span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">state =</span> GESTFIPS, </span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">metro_area =</span> GTCBSA, </span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">metro_status =</span> GTMETSTA, </span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">county =</span> GTCO,</span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">age =</span> PRTAGE, </span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">sex =</span> PESEX) <span class="sc">%&gt;%</span> </span>
-<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">recode</span>(state,</span>
-<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">1 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AL&quot;</span>, <span class="st">`</span><span class="at">17</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;IL&quot;</span>, <span class="st">`</span><span class="at">30</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;MT&quot;</span>, <span class="st">`</span><span class="at">44</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;RI&quot;</span>,</span>
-<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">2 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AK&quot;</span>, <span class="st">`</span><span class="at">18</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;IN&quot;</span>, <span class="st">`</span><span class="at">31</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NE&quot;</span>, <span class="st">`</span><span class="at">45</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SC&quot;</span>,</span>
-<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">4 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AZ&quot;</span>, <span class="st">`</span><span class="at">19</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;IA&quot;</span>, <span class="st">`</span><span class="at">32</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NV&quot;</span>, <span class="st">`</span><span class="at">46</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SD&quot;</span>,</span>
-<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">5 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AR&quot;</span>, <span class="st">`</span><span class="at">20</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;KS&quot;</span>, <span class="st">`</span><span class="at">33</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NH&quot;</span>, <span class="st">`</span><span class="at">47</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;TN&quot;</span>,</span>
-<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">6 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;CA&quot;</span>, <span class="st">`</span><span class="at">21</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;KY&quot;</span>, <span class="st">`</span><span class="at">34</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NJ&quot;</span>, <span class="st">`</span><span class="at">48</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;TX&quot;</span>,</span>
-<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">8 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;CO&quot;</span>, <span class="st">`</span><span class="at">22</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;LA&quot;</span>, <span class="st">`</span><span class="at">35</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NM&quot;</span>, <span class="st">`</span><span class="at">49</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;UT&quot;</span>,</span>
-<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">9 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;CT&quot;</span>, <span class="st">`</span><span class="at">23</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;ME&quot;</span>, <span class="st">`</span><span class="at">36</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NY&quot;</span>, <span class="st">`</span><span class="at">50</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;VT&quot;</span>,</span>
-<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">10</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;DE&quot;</span>, <span class="st">`</span><span class="at">24</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MD&quot;</span>, <span class="st">`</span><span class="at">37</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NC&quot;</span>, <span class="st">`</span><span class="at">51</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;VA&quot;</span>,</span>
-<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">11</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;DC&quot;</span>, <span class="st">`</span><span class="at">25</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MA&quot;</span>, <span class="st">`</span><span class="at">38</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;ND&quot;</span>, <span class="st">`</span><span class="at">53</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WA&quot;</span>,</span>
-<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">12</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;FL&quot;</span>, <span class="st">`</span><span class="at">26</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MI&quot;</span>, <span class="st">`</span><span class="at">39</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;OH&quot;</span>, <span class="st">`</span><span class="at">54</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WV&quot;</span>,</span>
-<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">13</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;GA&quot;</span>, <span class="st">`</span><span class="at">27</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MN&quot;</span>, <span class="st">`</span><span class="at">40</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;OK&quot;</span>, <span class="st">`</span><span class="at">55</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WI&quot;</span>,</span>
-<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">15</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;HI&quot;</span>, <span class="st">`</span><span class="at">28</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MS&quot;</span>, <span class="st">`</span><span class="at">41</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;OR&quot;</span>, <span class="st">`</span><span class="at">56</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WY&quot;</span>,</span>
-<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">16</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;ID&quot;</span>, <span class="st">`</span><span class="at">29</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MO&quot;</span>, <span class="st">`</span><span class="at">42</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;PA&quot;</span>), </span>
-<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a>        <span class="at">region =</span> <span class="fu">recode</span>(region, </span>
-<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Northeast&quot;</span>, </span>
-<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Midwest&quot;</span>, </span>
-<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;South&quot;</span>, </span>
-<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;West&quot;</span>), </span>
-<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>        <span class="at">division =</span> <span class="fu">recode</span>(division, </span>
-<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;New England&quot;</span>,</span>
-<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Middle Atlantic&quot;</span>,</span>
-<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;East North Central&quot;</span>,</span>
-<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;West North Central&quot;</span>,</span>
-<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">5</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;South Atlantic&quot;</span>,</span>
-<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">6</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;East South Central&quot;</span>,</span>
-<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">7</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;West South Central&quot;</span>,</span>
-<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">8</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Mountain&quot;</span>,</span>
-<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">9</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Pacific&quot;</span></span>
-<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>                          ), </span>
-<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>        <span class="at">metro_status =</span> <span class="fu">recode</span>(metro_status, </span>
-<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>                            <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;metropolitan&quot;</span>, </span>
-<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>                            <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;non-metropolitan&quot;</span>, </span>
-<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>                            <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;not identified&quot;</span>)) </span></code></pre></div>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="co">#stack the 2019 and 2020 cps datasets</span></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>cps_combined <span class="ot">=</span> <span class="fu">rbind</span>(cps_2019_sub, cps_2020_sub) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">division =</span> GEDIV, </span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>         <span class="at">region =</span> GEREG, </span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>         <span class="at">state =</span> GESTFIPS, </span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">metro_area =</span> GTCBSA, </span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>         <span class="at">metro_status =</span> GTMETSTA, </span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>         <span class="at">county =</span> GTCO,</span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>         <span class="at">age =</span> PRTAGE, </span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a>         <span class="at">sex =</span> PESEX) <span class="sc">%&gt;%</span> </span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">state =</span> <span class="fu">recode</span>(state,</span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">1 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AL&quot;</span>, <span class="st">`</span><span class="at">17</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;IL&quot;</span>, <span class="st">`</span><span class="at">30</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;MT&quot;</span>, <span class="st">`</span><span class="at">44</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;RI&quot;</span>,</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">2 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AK&quot;</span>, <span class="st">`</span><span class="at">18</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;IN&quot;</span>, <span class="st">`</span><span class="at">31</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NE&quot;</span>, <span class="st">`</span><span class="at">45</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SC&quot;</span>,</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">4 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AZ&quot;</span>, <span class="st">`</span><span class="at">19</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;IA&quot;</span>, <span class="st">`</span><span class="at">32</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NV&quot;</span>, <span class="st">`</span><span class="at">46</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;SD&quot;</span>,</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">5 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;AR&quot;</span>, <span class="st">`</span><span class="at">20</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;KS&quot;</span>, <span class="st">`</span><span class="at">33</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NH&quot;</span>, <span class="st">`</span><span class="at">47</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;TN&quot;</span>,</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">6 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;CA&quot;</span>, <span class="st">`</span><span class="at">21</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;KY&quot;</span>, <span class="st">`</span><span class="at">34</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NJ&quot;</span>, <span class="st">`</span><span class="at">48</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;TX&quot;</span>,</span>
+<span id="cb10-28"><a href="#cb10-28" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">8 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;CO&quot;</span>, <span class="st">`</span><span class="at">22</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;LA&quot;</span>, <span class="st">`</span><span class="at">35</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NM&quot;</span>, <span class="st">`</span><span class="at">49</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;UT&quot;</span>,</span>
+<span id="cb10-29"><a href="#cb10-29" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">9 </span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;CT&quot;</span>, <span class="st">`</span><span class="at">23</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;ME&quot;</span>, <span class="st">`</span><span class="at">36</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NY&quot;</span>, <span class="st">`</span><span class="at">50</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;VT&quot;</span>,</span>
+<span id="cb10-30"><a href="#cb10-30" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">10</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;DE&quot;</span>, <span class="st">`</span><span class="at">24</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MD&quot;</span>, <span class="st">`</span><span class="at">37</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;NC&quot;</span>, <span class="st">`</span><span class="at">51</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;VA&quot;</span>,</span>
+<span id="cb10-31"><a href="#cb10-31" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">11</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;DC&quot;</span>, <span class="st">`</span><span class="at">25</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MA&quot;</span>, <span class="st">`</span><span class="at">38</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;ND&quot;</span>, <span class="st">`</span><span class="at">53</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WA&quot;</span>,</span>
+<span id="cb10-32"><a href="#cb10-32" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">12</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;FL&quot;</span>, <span class="st">`</span><span class="at">26</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MI&quot;</span>, <span class="st">`</span><span class="at">39</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;OH&quot;</span>, <span class="st">`</span><span class="at">54</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WV&quot;</span>,</span>
+<span id="cb10-33"><a href="#cb10-33" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">13</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;GA&quot;</span>, <span class="st">`</span><span class="at">27</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MN&quot;</span>, <span class="st">`</span><span class="at">40</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;OK&quot;</span>, <span class="st">`</span><span class="at">55</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WI&quot;</span>,</span>
+<span id="cb10-34"><a href="#cb10-34" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">15</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;HI&quot;</span>, <span class="st">`</span><span class="at">28</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MS&quot;</span>, <span class="st">`</span><span class="at">41</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;OR&quot;</span>, <span class="st">`</span><span class="at">56</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;WY&quot;</span>,</span>
+<span id="cb10-35"><a href="#cb10-35" aria-hidden="true" tabindex="-1"></a><span class="st">`</span><span class="at">16</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;ID&quot;</span>, <span class="st">`</span><span class="at">29</span><span class="st">`</span><span class="ot">=</span> <span class="st">&quot;MO&quot;</span>, <span class="st">`</span><span class="at">42</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;PA&quot;</span>), </span>
+<span id="cb10-36"><a href="#cb10-36" aria-hidden="true" tabindex="-1"></a>        <span class="at">region =</span> <span class="fu">recode</span>(region, </span>
+<span id="cb10-37"><a href="#cb10-37" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Northeast&quot;</span>, </span>
+<span id="cb10-38"><a href="#cb10-38" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Midwest&quot;</span>, </span>
+<span id="cb10-39"><a href="#cb10-39" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;South&quot;</span>, </span>
+<span id="cb10-40"><a href="#cb10-40" aria-hidden="true" tabindex="-1"></a>                        <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;West&quot;</span>), </span>
+<span id="cb10-41"><a href="#cb10-41" aria-hidden="true" tabindex="-1"></a>        <span class="at">division =</span> <span class="fu">recode</span>(division, </span>
+<span id="cb10-42"><a href="#cb10-42" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;New England&quot;</span>,</span>
+<span id="cb10-43"><a href="#cb10-43" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Middle Atlantic&quot;</span>,</span>
+<span id="cb10-44"><a href="#cb10-44" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;East North Central&quot;</span>,</span>
+<span id="cb10-45"><a href="#cb10-45" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">4</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;West North Central&quot;</span>,</span>
+<span id="cb10-46"><a href="#cb10-46" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">5</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;South Atlantic&quot;</span>,</span>
+<span id="cb10-47"><a href="#cb10-47" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">6</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;East South Central&quot;</span>,</span>
+<span id="cb10-48"><a href="#cb10-48" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">7</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;West South Central&quot;</span>,</span>
+<span id="cb10-49"><a href="#cb10-49" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">8</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Mountain&quot;</span>,</span>
+<span id="cb10-50"><a href="#cb10-50" aria-hidden="true" tabindex="-1"></a>                          <span class="st">`</span><span class="at">9</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;Pacific&quot;</span></span>
+<span id="cb10-51"><a href="#cb10-51" aria-hidden="true" tabindex="-1"></a>                          ), </span>
+<span id="cb10-52"><a href="#cb10-52" aria-hidden="true" tabindex="-1"></a>        <span class="at">metro_status =</span> <span class="fu">recode</span>(metro_status, </span>
+<span id="cb10-53"><a href="#cb10-53" aria-hidden="true" tabindex="-1"></a>                            <span class="st">`</span><span class="at">1</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;metropolitan&quot;</span>, </span>
+<span id="cb10-54"><a href="#cb10-54" aria-hidden="true" tabindex="-1"></a>                            <span class="st">`</span><span class="at">2</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;non-metropolitan&quot;</span>, </span>
+<span id="cb10-55"><a href="#cb10-55" aria-hidden="true" tabindex="-1"></a>                            <span class="st">`</span><span class="at">3</span><span class="st">`</span> <span class="ot">=</span> <span class="st">&quot;not identified&quot;</span>)) </span></code></pre></div>
 <p>Merge the cps and summary datafiles and then group the merged dataset by case ID (TUCASEID) and category.</p>
 <div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>cps_summary_merged <span class="ot">=</span> <span class="fu">left_join</span>(actsum_combined_categorized, cps_combined, <span class="at">by =</span> <span class="fu">c</span>(<span class="st">&quot;TUCASEID&quot;</span>, <span class="st">&quot;age&quot;</span>, <span class="st">&quot;year&quot;</span>, <span class="st">&quot;sex&quot;</span>))</span>
 <span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a></span>
@@ -1017,14 +1019,14 @@ body {
 <pre><code>## # A tibble: 16 × 4
 ##    category              `2019` `2020` percent_change
 ##    &lt;chr&gt;                  &lt;dbl&gt;  &lt;dbl&gt;          &lt;dbl&gt;
-##  1 sleep                    9      9.1            1.1
-##  2 work                     7.6    7.6            0  
-##  3 education                5.8    5.3           -8.6
-##  4 leisure                  5.1    5.4            5.9
+##  1 sleep                    8.9    9              1.1
+##  2 work                     7.5    7.5            0  
+##  3 education                5.4    5.2           -3.7
+##  4 leisure                  5      5.3            6  
 ##  5 household                2.3    2.5            8.7
 ##  6 volunteer                2.3    2            -13  
 ##  7 caring_duties            1.7    2             17.6
-##  8 exercise                 1.7    1.5          -11.8
+##  8 exercise                 1.6    1.5           -6.3
 ##  9 religious_spiritual      1.5    1.4           -6.7
 ## 10 traveling                1.4    1.2          -14.3
 ## 11 eating_drinking          1.1    1.1            0  
@@ -1037,49 +1039,44 @@ body {
 <div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="co">#race, age, sex, labor force status, and state </span></span>
 <span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">#First we need to recode race, sex, and labor force status</span></span>
 <span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(table1)</span>
-<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(summary_household_category<span class="sc">$</span>race)</span></code></pre></div>
-<pre><code>## 
-##      1      2      3      4      5      6      7      8      9     10     11 
-## 249101  39151   2465  14161    578   1173   1666    748     51    153     51 
-##     12     13     15     16     17     19     21     23 
-##     34     17     34    170     17     34     68     17</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>summary_household_category<span class="sc">$</span>race <span class="ot">&lt;-</span> <span class="co"># Need to review race categorization</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_factor</span>(<span class="fu">case_when</span>(</span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">7</span>) <span class="sc">~</span> <span class="st">&quot;Asian&quot;</span>,</span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>) <span class="sc">~</span> <span class="st">&quot;White&quot;</span>, </span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">6</span>) <span class="sc">~</span> <span class="st">&quot;Black&quot;</span>,</span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">5</span>) <span class="sc">~</span> <span class="st">&quot;Hawaiian/Pacific Islander&quot;</span>,</span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;unknown&quot;</span>,</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>) <span class="sc">~</span> <span class="st">&quot;White&quot;</span>,</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2</span>) <span class="sc">~</span> <span class="st">&quot;Black&quot;</span>, </span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>) <span class="sc">~</span> <span class="st">&quot;American Indian&quot;</span>,</span>
-<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">4</span>) <span class="sc">~</span> <span class="st">&quot;Asian&quot;</span>,</span>
-<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">5</span>) <span class="sc">~</span> <span class="st">&quot;Hawaiian/Pacific Islander&quot;</span>,</span>
-<span id="cb18-13"><a href="#cb18-13" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;2+ races&quot;</span></span>
-<span id="cb18-14"><a href="#cb18-14" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb18-15"><a href="#cb18-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-16"><a href="#cb18-16" aria-hidden="true" tabindex="-1"></a>summary_household_category<span class="sc">$</span>labor_force_status <span class="ot">&lt;-</span></span>
-<span id="cb18-17"><a href="#cb18-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_factor</span>(<span class="fu">case_when</span>(</span>
-<span id="cb18-18"><a href="#cb18-18" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;Employed-At work&quot;</span>,</span>
-<span id="cb18-19"><a href="#cb18-19" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;Employed-Absent&quot;</span>,</span>
-<span id="cb18-20"><a href="#cb18-20" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">&quot;Unemployed-On layoff&quot;</span>,</span>
-<span id="cb18-21"><a href="#cb18-21" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">&quot;Unemployed-Looking&quot;</span>,</span>
-<span id="cb18-22"><a href="#cb18-22" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">&quot;Retired&quot;</span>,</span>
-<span id="cb18-23"><a href="#cb18-23" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;unknown&quot;</span></span>
-<span id="cb18-24"><a href="#cb18-24" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb18-25"><a href="#cb18-25" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-26"><a href="#cb18-26" aria-hidden="true" tabindex="-1"></a>summary_household_category<span class="sc">$</span>sex <span class="ot">&lt;-</span></span>
-<span id="cb18-27"><a href="#cb18-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_factor</span>(<span class="fu">case_when</span>(</span>
-<span id="cb18-28"><a href="#cb18-28" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>sex <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;Male&quot;</span>,</span>
-<span id="cb18-29"><a href="#cb18-29" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>sex <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;Female&quot;</span>,</span>
-<span id="cb18-30"><a href="#cb18-30" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;unknown&quot;</span></span>
-<span id="cb18-31"><a href="#cb18-31" aria-hidden="true" tabindex="-1"></a>  ))</span>
-<span id="cb18-32"><a href="#cb18-32" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-33"><a href="#cb18-33" aria-hidden="true" tabindex="-1"></a>unique_household <span class="ot">&lt;-</span> summary_household_category <span class="sc">%&gt;%</span></span>
-<span id="cb18-34"><a href="#cb18-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TUCASEID) <span class="sc">%&gt;%</span> </span>
-<span id="cb18-35"><a href="#cb18-35" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">==</span> <span class="dv">1</span>) </span>
-<span id="cb18-36"><a href="#cb18-36" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-37"><a href="#cb18-37" aria-hidden="true" tabindex="-1"></a><span class="fu">table1</span>(<span class="sc">~</span> race <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> labor_force_status <span class="sc">+</span> region<span class="sc">|</span>year, <span class="at">data =</span> unique_household)</span></code></pre></div>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>summary_household_category<span class="sc">$</span>race <span class="ot">&lt;-</span> <span class="co"># Need to review race categorization</span></span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_factor</span>(<span class="fu">case_when</span>(</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">4</span>, <span class="dv">7</span>) <span class="sc">~</span> <span class="st">&quot;Asian&quot;</span>,</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>) <span class="sc">~</span> <span class="st">&quot;White&quot;</span>, </span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">6</span>) <span class="sc">~</span> <span class="st">&quot;Black&quot;</span>,</span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">5</span>) <span class="sc">~</span> <span class="st">&quot;Hawaiian/Pacific Islander&quot;</span>,</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;unknown&quot;</span>,</span>
+<span id="cb16-12"><a href="#cb16-12" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>) <span class="sc">~</span> <span class="st">&quot;White&quot;</span>,</span>
+<span id="cb16-13"><a href="#cb16-13" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">2</span>) <span class="sc">~</span> <span class="st">&quot;Black&quot;</span>, </span>
+<span id="cb16-14"><a href="#cb16-14" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>) <span class="sc">~</span> <span class="st">&quot;American Indian&quot;</span>,</span>
+<span id="cb16-15"><a href="#cb16-15" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">4</span>) <span class="sc">~</span> <span class="st">&quot;Asian&quot;</span>,</span>
+<span id="cb16-16"><a href="#cb16-16" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>race <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">5</span>) <span class="sc">~</span> <span class="st">&quot;Hawaiian/Pacific Islander&quot;</span>,</span>
+<span id="cb16-17"><a href="#cb16-17" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;2+ races&quot;</span></span>
+<span id="cb16-18"><a href="#cb16-18" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb16-19"><a href="#cb16-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-20"><a href="#cb16-20" aria-hidden="true" tabindex="-1"></a>summary_household_category<span class="sc">$</span>labor_force_status <span class="ot">&lt;-</span></span>
+<span id="cb16-21"><a href="#cb16-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_factor</span>(<span class="fu">case_when</span>(</span>
+<span id="cb16-22"><a href="#cb16-22" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;Employed-At work&quot;</span>,</span>
+<span id="cb16-23"><a href="#cb16-23" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;Employed-Absent&quot;</span>,</span>
+<span id="cb16-24"><a href="#cb16-24" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">&quot;Unemployed-On layoff&quot;</span>,</span>
+<span id="cb16-25"><a href="#cb16-25" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">&quot;Unemployed-Looking&quot;</span>,</span>
+<span id="cb16-26"><a href="#cb16-26" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>labor_force_status <span class="sc">==</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">&quot;Retired&quot;</span>,</span>
+<span id="cb16-27"><a href="#cb16-27" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;unknown&quot;</span></span>
+<span id="cb16-28"><a href="#cb16-28" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb16-29"><a href="#cb16-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-30"><a href="#cb16-30" aria-hidden="true" tabindex="-1"></a>summary_household_category<span class="sc">$</span>sex <span class="ot">&lt;-</span></span>
+<span id="cb16-31"><a href="#cb16-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_factor</span>(<span class="fu">case_when</span>(</span>
+<span id="cb16-32"><a href="#cb16-32" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>sex <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;Male&quot;</span>,</span>
+<span id="cb16-33"><a href="#cb16-33" aria-hidden="true" tabindex="-1"></a>    summary_household_category<span class="sc">$</span>sex <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;Female&quot;</span>,</span>
+<span id="cb16-34"><a href="#cb16-34" aria-hidden="true" tabindex="-1"></a>    <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">&quot;unknown&quot;</span></span>
+<span id="cb16-35"><a href="#cb16-35" aria-hidden="true" tabindex="-1"></a>  ))</span>
+<span id="cb16-36"><a href="#cb16-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-37"><a href="#cb16-37" aria-hidden="true" tabindex="-1"></a>unique_household <span class="ot">&lt;-</span> summary_household_category <span class="sc">%&gt;%</span></span>
+<span id="cb16-38"><a href="#cb16-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TUCASEID) <span class="sc">%&gt;%</span> </span>
+<span id="cb16-39"><a href="#cb16-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">row_number</span>() <span class="sc">==</span> <span class="dv">1</span>) </span>
+<span id="cb16-40"><a href="#cb16-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-41"><a href="#cb16-41" aria-hidden="true" tabindex="-1"></a><span class="fu">table1</span>(<span class="sc">~</span> race <span class="sc">+</span> age <span class="sc">+</span> sex <span class="sc">+</span> labor_force_status <span class="sc">+</span> region<span class="sc">|</span>year, <span class="at">data =</span> unique_household)</span></code></pre></div>
 <pre><code>## Warning in table1.formula(~race + age + sex + labor_force_status + region | :
 ## Terms to the right of &#39;|&#39; in formula &#39;x&#39; define table columns and are expected
 ## to be factors with meaningful labels.</code></pre>
@@ -1209,37 +1206,82 @@ body {
 </tr>
 <tr>
 <td class="rowlabel">Midwest</td>
-<td>1799 (19.1%)</td>
+<td>1798 (19.1%)</td>
 <td>1673 (19.1%)</td>
-<td>3472 (19.1%)</td>
+<td>3471 (19.1%)</td>
 </tr>
 <tr>
 <td class="rowlabel">Northeast</td>
-<td>1277 (13.5%)</td>
-<td>1188 (13.5%)</td>
-<td>2465 (13.5%)</td>
+<td>1275 (13.5%)</td>
+<td>1184 (13.5%)</td>
+<td>2459 (13.5%)</td>
 </tr>
 <tr>
 <td class="rowlabel">South</td>
 <td>2953 (31.3%)</td>
-<td>2652 (30.2%)</td>
-<td>5605 (30.8%)</td>
+<td>2646 (30.1%)</td>
+<td>5599 (30.7%)</td>
 </tr>
 <tr>
 <td class="rowlabel">West</td>
-<td>1667 (17.7%)</td>
-<td>1639 (18.7%)</td>
-<td>3306 (18.1%)</td>
+<td>1665 (17.6%)</td>
+<td>1638 (18.7%)</td>
+<td>3303 (18.1%)</td>
 </tr>
 <tr>
 <td class="rowlabel lastrow">Missing</td>
-<td class="lastrow">1739 (18.4%)</td>
-<td class="lastrow">1630 (18.6%)</td>
-<td class="lastrow">3369 (18.5%)</td>
+<td class="lastrow">1744 (18.5%)</td>
+<td class="lastrow">1641 (18.7%)</td>
+<td class="lastrow">3385 (18.6%)</td>
 </tr>
 </tbody>
 </table>
 </div>
+
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">write_csv</span>(summary_household_category, <span class="st">&quot;summary_household_category.csv&quot;</span>)</span></code></pre></div>
+<p>Create separate dataset filtered for socializing codes.</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>socializing <span class="ot">=</span> </span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>  cps_summary_merged <span class="sc">%&gt;%</span> </span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(activity_codes <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">&quot;Socializing and communicating&quot;</span>,</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Socializing and communicating with others&quot;</span>,</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Attending/hosting social events, n.e.c.*&quot;</span>,</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Socializing, relaxing, and leisure, n.e.c.*&quot;</span>,</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;Socializing, relaxing, and leisure as part of job&quot;</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">time_weight =</span> weight<span class="sc">*</span>total_minutes) </span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>socializing <span class="sc">%&gt;%</span> </span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(TUCASEID, weight, year) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">sum_time_weight =</span> <span class="fu">sum</span>(time_weight), </span>
+<span id="cb19-13"><a href="#cb19-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">sum_total_minutes =</span> <span class="fu">sum</span>(total_minutes)) <span class="sc">%&gt;%</span> </span>
+<span id="cb19-14"><a href="#cb19-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">average_hours =</span> (sum_time_weight<span class="sc">/</span><span class="fu">sum</span>(weight))<span class="sc">/</span><span class="dv">60</span>)  </span></code></pre></div>
+<pre><code>## `summarise()` has grouped output by &#39;TUCASEID&#39;, &#39;weight&#39;. You can override using the `.groups` argument.
+
+## # A tibble: 18,217 × 6
+## # Groups:   TUCASEID, weight [18,217]
+##    TUCASEID    weight  year sum_time_weight sum_total_minutes average_hours
+##       &lt;dbl&gt;     &lt;dbl&gt; &lt;dbl&gt;           &lt;dbl&gt;             &lt;int&gt;         &lt;dbl&gt;
+##  1  2.02e13  2286291.  2019              0                  0         0    
+##  2  2.02e13 53729031.  2019              0                  0         0    
+##  3  2.02e13 23789099.  2019              0                  0         0    
+##  4  2.02e13 22241500.  2019              0                  0         0    
+##  5  2.02e13  2599757.  2019       90991482.                35         0.583
+##  6  2.02e13 17223161.  2019      688926421.                40         0.667
+##  7  2.02e13  5515376.  2019              0                  0         0    
+##  8  2.02e13  7640780.  2019              0                  0         0    
+##  9  2.02e13  2865212.  2019              0                  0         0    
+## 10  2.02e13 17748277.  2019              0                  0         0    
+## # … with 18,207 more rows</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>socializing <span class="ot">=</span> <span class="fu">read_csv</span>(<span class="st">&quot;./data/socializing.csv&quot;</span>)</span></code></pre></div>
+<pre><code>## Rows: 18217 Columns: 19
+
+## ── Column specification ────────────────────────────────────────────────────────
+## Delimiter: &quot;,&quot;
+## chr  (8): race, labor_force_status, sex, category, region, division, state, ...
+## dbl (11): TUCASEID, weight, age, day, year, TULINENO, metro_area, county, ca...
+
+## 
+## ℹ Use `spec()` to retrieve the full column specification for this data.
+## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
 
 </body>
 </html>
