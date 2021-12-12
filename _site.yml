@@ -20,7 +20,7 @@ navbar:
     - text: "Project Report"
       href: project_report.html
     - icon: fa-youtube
-      href: https://www.youtube.com/watch?v=5oObMqzIwXU
+      href: https://www.youtube.com/watch?v=oVzRGyr--LY
     - icon: fa-envelope fa-lg
       href: mailto:<shainamackin@gmail.com>
     - icon: fa-github fa-lg

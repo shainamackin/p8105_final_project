@@ -26,6 +26,12 @@ __An investigation into American time use trends pre- and post- onset of COVID-1
 
 ![](https://upload.wikimedia.org/wikipedia/commons/f/f4/Analog_clock_animation.gif)
 
+
+<figure class="video_container">
+  <iframe width="800" height="500" src="https://www.youtube.com/embed/oVzRGyr--LY" frameborder="0" allowfullscreen="true"> </iframe>
+</figure>
+
+
 # The Project
 COVID-19 has drastically impacted the ways in which we spend our time. At the onset of the pandemic in the United States -- March 2020 -- initiation of stay-at-home orders, lockdown measures, and social distancing norms rapidly and severely altered daily activities. From time spent with others to time spent at home, we were interested in exploring pandemic impacts on time use and analyzing how they may differ based on social and demographic characteristics across the United States. 
 </p>
