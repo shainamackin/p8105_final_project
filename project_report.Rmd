@@ -506,12 +506,9 @@ actsum_combined = rbind(activity_summary_2019_long, activity_summary_2020_long) 
 
 ```
 
-<<<<<<< HEAD
 We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that some activities could be considered to fall under more than one category (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise or even both). In our case, we used the definitions provided by ATUS to categorize each activity under one category. 
-=======
-We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that activity categorization is subjective (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise), but for the purposes of this analysis we adhered to the operational definitions provided by ATUS. 
->>>>>>> be448ebad1dbebca8d9d1836f2f8871ed53ad2b0
 
+We categorized activity codes into 16 different categories (caring for and helping others, consumer purchases, eating and drinking, education, government services and civic obligations, household activities, household services, personal care, professional and personal care services, religious and spiritual, leisure, sports/exercise, telephone calls, traveling, volunteering and working) using the category definitions provided by ATUS. It is important to note that activity categorization is subjective (i.e., some may consider sports to fall under leisure while others may consider it to fall under exercise), but for the purposes of this analysis we adhered to the operational definitions provided by ATUS. 
 ```{r eval = FALSE}
 actsum_combined_categorized = actsum_combined %>% 
   mutate(category = case_when(
@@ -986,12 +983,8 @@ cps_combined = rbind(cps_2019_sub, cps_2020_sub) %>%
                             `3` = "not identified")) 
 ```
 
-<<<<<<< HEAD
-We then merged the CPS files with the Activity Summary files. We then created a summarized data set that contained total time spent on each category of activity for each respondent, and did some final recoding of variables. We used write_csv to save a csv version of this data set(summary_household_category) which was used for our analyses.  
+We then merged the CPS files with the Activity Summary files and created a summarized data set that contained total time spent on each activity category for each respondent. Lastly, we did some final re-coding of variables including race and labor force status. Race originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation.We used write_csv to save a csv version of this data set(summary_household_category) which was used for our analyses. 
 
-=======
-We then merged the CPS files with the Activity Summary files and created a summarized data set that contained total time spent on each activity category for each respondent. Lastly, we did some final re-coding of variables including race and labor force status. Race originally had over 20 categories, so we grouped all mixed races into 1 category for ease of interpretation.  
->>>>>>> be448ebad1dbebca8d9d1836f2f8871ed53ad2b0
 ```{r eval = FALSE}
 
 cps_summary_merged = left_join(actsum_combined_categorized, cps_combined, by = c("TUCASEID", "age", "year", "sex"))
