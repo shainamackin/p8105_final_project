@@ -57,6 +57,11 @@ We started with the Activity Summary files. Our first step was to pivot from wid
 library(tidyverse)
 library(dplyr)
 library(ggplot2)
+library(modelr)
+library(mgcv)
+
+options(scipen = 50)
+knitr::opts_chunk$set(echo = TRUE)
 
 activity_summary_2019 = read.table("data/atussum_2019.dat", header = TRUE, sep = ",")
 activity_summary_2020 = read.table("data/atussum_2020.dat", header = TRUE, sep = ",")
@@ -1037,7 +1042,7 @@ To produce our summary tables and visualizations, we calculated average hours/mi
 ```{r eval = FALSE}
 
  summary_household_category %>% 
-  drop_na() %>% 
+  drop_na() %>%
   group_by(year, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
             sum_weight = sum(weight)) %>% 
