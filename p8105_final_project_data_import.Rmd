@@ -998,7 +998,6 @@ print(category_time)
 #race, age, sex, labor force status, and state 
 #First we need to recode race, sex, and labor force status
 library(table1)
-table(summary_household_category$race)
 
 summary_household_category$race <- # Need to review race categorization
   as_factor(case_when(
@@ -1062,7 +1061,7 @@ socializing %>%
   mutate(average_hours = (sum_time_weight/sum(weight))/60)  
 
 
-socializing = read_csv("socializing.csv")
+socializing = read_csv("./data/socializing.csv")
 
 ```
 

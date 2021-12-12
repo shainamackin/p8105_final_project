@@ -584,6 +584,7 @@ table1(~ race + age + sex + labor_force_status + region|year, data = cps_summary
 </tbody>
 </table>
 </div>
+<p>Respondents’ demographic characteristics stayed the same from 2019 to 2020. This means that the survey sample did not change significantly. It is reasonable to compare how time spent varied pre and post pandemic using ATUS data.</p>
 <pre class="r"><code>ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
   labs(x = &quot;Age (yrs)&quot;,
        y = &quot;Time Spent on Leisure Activities (hrs/day)&quot;,
