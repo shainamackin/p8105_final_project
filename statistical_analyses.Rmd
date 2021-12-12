@@ -73,13 +73,16 @@ There is a significant difference between 2019 and 2020 in terms of leisure time
 
 Now, we would like to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.
 
-**(Model 1)**: Labor force status
+**(Model 1)**: Labor force status 
+<p/>
 We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.
 
 **(Model 2)**: Demographic characteristics: race, age, and sex
+<p/>
 Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.
 
 **(Model 3)**: Demographic characteristics: race, age, and sex, and their interactions 
+<p/>
 This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.
 
 ```{r model1, message = FALSE, warning = FALSE}

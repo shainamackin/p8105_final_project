@@ -630,9 +630,15 @@ model_year %&gt;%
 </table>
 <p>There is a significant difference between 2019 and 2020 in terms of leisure time spent (p-value &lt;0.05). We expect that leisure time spent in 2020 (post-pandemic onset) is 0.2 hours longer per day than leisure time spent in 2019, on average. This aligns with our hypothesis that after the pandemic, people started spending additional time on leisure activities.</p>
 <p>Now, we would like to fit a few models that we hypothesize may predict time spent on leisure activities based on literature and own experiences.</p>
-<p><strong>(Model 1)</strong>: Labor force status We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.</p>
-<p><strong>(Model 2)</strong>: Demographic characteristics: race, age, and sex Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.</p>
-<p><strong>(Model 3)</strong>: Demographic characteristics: race, age, and sex, and their interactions This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.</p>
+<strong>(Model 1)</strong>: Labor force status
+<p/>
+<p>We believe that one of the strongest predictors of time spent on leisure activities is whether someone is currently employed or not. The categories of labor force status are employed but absent from work (reference group), retired, employed at work, unemployed and looking, and unemployed on layoff.</p>
+<strong>(Model 2)</strong>: Demographic characteristics: race, age, and sex
+<p/>
+<p>Race, age, and sex, are three common demographic variables that we would expend to see trends with for time spent on leisure activity.</p>
+<strong>(Model 3)</strong>: Demographic characteristics: race, age, and sex, and their interactions
+<p/>
+<p>This model builds on model 2 by exploring whether there are any additive or multiplicative interactions present between the 3 demographic variables.</p>
 <pre class="r"><code>model1 = 
   lm(category_sum_hour ~ labor_force_status, data = cps_summary_leisure)
 

@@ -1043,9 +1043,7 @@ write_csv(summary_household_category, "summary_household_category.csv")
 To produce our summary tables and visualizations, we calculated average hours/minutes spent on activities using weights. The weights were created by ATUS to account for the fact that respondents were more likely to participate on weekends vs weekdays, and for the fact that some demographics were more represented than others (for instance, women were more likely to respond than men). To calculate average daily hours/minutes spent on an activity, we multiplied total time spent on the activity by the weight, and then summed all these products together and divided this by the sum of the weights. See the code for this calculation below. 
 
 ```{r  message = FALSE, warning = FALSE}
-
-
- summary_household_category %>% 
+average_hours = summary_household_category %>% 
   drop_na() %>%
   group_by(year, category) %>% 
   summarize(sum_product = sum(category_sum_hour_weight), 
@@ -1184,14 +1182,14 @@ monthly_2020_plotly_minutes = category_time_month_2020 %>%
 
 ```
 
-```{r echo = FALSE, message = FALSE, warning = FALSE  }
+```{r message = FALSE, warning = FALSE  }
 monthly_2020_plotly_hours
 monthly_2020_plotly_minutes
 ```
 
 We plotted socializing trends, including by age. 
 
-```{r}
+```{r warning = FALSE, message = FALSE}
 socializing = read_csv("data/socializing.csv")
 
 socializing %>% 
