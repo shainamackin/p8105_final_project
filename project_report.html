@@ -9,12 +9,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
+<meta name="author" content="Dee Wang (dtw2127), Sandya Ganesh (sg3891), Shaina Mackin (smm2350), Xin Fang (xf2226)" />
 
 
 <title>Project Report</title>
 
 <script src="site_libs/header-attrs-2.10/header-attrs.js"></script>
-<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<script src="site_libs/jquery-3.5.1/jquery.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/lumen.min.css" rel="stylesheet" />
 <script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
@@ -36,6 +37,14 @@
 <script src="site_libs/navigation-1.1/codefolding.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<script src="site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+<script src="site_libs/plotly-binding-4.10.0/plotly.js"></script>
+<script src="site_libs/typedarray-0.1/typedarray.min.js"></script>
+<link href="site_libs/crosstalk-1.1.1/css/crosstalk.css" rel="stylesheet" />
+<script src="site_libs/crosstalk-1.1.1/js/crosstalk.min.js"></script>
+<link href="site_libs/plotly-htmlwidgets-css-2.5.1/plotly-htmlwidgets.css" rel="stylesheet" />
+<script src="site_libs/plotly-main-2.5.1/plotly-latest.min.js"></script>
+<link href="site_libs/table1-1.0/table1_defaults.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet" />
 <link href="site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet" />
 
@@ -392,11 +401,12 @@ div.tocify {
 
 
 <h1 class="title toc-ignore">Project Report</h1>
+<h4 class="author">Dee Wang (dtw2127), Sandya Ganesh (sg3891), Shaina Mackin (smm2350), Xin Fang (xf2226)</h4>
 
 </div>
 
 
-<p><strong>Collaborators: Dee Wang, Sandya Ganesh, Shaina Mackin, Xin Fang</strong> </br></p>
+<p></br></p>
 <div id="project-motivation" class="section level1">
 <h1>Project Motivation</h1>
 </p>
@@ -442,7 +452,16 @@ Data for this project comes from the U.S. Bureau of Labor Statistics’ American
 </p>
 <p>We started with the Activity Summary files. Our first step was to pivot from wide to long format, as the approximately 400 activity codes each had their own column. We also selected key demographic variables and renamed them to be more informative.</p>
 <pre class="r"><code>library(tidyverse)
+library(dplyr)
 library(ggplot2)
+library(modelr)
+library(mgcv)
+library(magrittr) 
+library(plotly)
+
+
+options(scipen = 50)
+knitr::opts_chunk$set(echo = TRUE)
 
 activity_summary_2019 = read.table(&quot;data/atussum_2019.dat&quot;, header = TRUE, sep = &quot;,&quot;)
 activity_summary_2020 = read.table(&quot;data/atussum_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
@@ -1397,36 +1416,959 @@ write_csv(summary_household_category, &quot;summary_household_category.csv&quot;
 </div>
 <div id="exploratory-analysis" class="section level1">
 <h1>Exploratory Analysis</h1>
-<div id="covid-19" class="section level3">
-<h3>COVID-19</h3>
-<p>For each of our visualizations and summary tables, we had to calculate average hours/minutes spent on activities using weights. The weights were created by ATUS to account for the fact that respondents were more likely to participate on weekends vs weekdays, and for the fact that some demographics were more represented than others (for instance, women were more likely to respond than men). To calculate average daily hours/minutes spent on an activity, we multiplied total time spent on the activity by the weight, and then summed all these products together and divided this by the sum of the weights. See the code for this calculation below.</p>
+<div id="covid-19-2019-vs-2020" class="section level3">
+<h3>COVID-19: 2019 vs 2020</h3>
+<p>To produce our summary tables and visualizations, we calculated average hours/minutes spent on activities using weights. The weights were created by ATUS to account for the fact that respondents were more likely to participate on weekends vs weekdays, and for the fact that some demographics were more represented than others (for instance, women were more likely to respond than men). To calculate average daily hours/minutes spent on an activity, we multiplied total time spent on the activity by the weight, and then summed all these products together and divided this by the sum of the weights. See the code for this calculation below.</p>
+<pre class="r"><code> summary_household_category %&gt;% 
+  drop_na() %&gt;%
+  group_by(year, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) </code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the `.groups` argument.</code></pre>
+<pre><code>## # A tibble: 32 x 5
+## # Groups:   year [2]
+##     year category                sum_product   sum_weight average_hours
+##    &lt;dbl&gt; &lt;chr&gt;                         &lt;dbl&gt;        &lt;dbl&gt;         &lt;dbl&gt;
+##  1  2019 caring_duties          42841745794. 77763912014.           0.6
+##  2  2019 eating_drinking        82704263492. 77763912014.           1.1
+##  3  2019 education              33584551555. 77763912014.           0.4
+##  4  2019 exercise               24350549685. 77763912014.           0.3
+##  5  2019 gov_civic_obligations    158433084. 77763912014.           0  
+##  6  2019 household             139323868473. 77763912014.           1.8
+##  7  2019 leisure               367139602561. 77763912014.           4.7
+##  8  2019 personal_care          59177648542. 77763912014.           0.8
+##  9  2019 professional_services   8498122728. 77763912014.           0.1
+## 10  2019 religious_spiritual    10987537121. 77763912014.           0.1
+## # ... with 22 more rows</code></pre>
+<p>The table below details average daily hours spent on categories of activities in 2019 versus 2020, along with the percent change.</p>
 <pre class="r"><code> summary_household_category %&gt;% 
   drop_na() %&gt;% 
   group_by(year, category) %&gt;% 
   summarize(sum_product = sum(category_sum_hour_weight), 
             sum_weight = sum(weight)) %&gt;% 
-  mutate(average_hours = round(sum_product/sum_weight, 1)) </code></pre>
-<p>We created a number of different plots. As mentioned in the Initial Questions section, instead of looking at time spent with others as originally planned (which would require cleaning and merging additional data sets), we looked at time spent socializing and communicating with others in 2019 vs 2020 and how this varied by age.</p>
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  subset(select = -c(sum_product,sum_weight)) %&gt;% 
+  pivot_wider(names_from = &quot;year&quot;, 
+              values_from = &quot;average_hours&quot;) %&gt;% 
+  mutate(percent_change = round((`2020` - `2019`)*100/`2019`, 1)) %&gt;% 
+  arrange(desc(`2019`)) %&gt;% 
+  knitr::kable()</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">category</th>
+<th align="right">2019</th>
+<th align="right">2020</th>
+<th align="right">percent_change</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">sleep</td>
+<td align="right">8.9</td>
+<td align="right">9.0</td>
+<td align="right">1.1</td>
+</tr>
+<tr class="even">
+<td align="left">leisure</td>
+<td align="right">4.7</td>
+<td align="right">5.0</td>
+<td align="right">6.4</td>
+</tr>
+<tr class="odd">
+<td align="left">work</td>
+<td align="right">3.3</td>
+<td align="right">3.1</td>
+<td align="right">-6.1</td>
+</tr>
+<tr class="even">
+<td align="left">household</td>
+<td align="right">1.8</td>
+<td align="right">2.0</td>
+<td align="right">11.1</td>
+</tr>
+<tr class="odd">
+<td align="left">traveling</td>
+<td align="right">1.2</td>
+<td align="right">0.8</td>
+<td align="right">-33.3</td>
+</tr>
+<tr class="even">
+<td align="left">eating_drinking</td>
+<td align="right">1.1</td>
+<td align="right">1.1</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="odd">
+<td align="left">personal_care</td>
+<td align="right">0.8</td>
+<td align="right">0.7</td>
+<td align="right">-12.5</td>
+</tr>
+<tr class="even">
+<td align="left">caring_duties</td>
+<td align="right">0.6</td>
+<td align="right">0.5</td>
+<td align="right">-16.7</td>
+</tr>
+<tr class="odd">
+<td align="left">education</td>
+<td align="right">0.4</td>
+<td align="right">0.4</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">shopping</td>
+<td align="right">0.4</td>
+<td align="right">0.3</td>
+<td align="right">-25.0</td>
+</tr>
+<tr class="odd">
+<td align="left">exercise</td>
+<td align="right">0.3</td>
+<td align="right">0.3</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">professional_services</td>
+<td align="right">0.1</td>
+<td align="right">0.1</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="odd">
+<td align="left">religious_spiritual</td>
+<td align="right">0.1</td>
+<td align="right">0.1</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">telephone</td>
+<td align="right">0.1</td>
+<td align="right">0.2</td>
+<td align="right">100.0</td>
+</tr>
+<tr class="odd">
+<td align="left">volunteer</td>
+<td align="right">0.1</td>
+<td align="right">0.1</td>
+<td align="right">0.0</td>
+</tr>
+<tr class="even">
+<td align="left">gov_civic_obligations</td>
+<td align="right">0.0</td>
+<td align="right">0.0</td>
+<td align="right">NaN</td>
+</tr>
+</tbody>
+</table>
+<p>We created a number of different plots to help visualize these differences.</p>
+<pre class="r"><code>summary_household_category %&gt;% 
+  drop_na() %&gt;% 
+  group_by(year, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  subset(select = -c(sum_product,sum_weight)) %&gt;% 
+  mutate(year = as.factor(year)) %&gt;% 
+  ggplot(aes(x = forcats::fct_reorder(category, average_hours, .desc = TRUE), y = average_hours, fill = year)) + 
+  geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;) + 
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust = 1)) +
+  labs(
+    y = &quot;Average Hours&quot;, 
+    x = &quot;Categories&quot;, 
+    title = &quot;Average hours spent in each category&quot;
+  )</code></pre>
+<p><img src="project_report_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>We also examined monthly activity trends across 2020.</p>
+<pre class="r"><code>actsum_cps_2020 = summary_household_category %&gt;%
+  filter(year == 2020)
+
+resp_2020 = read.table(&quot;data/atusresp_2020.dat&quot;, header = TRUE, sep = &quot;,&quot;)
+
+resp_2020_tidied = resp_2020 %&gt;% 
+  dplyr::select(TUCASEID, TULINENO, TUYEAR, TUMONTH, TUDIARYDAY, TUDIARYDATE) %&gt;%
+  mutate(date = lubridate::ymd(TUDIARYDATE)) %&gt;%
+  separate(date, c(&quot;year&quot;, &quot;month&quot;, &quot;date&quot;)) %&gt;%
+  mutate(month = month.name[as.numeric(month)]) %&gt;%
+  mutate(year = as.numeric(year)) %&gt;%
+  mutate(TUDIARYDATE = str_replace(TUDIARYDATE, &quot;2020&quot;, &quot;&quot;)) %&gt;%
+  filter(TUYEAR == 2020) %&gt;%
+  dplyr::select(-TUYEAR, -TUMONTH, -TULINENO) %&gt;%
+  mutate(
+    tudiaryday = factor(TUDIARYDAY, levels = c(1,2,3,4,5,6,7), labels = c(&quot;sunday&quot;, &quot;monday&quot;, &quot;tuesday&quot;, &quot;wednesday&quot;, &quot;thursday&quot;, &quot;friday&quot;, &quot;saturday&quot;))) %&gt;%
+  arrange(TUCASEID, month, date, year, TUDIARYDATE, tudiaryday)
+
+merged_actsum_cps_resp_2020 = left_join(actsum_cps_2020, resp_2020_tidied, by = c(&quot;TUCASEID&quot;)) %&gt;% janitor::clean_names()
+
+category_time_month_2020 = merged_actsum_cps_resp_2020 %&gt;% 
+  drop_na() %&gt;% 
+  filter(category %in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating_drinking&quot;, 
+                         &quot;personal_care&quot;, &quot;caring_duties&quot;)) %&gt;% 
+  group_by(month, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  subset(select = -c(sum_product,sum_weight)) %&gt;% 
+  mutate(
+    month = as.factor(month)) %&gt;%
+  mutate(month = match(month, month.name)) %&gt;%
+   mutate(
+     category = replace(category, category == &quot;caring_duties&quot;, &quot;caring duties&quot;),
+     category = replace(category, category == &quot;eating_drinking&quot;, &quot;eating/drinking&quot;),
+     category = replace(category, category == &quot;personal_care&quot;, &quot;personal care&quot;),
+     ) %&gt;%
+  arrange(month) 
+
+monthly_2020_plotly_hours = category_time_month_2020 %&gt;%
+  mutate(text_label = str_c(&quot;Activity: &quot;, category, &quot;\nAverage hours: &quot;, average_hours, &quot;\nMonth: &quot;, month)) %&gt;%
+  plot_ly(
+    x = ~month, y = ~average_hours, type = &quot;scatter&quot;, mode = &quot;line&quot;,
+    color = ~category, text = ~text_label, alpha = 0.9) %&gt;%
+ layout(title = &#39;Average time spent on activities across the U.S. in 2020&#39;, 
+        annotations = list(x = 2.5, y = 3, text = &quot;month 4 missing&quot;), 
+        xaxis = list(type = &quot;category&quot;, title = &#39;Month&#39;), 
+        yaxis = list(title = &#39;Average Hours&#39;))
+
+`%not_in%` &lt;- purrr::negate(`%in%`)
+
+category_time_month_2020 = merged_actsum_cps_resp_2020 %&gt;% 
+  drop_na() %&gt;% 
+  filter(category %not_in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating_drinking&quot;, 
+                         &quot;personal_care&quot;, &quot;caring_duties&quot;)) %&gt;% 
+  group_by(month, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %&gt;% 
+  subset(select = -c(sum_product,sum_weight)) %&gt;% 
+  mutate(
+    month = as.factor(month)) %&gt;%
+  mutate(month = match(month, month.name)) %&gt;%
+   mutate(
+     category = replace(category, category == &quot;gov_civic_obligations&quot;, &quot;gov/civic obligations&quot;),
+     category = replace(category, category == &quot;professional_services&quot;, &quot;professional services&quot;),
+     category = replace(category, category == &quot;religious_spiritual&quot;, &quot;religious/spiritual&quot;)
+     ) %&gt;%
+  arrange(month) 
+
+
+monthly_2020_plotly_minutes = category_time_month_2020 %&gt;%
+  mutate(text_label = str_c(&quot;Activity: &quot;, category, &quot;\nAverage minutes: &quot;, average_minutes, &quot;\nMonth: &quot;, month)) %&gt;%
+  plot_ly(
+    x = ~month, y = ~average_minutes, type = &quot;scatter&quot;, mode = &quot;line&quot;,
+    color = ~category, text = ~text_label, alpha = 0.9) %&gt;%
+ layout(title = &#39;Average time spent on activities across the U.S. in 2020&#39;, 
+        annotations = list(x = 2.5, y = 10, text = &quot;month 4 missing&quot;), 
+        xaxis = list(type = &quot;category&quot;, title = &#39;Month&#39;), 
+        yaxis = list(title = &#39;Average Minutes&#39;))</code></pre>
+<div id="htmlwidget-d8935020dfecda665016" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-d8935020dfecda665016">{"x":{"visdat":{"5a0025f17590":["function () ","plotlyVisDat"]},"cur_data":"5a0025f17590","attrs":{"5a0025f17590":{"x":{},"y":{},"mode":"line","text":{},"color":{},"alpha":0.9,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Average time spent on activities across the U.S. in 2020","annotations":[{"x":2.5,"y":3,"text":"month 4 missing"}],"xaxis":{"domain":[0,1],"automargin":true,"type":"category","title":"Month"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Average Hours"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[0.4,0.6,0.5,0.5,0.5,0.5,0.6,0.6,0.7,0.6,0.4],"mode":"line","text":["Activity: caring duties<br />Average hours: 0.4<br />Month: 1","Activity: caring duties<br />Average hours: 0.6<br />Month: 2","Activity: caring duties<br />Average hours: 0.5<br />Month: 3","Activity: caring duties<br />Average hours: 0.5<br />Month: 5","Activity: caring duties<br />Average hours: 0.5<br />Month: 6","Activity: caring duties<br />Average hours: 0.5<br />Month: 7","Activity: caring duties<br />Average hours: 0.6<br />Month: 8","Activity: caring duties<br />Average hours: 0.6<br />Month: 9","Activity: caring duties<br />Average hours: 0.7<br />Month: 10","Activity: caring duties<br />Average hours: 0.6<br />Month: 11","Activity: caring duties<br />Average hours: 0.4<br />Month: 12"],"type":"scatter","name":"caring duties","marker":{"color":"rgba(102,194,165,0.9)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,0.9)"},"error_y":{"color":"rgba(102,194,165,0.9)"},"error_x":{"color":"rgba(102,194,165,0.9)"},"line":{"color":"rgba(102,194,165,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1,1,1.1,1.1,1.1,1.1,1.1,1.1,1,1,1],"mode":"line","text":["Activity: eating/drinking<br />Average hours: 1<br />Month: 1","Activity: eating/drinking<br />Average hours: 1<br />Month: 2","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 3","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 5","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 6","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 7","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 8","Activity: eating/drinking<br />Average hours: 1.1<br />Month: 9","Activity: eating/drinking<br />Average hours: 1<br />Month: 10","Activity: eating/drinking<br />Average hours: 1<br />Month: 11","Activity: eating/drinking<br />Average hours: 1<br />Month: 12"],"type":"scatter","name":"eating/drinking","marker":{"color":"rgba(252,141,98,0.9)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,0.9)"},"error_y":{"color":"rgba(252,141,98,0.9)"},"error_x":{"color":"rgba(252,141,98,0.9)"},"line":{"color":"rgba(252,141,98,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1.7,1.7,1.9,2.2,2.1,2.2,2.2,1.9,1.9,2,2.1],"mode":"line","text":["Activity: household<br />Average hours: 1.7<br />Month: 1","Activity: household<br />Average hours: 1.7<br />Month: 2","Activity: household<br />Average hours: 1.9<br />Month: 3","Activity: household<br />Average hours: 2.2<br />Month: 5","Activity: household<br />Average hours: 2.1<br />Month: 6","Activity: household<br />Average hours: 2.2<br />Month: 7","Activity: household<br />Average hours: 2.2<br />Month: 8","Activity: household<br />Average hours: 1.9<br />Month: 9","Activity: household<br />Average hours: 1.9<br />Month: 10","Activity: household<br />Average hours: 2<br />Month: 11","Activity: household<br />Average hours: 2.1<br />Month: 12"],"type":"scatter","name":"household","marker":{"color":"rgba(141,160,203,0.9)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,0.9)"},"error_y":{"color":"rgba(141,160,203,0.9)"},"error_x":{"color":"rgba(141,160,203,0.9)"},"line":{"color":"rgba(141,160,203,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[5,4.5,4.7,5.5,5.2,5.1,5.4,4.6,5,4.9,5.5],"mode":"line","text":["Activity: leisure<br />Average hours: 5<br />Month: 1","Activity: leisure<br />Average hours: 4.5<br />Month: 2","Activity: leisure<br />Average hours: 4.7<br />Month: 3","Activity: leisure<br />Average hours: 5.5<br />Month: 5","Activity: leisure<br />Average hours: 5.2<br />Month: 6","Activity: leisure<br />Average hours: 5.1<br />Month: 7","Activity: leisure<br />Average hours: 5.4<br />Month: 8","Activity: leisure<br />Average hours: 4.6<br />Month: 9","Activity: leisure<br />Average hours: 5<br />Month: 10","Activity: leisure<br />Average hours: 4.9<br />Month: 11","Activity: leisure<br />Average hours: 5.5<br />Month: 12"],"type":"scatter","name":"leisure","marker":{"color":"rgba(231,138,195,0.9)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,0.9)"},"error_y":{"color":"rgba(231,138,195,0.9)"},"error_x":{"color":"rgba(231,138,195,0.9)"},"line":{"color":"rgba(231,138,195,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[0.7,0.8,0.8,0.6,0.7,0.6,0.7,0.8,0.7,0.6,0.6],"mode":"line","text":["Activity: personal care<br />Average hours: 0.7<br />Month: 1","Activity: personal care<br />Average hours: 0.8<br />Month: 2","Activity: personal care<br />Average hours: 0.8<br />Month: 3","Activity: personal care<br />Average hours: 0.6<br />Month: 5","Activity: personal care<br />Average hours: 0.7<br />Month: 6","Activity: personal care<br />Average hours: 0.6<br />Month: 7","Activity: personal care<br />Average hours: 0.7<br />Month: 8","Activity: personal care<br />Average hours: 0.8<br />Month: 9","Activity: personal care<br />Average hours: 0.7<br />Month: 10","Activity: personal care<br />Average hours: 0.6<br />Month: 11","Activity: personal care<br />Average hours: 0.6<br />Month: 12"],"type":"scatter","name":"personal care","marker":{"color":"rgba(166,216,84,0.9)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,0.9)"},"error_y":{"color":"rgba(166,216,84,0.9)"},"error_x":{"color":"rgba(166,216,84,0.9)"},"line":{"color":"rgba(166,216,84,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[9.1,8.9,8.9,9.1,9.1,8.9,8.9,8.9,9,9.1,9.1],"mode":"line","text":["Activity: sleep<br />Average hours: 9.1<br />Month: 1","Activity: sleep<br />Average hours: 8.9<br />Month: 2","Activity: sleep<br />Average hours: 8.9<br />Month: 3","Activity: sleep<br />Average hours: 9.1<br />Month: 5","Activity: sleep<br />Average hours: 9.1<br />Month: 6","Activity: sleep<br />Average hours: 8.9<br />Month: 7","Activity: sleep<br />Average hours: 8.9<br />Month: 8","Activity: sleep<br />Average hours: 8.9<br />Month: 9","Activity: sleep<br />Average hours: 9<br />Month: 10","Activity: sleep<br />Average hours: 9.1<br />Month: 11","Activity: sleep<br />Average hours: 9.1<br />Month: 12"],"type":"scatter","name":"sleep","marker":{"color":"rgba(255,217,47,0.9)","line":{"color":"rgba(255,217,47,1)"}},"textfont":{"color":"rgba(255,217,47,0.9)"},"error_y":{"color":"rgba(255,217,47,0.9)"},"error_x":{"color":"rgba(255,217,47,0.9)"},"line":{"color":"rgba(255,217,47,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[1,1.2,1,0.5,0.7,0.9,0.9,0.8,0.8,0.8,0.8],"mode":"line","text":["Activity: traveling<br />Average hours: 1<br />Month: 1","Activity: traveling<br />Average hours: 1.2<br />Month: 2","Activity: traveling<br />Average hours: 1<br />Month: 3","Activity: traveling<br />Average hours: 0.5<br />Month: 5","Activity: traveling<br />Average hours: 0.7<br />Month: 6","Activity: traveling<br />Average hours: 0.9<br />Month: 7","Activity: traveling<br />Average hours: 0.9<br />Month: 8","Activity: traveling<br />Average hours: 0.8<br />Month: 9","Activity: traveling<br />Average hours: 0.8<br />Month: 10","Activity: traveling<br />Average hours: 0.8<br />Month: 11","Activity: traveling<br />Average hours: 0.8<br />Month: 12"],"type":"scatter","name":"traveling","marker":{"color":"rgba(229,196,148,0.9)","line":{"color":"rgba(229,196,148,1)"}},"textfont":{"color":"rgba(229,196,148,0.9)"},"error_y":{"color":"rgba(229,196,148,0.9)"},"error_x":{"color":"rgba(229,196,148,0.9)"},"line":{"color":"rgba(229,196,148,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[3.5,3.3,3.2,3.1,3.1,3.3,2.8,3.2,3.1,2.9,2.8],"mode":"line","text":["Activity: work<br />Average hours: 3.5<br />Month: 1","Activity: work<br />Average hours: 3.3<br />Month: 2","Activity: work<br />Average hours: 3.2<br />Month: 3","Activity: work<br />Average hours: 3.1<br />Month: 5","Activity: work<br />Average hours: 3.1<br />Month: 6","Activity: work<br />Average hours: 3.3<br />Month: 7","Activity: work<br />Average hours: 2.8<br />Month: 8","Activity: work<br />Average hours: 3.2<br />Month: 9","Activity: work<br />Average hours: 3.1<br />Month: 10","Activity: work<br />Average hours: 2.9<br />Month: 11","Activity: work<br />Average hours: 2.8<br />Month: 12"],"type":"scatter","name":"work","marker":{"color":"rgba(179,179,179,0.9)","line":{"color":"rgba(179,179,179,1)"}},"textfont":{"color":"rgba(179,179,179,0.9)"},"error_y":{"color":"rgba(179,179,179,0.9)"},"error_x":{"color":"rgba(179,179,179,0.9)"},"line":{"color":"rgba(179,179,179,0.9)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<div id="htmlwidget-ec36d3c40ccc4d156868" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-ec36d3c40ccc4d156868">{"x":{"visdat":{"5a00605c7c5e":["function () ","plotlyVisDat"]},"cur_data":"5a00605c7c5e","attrs":{"5a00605c7c5e":{"x":{},"y":{},"mode":"line","text":{},"color":{},"alpha":0.9,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Average time spent on activities across the U.S. in 2020","annotations":[{"x":2.5,"y":10,"text":"month 4 missing"}],"xaxis":{"domain":[0,1],"automargin":true,"type":"category","title":"Month"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Average Minutes"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[16.6,40.2,40.8,15.1,10.4,3.3,7.5,40.2,43.9,37.8,26.3],"mode":"line","text":["Activity: education<br />Average minutes: 16.6<br />Month: 1","Activity: education<br />Average minutes: 40.2<br />Month: 2","Activity: education<br />Average minutes: 40.8<br />Month: 3","Activity: education<br />Average minutes: 15.1<br />Month: 5","Activity: education<br />Average minutes: 10.4<br />Month: 6","Activity: education<br />Average minutes: 3.3<br />Month: 7","Activity: education<br />Average minutes: 7.5<br />Month: 8","Activity: education<br />Average minutes: 40.2<br />Month: 9","Activity: education<br />Average minutes: 43.9<br />Month: 10","Activity: education<br />Average minutes: 37.8<br />Month: 11","Activity: education<br />Average minutes: 26.3<br />Month: 12"],"type":"scatter","name":"education","marker":{"color":"rgba(102,194,165,0.9)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,0.9)"},"error_y":{"color":"rgba(102,194,165,0.9)"},"error_x":{"color":"rgba(102,194,165,0.9)"},"line":{"color":"rgba(102,194,165,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[15.8,14.7,20.6,19.4,26.8,24.7,26.7,20.8,20,20,12.4],"mode":"line","text":["Activity: exercise<br />Average minutes: 15.8<br />Month: 1","Activity: exercise<br />Average minutes: 14.7<br />Month: 2","Activity: exercise<br />Average minutes: 20.6<br />Month: 3","Activity: exercise<br />Average minutes: 19.4<br />Month: 5","Activity: exercise<br />Average minutes: 26.8<br />Month: 6","Activity: exercise<br />Average minutes: 24.7<br />Month: 7","Activity: exercise<br />Average minutes: 26.7<br />Month: 8","Activity: exercise<br />Average minutes: 20.8<br />Month: 9","Activity: exercise<br />Average minutes: 20<br />Month: 10","Activity: exercise<br />Average minutes: 20<br />Month: 11","Activity: exercise<br />Average minutes: 12.4<br />Month: 12"],"type":"scatter","name":"exercise","marker":{"color":"rgba(252,141,98,0.9)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,0.9)"},"error_y":{"color":"rgba(252,141,98,0.9)"},"error_x":{"color":"rgba(252,141,98,0.9)"},"line":{"color":"rgba(252,141,98,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[0,0,0.3,0,0,0,0.2,0.1,0.1,0,0],"mode":"line","text":["Activity: gov/civic obligations<br />Average minutes: 0<br />Month: 1","Activity: gov/civic obligations<br />Average minutes: 0<br />Month: 2","Activity: gov/civic obligations<br />Average minutes: 0.3<br />Month: 3","Activity: gov/civic obligations<br />Average minutes: 0<br />Month: 5","Activity: gov/civic obligations<br />Average minutes: 0<br />Month: 6","Activity: gov/civic obligations<br />Average minutes: 0<br />Month: 7","Activity: gov/civic obligations<br />Average minutes: 0.2<br />Month: 8","Activity: gov/civic obligations<br />Average minutes: 0.1<br />Month: 9","Activity: gov/civic obligations<br />Average minutes: 0.1<br />Month: 10","Activity: gov/civic obligations<br />Average minutes: 0<br />Month: 11","Activity: gov/civic obligations<br />Average minutes: 0<br />Month: 12"],"type":"scatter","name":"gov/civic obligations","marker":{"color":"rgba(141,160,203,0.9)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,0.9)"},"error_y":{"color":"rgba(141,160,203,0.9)"},"error_x":{"color":"rgba(141,160,203,0.9)"},"line":{"color":"rgba(141,160,203,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[9.3,6.8,4.6,1.9,7.4,6.1,5.3,6.1,7.3,7.3,7.4],"mode":"line","text":["Activity: professional services<br />Average minutes: 9.3<br />Month: 1","Activity: professional services<br />Average minutes: 6.8<br />Month: 2","Activity: professional services<br />Average minutes: 4.6<br />Month: 3","Activity: professional services<br />Average minutes: 1.9<br />Month: 5","Activity: professional services<br />Average minutes: 7.4<br />Month: 6","Activity: professional services<br />Average minutes: 6.1<br />Month: 7","Activity: professional services<br />Average minutes: 5.3<br />Month: 8","Activity: professional services<br />Average minutes: 6.1<br />Month: 9","Activity: professional services<br />Average minutes: 7.3<br />Month: 10","Activity: professional services<br />Average minutes: 7.3<br />Month: 11","Activity: professional services<br />Average minutes: 7.4<br />Month: 12"],"type":"scatter","name":"professional services","marker":{"color":"rgba(231,138,195,0.9)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,0.9)"},"error_y":{"color":"rgba(231,138,195,0.9)"},"error_x":{"color":"rgba(231,138,195,0.9)"},"line":{"color":"rgba(231,138,195,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[9.3,6.5,7,7.1,6.3,4.2,6,4.7,5.7,8.2,3.1],"mode":"line","text":["Activity: religious/spiritual<br />Average minutes: 9.3<br />Month: 1","Activity: religious/spiritual<br />Average minutes: 6.5<br />Month: 2","Activity: religious/spiritual<br />Average minutes: 7<br />Month: 3","Activity: religious/spiritual<br />Average minutes: 7.1<br />Month: 5","Activity: religious/spiritual<br />Average minutes: 6.3<br />Month: 6","Activity: religious/spiritual<br />Average minutes: 4.2<br />Month: 7","Activity: religious/spiritual<br />Average minutes: 6<br />Month: 8","Activity: religious/spiritual<br />Average minutes: 4.7<br />Month: 9","Activity: religious/spiritual<br />Average minutes: 5.7<br />Month: 10","Activity: religious/spiritual<br />Average minutes: 8.2<br />Month: 11","Activity: religious/spiritual<br />Average minutes: 3.1<br />Month: 12"],"type":"scatter","name":"religious/spiritual","marker":{"color":"rgba(166,216,84,0.9)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,0.9)"},"error_y":{"color":"rgba(166,216,84,0.9)"},"error_x":{"color":"rgba(166,216,84,0.9)"},"line":{"color":"rgba(166,216,84,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[16.8,22.3,21.7,15.1,14.5,15.9,16.2,18.7,14.6,17.6,17.9],"mode":"line","text":["Activity: shopping<br />Average minutes: 16.8<br />Month: 1","Activity: shopping<br />Average minutes: 22.3<br />Month: 2","Activity: shopping<br />Average minutes: 21.7<br />Month: 3","Activity: shopping<br />Average minutes: 15.1<br />Month: 5","Activity: shopping<br />Average minutes: 14.5<br />Month: 6","Activity: shopping<br />Average minutes: 15.9<br />Month: 7","Activity: shopping<br />Average minutes: 16.2<br />Month: 8","Activity: shopping<br />Average minutes: 18.7<br />Month: 9","Activity: shopping<br />Average minutes: 14.6<br />Month: 10","Activity: shopping<br />Average minutes: 17.6<br />Month: 11","Activity: shopping<br />Average minutes: 17.9<br />Month: 12"],"type":"scatter","name":"shopping","marker":{"color":"rgba(255,217,47,0.9)","line":{"color":"rgba(255,217,47,1)"}},"textfont":{"color":"rgba(255,217,47,0.9)"},"error_y":{"color":"rgba(255,217,47,0.9)"},"error_x":{"color":"rgba(255,217,47,0.9)"},"line":{"color":"rgba(255,217,47,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[4.8,5.4,7.4,9.7,9.3,12.1,8,8.7,10.3,15.6,12.7],"mode":"line","text":["Activity: telephone<br />Average minutes: 4.8<br />Month: 1","Activity: telephone<br />Average minutes: 5.4<br />Month: 2","Activity: telephone<br />Average minutes: 7.4<br />Month: 3","Activity: telephone<br />Average minutes: 9.7<br />Month: 5","Activity: telephone<br />Average minutes: 9.3<br />Month: 6","Activity: telephone<br />Average minutes: 12.1<br />Month: 7","Activity: telephone<br />Average minutes: 8<br />Month: 8","Activity: telephone<br />Average minutes: 8.7<br />Month: 9","Activity: telephone<br />Average minutes: 10.3<br />Month: 10","Activity: telephone<br />Average minutes: 15.6<br />Month: 11","Activity: telephone<br />Average minutes: 12.7<br />Month: 12"],"type":"scatter","name":"telephone","marker":{"color":"rgba(229,196,148,0.9)","line":{"color":"rgba(229,196,148,1)"}},"textfont":{"color":"rgba(229,196,148,0.9)"},"error_y":{"color":"rgba(229,196,148,0.9)"},"error_x":{"color":"rgba(229,196,148,0.9)"},"line":{"color":"rgba(229,196,148,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[1,2,3,5,6,7,8,9,10,11,12],"y":[6.3,5.6,8.5,2,4.3,4.1,5.9,6.8,6.8,4.8,5.1],"mode":"line","text":["Activity: volunteer<br />Average minutes: 6.3<br />Month: 1","Activity: volunteer<br />Average minutes: 5.6<br />Month: 2","Activity: volunteer<br />Average minutes: 8.5<br />Month: 3","Activity: volunteer<br />Average minutes: 2<br />Month: 5","Activity: volunteer<br />Average minutes: 4.3<br />Month: 6","Activity: volunteer<br />Average minutes: 4.1<br />Month: 7","Activity: volunteer<br />Average minutes: 5.9<br />Month: 8","Activity: volunteer<br />Average minutes: 6.8<br />Month: 9","Activity: volunteer<br />Average minutes: 6.8<br />Month: 10","Activity: volunteer<br />Average minutes: 4.8<br />Month: 11","Activity: volunteer<br />Average minutes: 5.1<br />Month: 12"],"type":"scatter","name":"volunteer","marker":{"color":"rgba(179,179,179,0.9)","line":{"color":"rgba(179,179,179,1)"}},"textfont":{"color":"rgba(179,179,179,0.9)"},"error_y":{"color":"rgba(179,179,179,0.9)"},"error_x":{"color":"rgba(179,179,179,0.9)"},"line":{"color":"rgba(179,179,179,0.9)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
+<p>We plotted socializing trends, including by age.</p>
+<pre class="r"><code>socializing = read_csv(&quot;data/socializing.csv&quot;)</code></pre>
+<pre><code>## Rows: 18217 Columns: 19</code></pre>
+<pre><code>## -- Column specification --------------------------------------------------------
+## Delimiter: &quot;,&quot;
+## chr  (8): race, labor_force_status, sex, category, region, division, state, ...
+## dbl (11): TUCASEID, weight, age, day, year, TULINENO, metro_area, county, ca...</code></pre>
+<pre><code>## 
+## i Use `spec()` to retrieve the full column specification for this data.
+## i Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+<pre class="r"><code>socializing %&gt;% 
+  mutate(year = as.factor(year)) %&gt;% 
+  group_by(year, category) %&gt;% 
+    summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_minutes = round((sum_product*60/sum_weight), 2)) %&gt;% 
+  ggplot(aes(x = year, y = average_minutes, fill = year)) + 
+  geom_bar(stat = &quot;identity&quot;, position = &quot;stack&quot;, width = 0.5) + 
+  geom_text(aes(label = average_minutes, hjust = 0.5, vjust = 3)) + 
+  labs(
+    title = &quot;Average minutes spent on socializing&quot;, 
+    x = &quot;Year&quot;, 
+    y = &quot;Average minutes&quot;
+  )</code></pre>
+<pre><code>## `summarise()` has grouped output by &#39;year&#39;. You can override using the `.groups` argument.</code></pre>
+<p><img src="project_report_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>socializing %&gt;% 
+    mutate(year = factor(year)) %&gt;% 
+  group_by(year, category, age) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 2)) %&gt;% 
+  ggplot(aes(x = age, y = average_minutes, color = year)) + 
+  geom_point(alpha = .5) + 
+  geom_smooth() + 
+  labs(
+    title = &quot;Average minutes spent on socializing based on age&quot;, 
+    x = &quot;Age&quot;, 
+    y = &quot;Average minutes&quot;
+  ) </code></pre>
+<p><img src="project_report_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 </div>
 <div id="differences-by-age-and-sex" class="section level3">
 <h3>Differences by age and sex</h3>
 <p>We created multi-panel plots to show how time spent on activities differed depending on age and sex.</p>
+<pre class="r"><code>summary_household_category = read_csv(&quot;data/summary_household_category.csv&quot;) %&gt;% 
+     mutate(
+     category = replace(category, category == &quot;caring_duties&quot;, &quot;caring duties&quot;),
+     category = replace(category, category == &quot;eating_drinking&quot;, &quot;eating/drinking&quot;),
+     category = replace(category, category == &quot;personal_care&quot;, &quot;personal care&quot;),
+     category = replace(category, category == &quot;gov_civic_obligations&quot;, &quot;gov/civic obligations&quot;),
+     category = replace(category, category == &quot;professional_services&quot;, &quot;professional services&quot;),
+     category = replace(category, category == &quot;religious_spiritual&quot;, &quot;religious/spiritual&quot;))
+
+`%not_in%` &lt;- purrr::negate(`%in%`)
+
+plot1 = summary_household_category %&gt;% 
+   filter(category %in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(age, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = age, y = average_hours)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = &quot;Average hours&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2)
+
+plot2 = summary_household_category %&gt;% 
+   filter(category %not_in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  drop_na() %&gt;% 
+  group_by(age, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = age, y = average_minutes)) +
+    #geom_point(aes(color = category, alpha = .3)) +
+    geom_smooth(aes(color = category), show.legend = FALSE) +
+    labs(y = &quot;Average minutes&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2)
+
+gridExtra::grid.arrange(plot1, plot2, ncol = 2)</code></pre>
+<p><img src="project_report_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>plot1 = summary_household_category %&gt;% 
+  drop_na() %&gt;% 
+  filter(category %in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  group_by(sex, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_hours = round(sum_product/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = sex, y = average_hours, fill = sex)) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, width = 0.5, show.legend = FALSE) +
+    labs(y = &quot;Average hours&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2)
+
+plot2 = summary_household_category %&gt;% 
+  drop_na() %&gt;% 
+  filter(category %not_in% c(&quot;sleep&quot;, &quot;leisure&quot;, 
+                         &quot;work&quot;, &quot;household&quot;, 
+                         &quot;traveling&quot;, &quot;eating/drinking&quot;, 
+                         &quot;personal care&quot;, &quot;caring duties&quot;)) %&gt;% 
+  group_by(sex, category) %&gt;% 
+  summarize(sum_product = sum(category_sum_hour_weight), 
+            sum_weight = sum(weight)) %&gt;% 
+  mutate(average_minutes = round(sum_product*60/sum_weight, 1)) %&gt;% 
+  select(-sum_product, -sum_weight) %&gt;% 
+  ggplot(aes(x = sex, y = average_minutes, fill = sex)) +
+    geom_bar(stat = &quot;identity&quot;, position = &quot;dodge&quot;, width = 0.5, show.legend = FALSE) +
+  labs(y = &quot;Average minutes&quot;) +
+    facet_wrap(~category, scales = &quot;free&quot;, ncol = 2) 
+
+gridExtra::grid.arrange(plot1, plot2, ncol = 2)</code></pre>
+<p><img src="project_report_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 </div>
 <div id="multi-year-trends" class="section level3">
 <h3>Multi-year trends</h3>
 <p>We also plotted average time spent on different categories of activities from 2009 to 2019.</p>
+<pre class="r"><code>annual_data = read_csv(&quot;data/annual_activity.csv&quot;) 
+
+annual_data_plotly = annual_data %&gt;% 
+  mutate(text_label = str_c(&quot;Activity: &quot;, Activity, &quot;\nEstimate: &quot;, Estimate, &quot;\nYear: &quot;, Year)) %&gt;%
+  plot_ly(
+    x = ~Year, y = ~Estimate, type = &quot;scatter&quot;, mode = &quot;line&quot;,
+    color = ~Activity, text = ~text_label, alpha = 0.9) %&gt;%
+ layout(title = &#39;Average time spent on activities across the U.S. from 2009-2019&#39;, 
+        xaxis = list(type = &quot;category&quot;, title = &#39;Year&#39;), 
+        yaxis = list(title = &#39;Average Hours&#39;))</code></pre>
+<pre class="r"><code>annual_data_plotly</code></pre>
+<div id="htmlwidget-05772e263f535c5d3a67" style="width:672px;height:480px;" class="plotly html-widget"></div>
+<script type="application/json" data-for="htmlwidget-05772e263f535c5d3a67">{"x":{"visdat":{"5a00688a275":["function () ","plotlyVisDat"]},"cur_data":"5a00688a275","attrs":{"5a00688a275":{"x":{},"y":{},"mode":"line","text":{},"color":{},"alpha":0.9,"alpha_stroke":1,"sizes":[10,100],"spans":[1,20],"type":"scatter"}},"layout":{"margin":{"b":40,"l":60,"t":25,"r":10},"title":"Average time spent on activities across the U.S. from 2009-2019","xaxis":{"domain":[0,1],"automargin":true,"type":"category","title":"Year"},"yaxis":{"domain":[0,1],"automargin":true,"title":"Average Hours"},"hovermode":"closest","showlegend":true},"source":"A","config":{"modeBarButtonsToAdd":["hoverclosest","hovercompare"],"showSendToCloud":false},"data":[{"x":[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019],"y":[0.46,0.47,0.47,0.5,0.48,0.42,0.46,0.49,0.48,0.46,0.46],"mode":"line","text":["Activity: education<br />Estimate: 0.46<br />Year: 2009","Activity: education<br />Estimate: 0.47<br />Year: 2010","Activity: education<br />Estimate: 0.47<br />Year: 2011","Activity: education<br />Estimate: 0.5<br />Year: 2012","Activity: education<br />Estimate: 0.48<br />Year: 2013","Activity: education<br />Estimate: 0.42<br />Year: 2014","Activity: education<br />Estimate: 0.46<br />Year: 2015","Activity: education<br />Estimate: 0.49<br />Year: 2016","Activity: education<br />Estimate: 0.48<br />Year: 2017","Activity: education<br />Estimate: 0.46<br />Year: 2018","Activity: education<br />Estimate: 0.46<br />Year: 2019"],"type":"scatter","name":"education","marker":{"color":"rgba(102,194,165,0.9)","line":{"color":"rgba(102,194,165,1)"}},"textfont":{"color":"rgba(102,194,165,0.9)"},"error_y":{"color":"rgba(102,194,165,0.9)"},"error_x":{"color":"rgba(102,194,165,0.9)"},"line":{"color":"rgba(102,194,165,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019],"y":[1.8,1.79,1.77,1.74,1.78,1.77,1.84,1.82,1.81,1.78,1.78],"mode":"line","text":["Activity: household<br />Estimate: 1.8<br />Year: 2009","Activity: household<br />Estimate: 1.79<br />Year: 2010","Activity: household<br />Estimate: 1.77<br />Year: 2011","Activity: household<br />Estimate: 1.74<br />Year: 2012","Activity: household<br />Estimate: 1.78<br />Year: 2013","Activity: household<br />Estimate: 1.77<br />Year: 2014","Activity: household<br />Estimate: 1.84<br />Year: 2015","Activity: household<br />Estimate: 1.82<br />Year: 2016","Activity: household<br />Estimate: 1.81<br />Year: 2017","Activity: household<br />Estimate: 1.78<br />Year: 2018","Activity: household<br />Estimate: 1.78<br />Year: 2019"],"type":"scatter","name":"household","marker":{"color":"rgba(252,141,98,0.9)","line":{"color":"rgba(252,141,98,1)"}},"textfont":{"color":"rgba(252,141,98,0.9)"},"error_y":{"color":"rgba(252,141,98,0.9)"},"error_x":{"color":"rgba(252,141,98,0.9)"},"line":{"color":"rgba(252,141,98,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019],"y":[5.25,5.18,5.21,5.37,5.26,5.3,5.21,5.13,5.24,5.27,5.19],"mode":"line","text":["Activity: leisure<br />Estimate: 5.25<br />Year: 2009","Activity: leisure<br />Estimate: 5.18<br />Year: 2010","Activity: leisure<br />Estimate: 5.21<br />Year: 2011","Activity: leisure<br />Estimate: 5.37<br />Year: 2012","Activity: leisure<br />Estimate: 5.26<br />Year: 2013","Activity: leisure<br />Estimate: 5.3<br />Year: 2014","Activity: leisure<br />Estimate: 5.21<br />Year: 2015","Activity: leisure<br />Estimate: 5.13<br />Year: 2016","Activity: leisure<br />Estimate: 5.24<br />Year: 2017","Activity: leisure<br />Estimate: 5.27<br />Year: 2018","Activity: leisure<br />Estimate: 5.19<br />Year: 2019"],"type":"scatter","name":"leisure","marker":{"color":"rgba(141,160,203,0.9)","line":{"color":"rgba(141,160,203,1)"}},"textfont":{"color":"rgba(141,160,203,0.9)"},"error_y":{"color":"rgba(141,160,203,0.9)"},"error_x":{"color":"rgba(141,160,203,0.9)"},"line":{"color":"rgba(141,160,203,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019],"y":[8.67,8.67,8.71,8.73,8.74,8.8,8.83,8.79,8.8,8.82,8.84],"mode":"line","text":["Activity: sleeping<br />Estimate: 8.67<br />Year: 2009","Activity: sleeping<br />Estimate: 8.67<br />Year: 2010","Activity: sleeping<br />Estimate: 8.71<br />Year: 2011","Activity: sleeping<br />Estimate: 8.73<br />Year: 2012","Activity: sleeping<br />Estimate: 8.74<br />Year: 2013","Activity: sleeping<br />Estimate: 8.8<br />Year: 2014","Activity: sleeping<br />Estimate: 8.83<br />Year: 2015","Activity: sleeping<br />Estimate: 8.79<br />Year: 2016","Activity: sleeping<br />Estimate: 8.8<br />Year: 2017","Activity: sleeping<br />Estimate: 8.82<br />Year: 2018","Activity: sleeping<br />Estimate: 8.84<br />Year: 2019"],"type":"scatter","name":"sleeping","marker":{"color":"rgba(231,138,195,0.9)","line":{"color":"rgba(231,138,195,1)"}},"textfont":{"color":"rgba(231,138,195,0.9)"},"error_y":{"color":"rgba(231,138,195,0.9)"},"error_x":{"color":"rgba(231,138,195,0.9)"},"line":{"color":"rgba(231,138,195,0.9)"},"xaxis":"x","yaxis":"y","frame":null},{"x":[2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019],"y":[3.53,3.5,3.57,3.53,3.46,3.59,3.53,3.61,3.59,3.57,3.61],"mode":"line","text":["Activity: work<br />Estimate: 3.53<br />Year: 2009","Activity: work<br />Estimate: 3.5<br />Year: 2010","Activity: work<br />Estimate: 3.57<br />Year: 2011","Activity: work<br />Estimate: 3.53<br />Year: 2012","Activity: work<br />Estimate: 3.46<br />Year: 2013","Activity: work<br />Estimate: 3.59<br />Year: 2014","Activity: work<br />Estimate: 3.53<br />Year: 2015","Activity: work<br />Estimate: 3.61<br />Year: 2016","Activity: work<br />Estimate: 3.59<br />Year: 2017","Activity: work<br />Estimate: 3.57<br />Year: 2018","Activity: work<br />Estimate: 3.61<br />Year: 2019"],"type":"scatter","name":"work","marker":{"color":"rgba(166,216,84,0.9)","line":{"color":"rgba(166,216,84,1)"}},"textfont":{"color":"rgba(166,216,84,0.9)"},"error_y":{"color":"rgba(166,216,84,0.9)"},"error_x":{"color":"rgba(166,216,84,0.9)"},"line":{"color":"rgba(166,216,84,0.9)"},"xaxis":"x","yaxis":"y","frame":null}],"highlight":{"on":"plotly_click","persistent":false,"dynamic":false,"selectize":false,"opacityDim":0.2,"selected":{"opacity":1},"debounce":0},"shinyEvents":["plotly_hover","plotly_click","plotly_selected","plotly_relayout","plotly_brushed","plotly_brushing","plotly_clickannotation","plotly_doubleclick","plotly_deselect","plotly_afterplot","plotly_sunburstclick"],"base_url":"https://plot.ly"},"evals":[],"jsHooks":[]}</script>
 </div>
 </div>
 <div id="statistical-analysis" class="section level1">
 <h1>Statistical Analysis</h1>
-<p>We studied how various sociodemographic factors affected time spent on leisure activities. As the outcome of hours per day spent on leisure activities is continuous, we conducted linear regression analyses. First, we looked at whether the predictor variables should be categorical or continuous. After plotting age against time spent on leisure activities, we saw a relatively linear association and no need for categorization. We did not need to adjust the sex and employment status categorization.</p>
-<p>We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we hypothesized that during the pandemic in 2020 people spent more time on leisure activities, and found a significant difference. Leisure time spent in 2020 (post-pandemic) is expected to be approximately 0.2 hours (or 12 minutes) longer per day than leisure time spent in 2019, on average.</p>
+<p>We studied how various sociodemographic factors affected time spent on leisure activities. As the outcome of hours per day spent on leisure activities is continuous, we conducted linear regression analyses.</p>
+<p>First, we will explore the demographics of the respondents included in our database and distribution of the predictors. We will then check to make sure that age can be used as a continuous variable by plotting age against time spent on leisure activities.</p>
+<pre class="r"><code>cps_summary = 
+  read_csv(&quot;./data/summary_household_category.csv&quot;)
+
+cps_summary_leisure = cps_summary %&gt;% 
+  filter(category == &quot;leisure&quot;)
+
+library(table1)
+table1(~ race + age + sex + labor_force_status + region|year, data = cps_summary)</code></pre>
+<div class="Rtable1"><table class="Rtable1">
+<thead>
+<tr>
+<th class='rowlabel firstrow lastrow'></th>
+<th class='firstrow lastrow'><span class='stratlabel'>2019<br><span class='stratn'>(N=160395)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>2020<br><span class='stratn'>(N=149294)</span></span></th>
+<th class='firstrow lastrow'><span class='stratlabel'>Overall<br><span class='stratn'>(N=309689)</span></span></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td class='rowlabel firstrow'>race</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>2+ races</td>
+<td>2091 (1.3%)</td>
+<td>2142 (1.4%)</td>
+<td>4233 (1.4%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>American Indian</td>
+<td>1173 (0.7%)</td>
+<td>1292 (0.9%)</td>
+<td>2465 (0.8%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Asian</td>
+<td>6834 (4.3%)</td>
+<td>7327 (4.9%)</td>
+<td>14161 (4.6%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Black</td>
+<td>21114 (13.2%)</td>
+<td>18037 (12.1%)</td>
+<td>39151 (12.6%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Hawaiian/Pacific Islander</td>
+<td>323 (0.2%)</td>
+<td>255 (0.2%)</td>
+<td>578 (0.2%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>White</td>
+<td class='lastrow'>128860 (80.3%)</td>
+<td class='lastrow'>120241 (80.5%)</td>
+<td class='lastrow'>249101 (80.4%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>age</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Mean (SD)</td>
+<td>51.1 (18.2)</td>
+<td>51.2 (18.3)</td>
+<td>51.1 (18.2)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Median [Min, Max]</td>
+<td class='lastrow'>51.0 [15.0, 85.0]</td>
+<td class='lastrow'>52.0 [15.0, 85.0]</td>
+<td class='lastrow'>52.0 [15.0, 85.0]</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>sex</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Female</td>
+<td>87108 (54.3%)</td>
+<td>80444 (53.9%)</td>
+<td>167552 (54.1%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Male</td>
+<td class='lastrow'>73287 (45.7%)</td>
+<td class='lastrow'>68850 (46.1%)</td>
+<td class='lastrow'>142137 (45.9%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>labor_force_status</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Employed-Absent</td>
+<td>4658 (2.9%)</td>
+<td>4930 (3.3%)</td>
+<td>9588 (3.1%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Employed-At work</td>
+<td>92633 (57.8%)</td>
+<td>81005 (54.3%)</td>
+<td>173638 (56.1%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Retired</td>
+<td>58616 (36.5%)</td>
+<td>57511 (38.5%)</td>
+<td>116127 (37.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Unemployed-Looking</td>
+<td>4114 (2.6%)</td>
+<td>4488 (3.0%)</td>
+<td>8602 (2.8%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Unemployed-On layoff</td>
+<td class='lastrow'>374 (0.2%)</td>
+<td class='lastrow'>1360 (0.9%)</td>
+<td class='lastrow'>1734 (0.6%)</td>
+</tr>
+<tr>
+<td class='rowlabel firstrow'>region</td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+<td class='firstrow'></td>
+</tr>
+<tr>
+<td class='rowlabel'>Midwest</td>
+<td>30566 (19.1%)</td>
+<td>28441 (19.1%)</td>
+<td>59007 (19.1%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>Northeast</td>
+<td>21675 (13.5%)</td>
+<td>20128 (13.5%)</td>
+<td>41803 (13.5%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>South</td>
+<td>50201 (31.3%)</td>
+<td>44982 (30.1%)</td>
+<td>95183 (30.7%)</td>
+</tr>
+<tr>
+<td class='rowlabel'>West</td>
+<td>28305 (17.6%)</td>
+<td>27846 (18.7%)</td>
+<td>56151 (18.1%)</td>
+</tr>
+<tr>
+<td class='rowlabel lastrow'>Missing</td>
+<td class='lastrow'>29648 (18.5%)</td>
+<td class='lastrow'>27897 (18.7%)</td>
+<td class='lastrow'>57545 (18.6%)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Respondents’ demographic characteristics stayed the same from 2019 to 2020. This means that the survey sample did not change significantly. It is reasonable to compare how time spent varied pre and post pandemic using ATUS data.</p>
+<pre class="r"><code>ggplot(data = cps_summary_leisure, aes(x = age, y = category_sum_hour)) + geom_point() +
+  labs(x = &quot;Age (yrs)&quot;,
+       y = &quot;Time Spent on Leisure Activities (hrs/day)&quot;,
+       title = &quot;Relationship between Age and Leisure Time&quot;)</code></pre>
+<p><img src="project_report_files/figure-html/univariate-1.png" width="672" /> From the plot above, we don’t see any clear distinctions indicating a need for categorization of age, so we will leave it as a continuous variable, as there appears to be monotonic and linear relationship. We did not need to adjust the sex and employment status categorization.</p>
+<p>We explored whether there are differences in time spent on leisure activities in 2019 vs. 2020, as we hypothesized that during the pandemic in 2020 people spent more time on leisure activities.</p>
+<pre class="r"><code>cps_summary_leisure$year =
+  as_factor(case_when(
+    cps_summary_leisure$year == 2019 ~ &quot;Pre-Pandemic Onset 2019&quot;,
+    cps_summary_leisure$year == 2020 ~ &quot;Post-Pandemic Onset 2020&quot;,
+    TRUE ~ &quot;unknown&quot;
+  ))
+
+model_year = lm(category_sum_hour ~ year, data = cps_summary_leisure)
+model_year %&gt;% 
+  broom::tidy() %&gt;% 
+  select(term, estimate, p.value) %&gt;% 
+  mutate(term = str_replace(term, &quot;^year&quot;, &quot;Year: &quot;)) %&gt;% 
+  knitr::kable(digits = 3)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">5.180</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">Year: Post-Pandemic Onset 2020</td>
+<td align="right">0.237</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p>We found a significant difference. Leisure time spent in 2020 (post-pandemic) is expected to be approximately 0.2 hours (or 12 minutes) longer per day than leisure time spent in 2019, on average.</p>
 <p>Next, we created several linear regression models to test our various hypotheses around sociodemographic characteristics, and compared the fitted models in terms of their RSME values:</p>
-<p><strong>(Model 1)</strong>: Labor force status Those who are employed and at work are expected to spend 2.9 fewer hours per day on leisure activities per day in comparison to those who are retired, on average (p-value &lt; 0.05)</p>
-<p><strong>(Model 2)</strong>: Demographic characteristics: race, age, and sex. The 3 main effect predictors in Model 2 are all significant (p-value &lt; 0.05). Specifically, for every 1 year increase in age, we expect people to spend 0.059 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 0.785 hours more on leisure activities per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.02 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age.</p>
-<p>The 3 main effect predictors in Model 2 are all significant (p-value &lt; 0.05). Specifically, for every 1 year increase in age, we expect people to spend 3.6 minutes or 0.06 hours more on leisure activities per day on average, adjusting for race and sex. We expect males to spend 47 minutes or approximately 0.8 hours more on leisure activities per day on average, adjusting for race and age. Finally, those of Hawaiian/Pacific Islanders descent are expected to spend 1.0 hours more per day on leisure activities when compared to people of mixed race, while those who are Asian spend the least time on leisure activities on average, adjusting for sex and age.</p>
-<p><strong>(Model 3)</strong>: Demographic characteristics: race, age, and sex, and their interactions. When interaction terms are added, race is no longer significant, and none of the interaction terms are significant (p-value &gt; 0.05).</p>
-<p>We found that Model 1 resulted in the lowest RSME values, which indicates that it is the best model, while Model 2 and Model 3 were similar in terms of RSME values.</p>
+<p><strong>(Model 1)</strong>: Labor force status</p>
+<p><strong>(Model 2)</strong>: Demographic characteristics: race, age, and sex.</p>
+<p><strong>(Model 3)</strong>: Demographic characteristics: race, age, and sex, and their interactions.</p>
+<pre class="r"><code>model1 = 
+  lm(category_sum_hour ~ labor_force_status, data = cps_summary_leisure)
+
+model1 %&gt;% 
+  broom::tidy() %&gt;% 
+  select(term, estimate, p.value) %&gt;% 
+  mutate(term = str_replace(term, &quot;^labor_force_status&quot;, &quot;Employment Status: &quot;)) %&gt;% 
+  knitr::kable(digits = 3, caption = &quot;Model 1 Parameter Estimates&quot;)</code></pre>
+<table>
+<caption>Model 1 Parameter Estimates</caption>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">5.525</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">Employment Status: Employed-At work</td>
+<td align="right">-1.441</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Employment Status: Retired</td>
+<td align="right">1.513</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">Employment Status: Unemployed-Looking</td>
+<td align="right">0.289</td>
+<td align="right">0.169</td>
+</tr>
+<tr class="odd">
+<td align="left">Employment Status: Unemployed-On layoff</td>
+<td align="right">0.395</td>
+<td align="right">0.286</td>
+</tr>
+</tbody>
+</table>
+<p>Those who are employed and at work are expected to spend 2.9 fewer hours per day on leisure activities per day in comparison to those who are retired, on average (p-value &lt; 0.05)</p>
+<pre class="r"><code>model2 = 
+  lm(category_sum_hour ~ age + race + sex, data = cps_summary_leisure)
+
+model2 %&gt;% 
+  broom::tidy() %&gt;% 
+  select(term, estimate, p.value) %&gt;%
+  mutate(
+    term = str_replace(term, &quot;^race&quot;, &quot;Race: &quot;),
+    term = str_replace(term, &quot;sexMale&quot;, &quot;Sex: Male&quot;),
+    term = str_replace(term, &quot;age&quot;, &quot;Age&quot;)
+    ) %&gt;% 
+  knitr::kable(digits = 3, caption = &quot;Model 2 Parameter Estimates&quot;)</code></pre>
+<table>
+<caption>Model 2 Parameter Estimates</caption>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">2.278</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">Age</td>
+<td align="right">0.059</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Race: American Indian</td>
+<td align="right">-0.382</td>
+<td align="right">0.299</td>
+</tr>
+<tr class="even">
+<td align="left">Race: Asian</td>
+<td align="right">-1.322</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Race: Black</td>
+<td align="right">0.335</td>
+<td align="right">0.154</td>
+</tr>
+<tr class="even">
+<td align="left">Race: Hawaiian/Pacific Islander</td>
+<td align="right">1.017</td>
+<td align="right">0.114</td>
+</tr>
+<tr class="odd">
+<td align="left">Race: White</td>
+<td align="right">-0.410</td>
+<td align="right">0.069</td>
+</tr>
+<tr class="even">
+<td align="left">Sex: Male</td>
+<td align="right">0.785</td>
+<td align="right">0.000</td>
+</tr>
+</tbody>
+</table>
+<p>The 3 main effect predictors in Model 2 are all significant (p-value &lt; 0.05). Specifically, for every 1 year increase in age, we expect people to spend 3.6 minutes or 0.06 hours more on leisure activities per day on average, adjusting for race and sex.</p>
+<pre class="r"><code>model3 = 
+  lm(
+    category_sum_hour ~ age + race + sex + age*race + age*sex + race*sex + age*race*sex,
+    data = cps_summary_leisure)
+
+model3 %&gt;% 
+  broom::tidy() %&gt;% 
+  select(term, estimate, p.value) %&gt;%
+  mutate(
+    term = str_replace(term, &quot;^race&quot;, &quot;Race: &quot;),
+    term = str_replace(term, &quot;sexMale&quot;, &quot;Sex: Male&quot;),
+    term = str_replace(term, &quot;age&quot;, &quot;Age&quot;),
+    term = str_replace(term, &quot;Age:race&quot;, &quot;Age * Race:&quot;),
+    term = str_replace(term, &quot;Age:Sex&quot;, &quot;Age * Sex&quot;),
+    term = str_replace(term, &quot;Race: American Indian:Sex: Male&quot;, &quot;Race:American-Indian * Sex:Male&quot;),
+    term = str_replace(term, &quot;Race: Asian:Sex: Male&quot;, &quot;Race:Asian * Sex:Male&quot;),
+    term = str_replace(term, &quot;Race: White:Sex: Male&quot;, &quot;Race:White * Sex:Male&quot;),
+    term = str_replace(term, &quot;Race: Black:Sex: Male&quot;, &quot;Race:Black * Sex:Male&quot;),
+    term = str_replace(term, &quot;Race: Hawaiian/Pacific Islander:Sex: Male&quot;, &quot;Race:Hawaiian/Pacific Islander * Sex:Male&quot;),
+    term = str_replace(term, &quot;Age * Race:American Indian:Sex: Male&quot;, &quot;Age * Race:American Indian * Sex:Male&quot;),
+    term = str_replace(term, &quot;Age * Race:Asian:Sex: Male&quot;, &quot;Age * Race:Asian * Sex:Male&quot;),
+    term = str_replace(term, &quot;Age * Race:Black:Sex: Male&quot;, &quot;Age * Race:Black * Sex:Male&quot;),
+    term = str_replace(term, &quot;Age * Race:White:Sex: Male&quot;, &quot;Age * Race:White * Sex:Male&quot;),
+    term = str_replace(term, &quot;Age * Race:Hawaiian/Pacific Islander:Sex: Male&quot;, &quot;Age * Race:Hawaiian/Pacific Islander * Sex:Male&quot;),
+    ) %&gt;% 
+  knitr::kable(digits = 3, caption = &quot;Model 3 Parameter Estimates&quot;)</code></pre>
+<table>
+<caption>Model 3 Parameter Estimates</caption>
+<thead>
+<tr class="header">
+<th align="left">term</th>
+<th align="right">estimate</th>
+<th align="right">p.value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">2.168</td>
+<td align="right">0.008</td>
+</tr>
+<tr class="even">
+<td align="left">Age</td>
+<td align="right">0.059</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">Race: American Indian</td>
+<td align="right">-1.665</td>
+<td align="right">0.248</td>
+</tr>
+<tr class="even">
+<td align="left">Race: Asian</td>
+<td align="right">0.015</td>
+<td align="right">0.987</td>
+</tr>
+<tr class="odd">
+<td align="left">Race: Black</td>
+<td align="right">-0.857</td>
+<td align="right">0.324</td>
+</tr>
+<tr class="even">
+<td align="left">Race: Hawaiian/Pacific Islander</td>
+<td align="right">3.108</td>
+<td align="right">0.253</td>
+</tr>
+<tr class="odd">
+<td align="left">Race: White</td>
+<td align="right">-0.386</td>
+<td align="right">0.639</td>
+</tr>
+<tr class="even">
+<td align="left">Sex: Male</td>
+<td align="right">2.937</td>
+<td align="right">0.013</td>
+</tr>
+<tr class="odd">
+<td align="left">Age * Race:American Indian</td>
+<td align="right">0.019</td>
+<td align="right">0.498</td>
+</tr>
+<tr class="even">
+<td align="left">Age * Race:Asian</td>
+<td align="right">-0.029</td>
+<td align="right">0.138</td>
+</tr>
+<tr class="odd">
+<td align="left">Age * Race:Black</td>
+<td align="right">0.021</td>
+<td align="right">0.233</td>
+</tr>
+<tr class="even">
+<td align="left">Age * Race:Hawaiian/Pacific Islander</td>
+<td align="right">-0.063</td>
+<td align="right">0.359</td>
+</tr>
+<tr class="odd">
+<td align="left">Age * Race:White</td>
+<td align="right">0.002</td>
+<td align="right">0.904</td>
+</tr>
+<tr class="even">
+<td align="left">Age * Sex: Male</td>
+<td align="right">-0.044</td>
+<td align="right">0.070</td>
+</tr>
+<tr class="odd">
+<td align="left">Race:American-Indian * Sex:Male</td>
+<td align="right">-1.554</td>
+<td align="right">0.464</td>
+</tr>
+<tr class="even">
+<td align="left">Race:Asian * Sex:Male</td>
+<td align="right">-1.359</td>
+<td align="right">0.324</td>
+</tr>
+<tr class="odd">
+<td align="left">Race:Black * Sex:Male</td>
+<td align="right">-1.616</td>
+<td align="right">0.204</td>
+</tr>
+<tr class="even">
+<td align="left">Race:Hawaiian/Pacific Islander * Sex:Male</td>
+<td align="right">-2.826</td>
+<td align="right">0.475</td>
+</tr>
+<tr class="odd">
+<td align="left">Race:White * Sex:Male</td>
+<td align="right">-1.829</td>
+<td align="right">0.126</td>
+</tr>
+<tr class="even">
+<td align="left">Age * Race:American Indian:Sex: Male</td>
+<td align="right">0.051</td>
+<td align="right">0.222</td>
+</tr>
+<tr class="odd">
+<td align="left">Age * Race:Asian:Sex: Male</td>
+<td align="right">0.025</td>
+<td align="right">0.395</td>
+</tr>
+<tr class="even">
+<td align="left">Age * Race:Black:Sex: Male</td>
+<td align="right">0.043</td>
+<td align="right">0.099</td>
+</tr>
+<tr class="odd">
+<td align="left">Age * Race:Hawaiian/Pacific Islander:Sex: Male</td>
+<td align="right">0.085</td>
+<td align="right">0.371</td>
+</tr>
+<tr class="even">
+<td align="left">Age * Race:White:Sex: Male</td>
+<td align="right">0.037</td>
+<td align="right">0.140</td>
+</tr>
+</tbody>
+</table>
+<p>When interaction terms are added, race is no longer significant, and none of the interaction terms are significant (p-value &gt; 0.05).</p>
+<p>Before we proceed, it is also important to look at residuals and fitted values in our models.</p>
+<pre class="r"><code>cps_summary_leisure %&gt;% 
+  modelr::add_residuals(model1) %&gt;% modelr::add_predictions(model1) %&gt;% 
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
+  labs(x = &quot;Predicted Leisure Time Spent (hr)&quot;,
+       y = &quot;Residuals&quot;,
+       title = &quot;Model 1: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
+<p><img src="project_report_files/figure-html/residuals_plots-1.png" width="672" /></p>
+<pre class="r"><code>cps_summary_leisure %&gt;% 
+  modelr::add_residuals(model2) %&gt;% modelr::add_predictions(model2) %&gt;% 
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
+  labs(x = &quot;Predicted Leisure Time Spent (hr)&quot;,
+       y = &quot;Residuals&quot;,
+       title = &quot;Model 2: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
+<p><img src="project_report_files/figure-html/residuals_plots-2.png" width="672" /></p>
+<pre class="r"><code>cps_summary_leisure %&gt;% 
+  modelr::add_residuals(model3) %&gt;% modelr::add_predictions(model3) %&gt;% 
+  ggplot(aes(x = resid, y = pred)) + geom_point(alpha = 0.4) +
+  labs(x = &quot;Predicted Leisure Time Spent (hr)&quot;,
+       y = &quot;Residuals&quot;,
+       title = &quot;Model 3: Relationship between Predicted Leisure Time and Residuals&quot;)</code></pre>
+<p><img src="project_report_files/figure-html/residuals_plots-3.png" width="672" /></p>
+<p>There are some outliers that should be noted and addressed in future analyses. Additionally, we would hope to see a random distribution of residuals across the predicted leisure time values, however there appears to be clear patterns and we can see skewness in the 3 model. This indicates that our models can be improved, but for the purposes of this project, we will continue with our existing model comparisons.</p>
+<p>Finally we will compare the 3 models using RSME values and cross validation. In order to perform cross validation, we will first create the crossv_mc tibble with the train and test data.</p>
+<pre class="r"><code>cv_df = crossv_mc(cps_summary_leisure, 100) %&gt;% 
+  mutate(
+    train = map(train, as_tibble),
+    test = map(test, as_tibble)
+  )</code></pre>
+<p>Next, we will fit the models and get the root mean squared errors.</p>
+<pre class="r"><code>fitted_df = cv_df %&gt;%
+  mutate(
+    model1 = map(train, 
+                 ~lm(category_sum_hour ~ labor_force_status, 
+                     data =.x)),
+    model2 = map(train,
+                  ~lm(category_sum_hour ~ age + race + sex, 
+                     data = .x)),
+    model3 = map(train,
+                  ~lm(category_sum_hour ~ 
+                      age + race + sex + age*race + age*sex + race*sex + age*race*sex,
+                      data = .x))) %&gt;% 
+  mutate(
+    rmse_model1 = map2_dbl(model1, test, ~rmse(model = .x, data = .y)),
+    rmse_model2  = map2_dbl(model2, test, ~rmse(model = .x, data = .y)),
+    rmse_model3  = map2_dbl(model3, test, ~rmse(model = .x, data = .y))
+)</code></pre>
+<p>Finally, we will plot the distribution of RMSE values to compare each candidate model.</p>
+<pre class="r"><code>fitted_df %&gt;%
+  select(starts_with(&quot;rmse&quot;)) %&gt;% 
+  pivot_longer(
+    everything(),
+    names_to = &quot;model&quot;, 
+    values_to = &quot;rmse&quot;,
+    names_prefix = &quot;rmse_&quot;) %&gt;% 
+  mutate(model = fct_inorder(model)) %&gt;% 
+  ggplot(aes(x = model, y = rmse, color = model)) + geom_violin(alpha = 0.5) +
+  labs(
+    x = &quot;Regression Model&quot;,
+    y = &quot;RSME&quot;,
+    title = &quot;Leisure Time Spent: Regression Models and RSME values&quot;
+  )</code></pre>
+<p><img src="project_report_files/figure-html/rsme_plot-1.png" width="672" /></p>
+<p>Model 1, the model with employment status as the predictor, has the lowest RMSE average, which means it is the best model fit of the 3 that we tested. The interaction terms did not seem to make much of a difference in terms of RSME, as indicated by similar Model 2 and Model 3 plots.</p>
 </div>
 <div id="discussion" class="section level1">
 <h1>Discussion</h1>

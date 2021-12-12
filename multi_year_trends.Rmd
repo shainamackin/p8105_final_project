@@ -16,7 +16,6 @@ options(scipen = 50)
 library(ggplot2)
 library(plotly)
 
-
 theme_set(theme_minimal() + theme(legend.position = "bottom"))
 options(
   ggplot2.continuous.colour = "viridis",
@@ -35,13 +34,10 @@ knitr::opts_chunk$set(
 
 
 ```
-<p/>
-<p/>
-### Time use across 2009-2019
 
 We were also curious to see if there were any trends in time spent on different categories and plotted average time spent on activities from 2009 to 2019. While we don't see any obvious trends, the average time we spend on sleep seems to have been slightly increasing. 
 
-```{r message = FALSE}
+```{r message = FALSE, echo = FALSE}
 
 annual_data = read_csv("data/annual_activity.csv") 
 
@@ -57,7 +53,7 @@ annual_data_plotly = annual_data %>%
 
 ```
 
-```{r month_plot, message = FALSE, warning = FALSE}
+```{r month_plot, echo = FALSE, message = FALSE, warning = FALSE}
 annual_data_plotly
 ```
 
