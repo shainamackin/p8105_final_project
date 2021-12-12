@@ -900,11 +900,13 @@ Let's read in and tidy the cps files that have the geographic information. First
 ```{r}
 cps_2020_sub = cps_2020 %>% #select geographic variables
   select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
-  mutate(year = 2020)
+  mutate(year = 2020) %>% 
+  filter(TULINENO == 1)
 
 cps_2019_sub = cps_2019 %>% #select geographic variables
   select(TUCASEID:GTCO, PRTAGE, PESEX) %>% 
-  mutate(year = 2019)
+  mutate(year = 2019) %>% 
+  filter(TULINENO == 1)
 
 #stack the 2019 and 2020 cps datasets
 
@@ -1035,6 +1037,32 @@ unique_household <- summary_household_category %>%
   filter(row_number() == 1) 
 
 table1(~ race + age + sex + labor_force_status + region|year, data = unique_household)
+
+write_csv(summary_household_category, "summary_household_category.csv")
+
+```
+
+Create separate dataset filtered for socializing codes. 
+
+```{r}
+
+socializing = 
+  cps_summary_merged %>% 
+  filter(activity_codes %in% c("Socializing and communicating",
+"Socializing and communicating with others",
+"Attending/hosting social events, n.e.c.*",
+"Socializing, relaxing, and leisure, n.e.c.*",
+"Socializing, relaxing, and leisure as part of job")) %>% 
+  mutate(time_weight = weight*total_minutes) 
+
+socializing %>% 
+  group_by(TUCASEID, weight, year) %>% 
+  summarize(sum_time_weight = sum(time_weight), 
+            sum_total_minutes = sum(total_minutes)) %>% 
+  mutate(average_hours = (sum_time_weight/sum(weight))/60)  
+
+
+socializing = read_csv("socializing.csv")
 
 ```
 
